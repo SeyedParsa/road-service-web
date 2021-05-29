@@ -3,13 +3,59 @@ from django.db import models
 from accounts.models import User
 
 
-class Province(models.Model):
-    name = models.CharField(max_length=20)
+class GeoModel(models.Model):
+    lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    long = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def location(self):
+        return Location(self.lat, self.long)
+
+    @location.setter
+    def location(self, val):
+        self.lat = val.lat
+        self.long = val.long
 
 
-class County(models.Model):
+class Region(models.Model):
     name = models.CharField(max_length=20)
+
+    class Meta:
+        abstract = True
+
+
+class Country(Region):
+    pass
+
+
+class Province(Region):
+    country = models.ForeignKey(Country, on_delete=models.PROTECT)
+
+
+class County(Region):
     province = models.ForeignKey(Province, on_delete=models.PROTECT)
+
+
+class Moderator(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class CountryModerator(Moderator):
+    country = models.OneToOneField(Country, on_delete=models.CASCADE)
+
+
+class ProvinceModerator(Moderator):
+    province = models.OneToOneField(Province, on_delete=models.CASCADE)
+
+
+class CountyModerator(Moderator):
+    county = models.OneToOneField(County, on_delete=models.CASCADE)
 
 
 class Speciality(models.Model):
@@ -43,7 +89,7 @@ class ServiceTeam(models.Model):
         return self.active_mission is None
 
 
-class Serviceman(models.Model):
+class Serviceman(GeoModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(ServiceTeam, on_delete=models.SET_NULL, null=True)
 
@@ -58,7 +104,7 @@ class Location:
         self.long = long
 
 
-class Issue(models.Model):
+class Issue(GeoModel):
 
     class IssueState(models.TextChoices):
         REPORTED = 'RP'
@@ -71,20 +117,9 @@ class Issue(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=280)
     reporter = models.ForeignKey(Citizen, on_delete=models.SET_NULL, null=True)
-    lat = models.DecimalField(max_digits=9, decimal_places=6)
-    long = models.DecimalField(max_digits=9, decimal_places=6)
-    province = models.ForeignKey(Province, on_delete=models.PROTECT)
+    county = models.ForeignKey(County, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     state = models.CharField(max_length=2, choices=IssueState.choices, default=IssueState.REPORTED)
-
-    @property
-    def location(self):
-        return Location(self.lat, self.long)
-
-    @location.setter
-    def location(self, val):
-        self.lat = val.lat
-        self.long = val.long
 
 
 class SpecialityRequirement(models.Model):
