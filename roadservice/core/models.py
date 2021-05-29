@@ -1,6 +1,19 @@
+from geopy.distance import geodesic
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from accounts.models import User
+
+
+class Location:
+    def __init__(self, lat, long):
+        self.lat = lat
+        self.long = long
+
+    def distance_from(self, location):
+        return geodesic(self.to_tuple(), location.to_tuple()).miles
+
+    def to_tuple(self):
+        return self.lat, self.long
 
 
 class GeoModel(models.Model):
@@ -26,6 +39,9 @@ class Region(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return self.name
+
 
 class Country(Region):
     pass
@@ -40,10 +56,13 @@ class County(Region):
 
 
 class Moderator(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return str(self.user)
 
 
 class CountryModerator(Moderator):
@@ -61,9 +80,15 @@ class CountyModerator(Moderator):
 class Speciality(models.Model):
     name = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.name
+
 
 class MachineryType(models.Model):
     name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
 
 class Machinery(models.Model):
@@ -72,36 +97,38 @@ class Machinery(models.Model):
     total_count = models.PositiveIntegerField()
     available_count = models.PositiveIntegerField()
 
+    def __str__(self):
+        return '%s - %s: %d/%d' % (self.type, self.county, self.available_count, self.total_count)
+
 
 class ServiceTeam(models.Model):
     county = models.ForeignKey(County, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
-    deleted_at = models.DateTimeField(auto_now=False, auto_now_add=False, null=True)
-    active_mission = models.ForeignKey('Mission', on_delete=models.SET_NULL, null=True)
+    deleted_at = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    active_mission = models.ForeignKey('Mission', on_delete=models.SET_NULL, null=True, blank=True)
     speciality = models.ForeignKey(Speciality, on_delete=models.PROTECT)
 
-    @property
-    def is_deleted(self):
-        return self.deleted_at is not None
+    def __str__(self):
+        return '%s - %s (%d members)' % (self.speciality, self.county, len(self.members.all()))
 
-    @property
-    def is_idle(self):
-        return self.active_mission is None
+    def farest_member_distance(self, location):
+        distances = [member.location.distance_from(location) for member in self.members.all()]
+        return max(distances)
 
 
 class Serviceman(GeoModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    team = models.ForeignKey(ServiceTeam, on_delete=models.SET_NULL, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(ServiceTeam, on_delete=models.SET_NULL, null=True, related_name='members')
+
+    def __str__(self):
+        return str(self.user)
 
 
 class Citizen(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-
-class Location:
-    def __init__(self, lat, long):
-        self.lat = lat
-        self.long = long
+    def __str__(self):
+        return str(self.user)
 
 
 class Issue(GeoModel):
@@ -110,6 +137,7 @@ class Issue(GeoModel):
         REPORTED = 'RP'
         REJECTED = 'RJ'
         ACCEPTED = 'AC'
+        FAILED = 'FL'
         ASSIGNED = 'AS'
         DONE = 'DO'
         SCORED = 'SC'
@@ -121,11 +149,17 @@ class Issue(GeoModel):
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     state = models.CharField(max_length=2, choices=IssueState.choices, default=IssueState.REPORTED)
 
+    def __str__(self):
+        return '%s: %s (%s)' % (self.county, self.title, self.IssueState(self.state).label)
+
 
 class SpecialityRequirement(models.Model):
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
     speciality = models.ForeignKey(Speciality, on_delete=models.PROTECT)
     amount = models.PositiveIntegerField()
+
+    def __str__(self):
+        return '%d x %s - %s: %s' % (self.amount, self.speciality, self.issue.county, self.issue.title)
 
 
 class MachineryRequirement(models.Model):
@@ -133,21 +167,88 @@ class MachineryRequirement(models.Model):
     machinery_type = models.ForeignKey(MachineryType, on_delete=models.PROTECT)
     amount = models.PositiveIntegerField()
 
+    def __str__(self):
+        return '%d x %s - %s: %s' % (self.amount, self.machinery_type, self.issue.county, self.issue.title)
+
 
 class MissionType(models.Model):
     name = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.name
+
 
 class Mission(models.Model):
-    issue = models.ForeignKey(Issue, on_delete=models.PROTECT)
+    issue = models.OneToOneField(Issue, on_delete=models.PROTECT)
     service_teams = models.ManyToManyField(ServiceTeam)
     type = models.ForeignKey(MissionType, on_delete=models.PROTECT)
     score = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
 
+    def __str__(self):
+        return str(self.issue)
+
 
 class CountyExpert(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    county = models.ForeignKey(County, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    county = models.OneToOneField(County, on_delete=models.CASCADE)
 
-    # def accept_issue(self, issue, speciality_requirement_dict, machinery_requirement_dict):
-    #     pass
+    def __str__(self):
+        return str(self.user)
+
+    def accept_issue(self, issue, mission_type, speciality_requirements, machinery_requirements):
+        """
+            speciality_requirements is a list of tuples in the form of (Speciality, Amount) in which the
+                specialities are distinct. The same goes for machinery_requirements.
+        """
+        for speciality, amount in speciality_requirements:
+            SpecialityRequirement.objects.create(issue=issue, speciality=speciality, amount=amount)
+
+        for machinery_type, amount in machinery_requirements:
+            MachineryRequirement.objects.create(issue=issue, machinery_type=machinery_type, amount=amount)
+
+        issue.state = Issue.IssueState.ACCEPTED
+        issue.save()
+        self.assign_resources_to_issue(issue, mission_type)
+
+    def assign_resources_to_issue(self, issue, mission_type):
+        # TODO: requires lock
+        # TODO: check if the issue is in the same county as the expert
+        # TODO: check if the issue is the proper state (reported)
+        required_teams = []
+        for speciality_requirement in issue.specialityrequirement_set.all():
+            service_team_qs = ServiceTeam.objects.filter(county=issue.county,
+                                                         speciality=speciality_requirement.speciality,
+                                                         active_mission__isnull=True,
+                                                         deleted_at__isnull=True)
+            special_teams = list(service_team_qs)
+            if len(special_teams) < speciality_requirement.amount:
+                self.postpone_assignment(issue, mission_type)
+                return
+            special_teams.sort(key=lambda t: t.farest_member_distance(issue.location))
+            required_teams += special_teams[:speciality_requirement.amount]
+
+        required_machineries = []
+        for machinery_requirement in issue.machineryrequirement_set.all():
+            machinery_qs = Machinery.objects.filter(county=issue.county,
+                                                    type=machinery_requirement.machinery_type,
+                                                    available_count__gte=machinery_requirement.amount)
+            if not machinery_qs:
+                self.postpone_assignment(issue, mission_type)
+                return
+            required_machineries.append((machinery_qs.get(), machinery_requirement.amount))
+
+        mission = Mission.objects.create(issue=issue, type=mission_type)
+        for team in required_teams:
+            mission.service_teams.add(team)
+            team.active_mission = mission
+            team.save()
+        for machinery, amount in required_machineries:
+            machinery.available_count -= amount
+            machinery.save()
+        issue.state = Issue.IssueState.ASSIGNED
+        issue.save()
+
+    def postpone_assignment(self, issue, mission_type):
+        # Right now we won't implement the queue, so the mission will just fail
+        issue.state = Issue.IssueState.FAILED
+        issue.save()
