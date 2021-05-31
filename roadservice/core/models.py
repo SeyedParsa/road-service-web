@@ -86,7 +86,7 @@ class CountryModerator(Moderator):
         else:
             if hasattr(province, 'provincemoderator'):
                 province.provincemoderator.dismiss()
-            ProvinceModerator.objects.create(user=user, province=province)
+            return ProvinceModerator.objects.create(user=user, province=province)
 
     def __str__(self):
         return ' '.join([str(self.user), str(self.country)])
@@ -109,7 +109,7 @@ class ProvinceModerator(Moderator):
         else:
             if hasattr(county, 'countymoderator'):
                 county.countymoderator.dismiss()
-            CountyModerator.objects.create(user=user, county=county)
+            return CountyModerator.objects.create(user=user, county=county)
 
     def __str__(self):
         return ' '.join([str(self.user), str(self.province)])
@@ -120,7 +120,7 @@ class CountyModerator(Moderator):
 
     def save(self, *args, **kwargs):
         self.user.state = User.State.COUNTY_MODERATOR
-        self.user.save(*args, **kwargs)
+        self.user.save()
         super().save(*args, **kwargs)
 
     def __str__(self):
