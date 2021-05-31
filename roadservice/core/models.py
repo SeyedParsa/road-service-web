@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from geopy.distance import geodesic
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -61,20 +63,68 @@ class Moderator(models.Model):
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return str(self.user)
+    def dismiss(self):
+        self.user.state = User.State.SIMPLE
+        self.user.save()
+        self.delete()
 
 
 class CountryModerator(Moderator):
     country = models.OneToOneField(Country, on_delete=models.CASCADE)
 
+    def save(self, *args, **kwargs):
+        self.user.state = User.State.COUNTRY_MODERATOR
+        self.user.save()
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def assign_province_moderator(cls, user, province):
+        if hasattr(province, 'provincemoderator') and province.provincemoderator.user is user:
+            raise Exception('The user is already the moderator of the province')
+        elif user.has_role():
+            raise Exception('The user has a role')
+        else:
+            if hasattr(province, 'provincemoderator'):
+                province.provincemoderator.dismiss()
+            ProvinceModerator.objects.create(user=user, province=province)
+
+    def __str__(self):
+        return ' '.join([str(self.user), str(self.country)])
+
 
 class ProvinceModerator(Moderator):
     province = models.OneToOneField(Province, on_delete=models.CASCADE)
 
+    def save(self, *args, **kwargs):
+        self.user.state = User.State.PROVINCE_MODERATOR
+        self.user.save()
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def assign_county_moderator(cls, user, county):
+        if hasattr(county, 'countymoderator') and county.countymoderator.user is user:
+            raise Exception('The user is already the moderator of the county')
+        elif user.has_role():
+            raise Exception('The user has a role')
+        else:
+            if hasattr(county, 'countymoderator'):
+                county.countymoderator.dismiss()
+            CountyModerator.objects.create(user=user, county=county)
+
+    def __str__(self):
+        return ' '.join([str(self.user), str(self.province)])
+
 
 class CountyModerator(Moderator):
     county = models.OneToOneField(County, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        self.user.state = User.State.COUNTY_MODERATOR
+        self.user.save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return ' '.join([str(self.user), str(self.county)])
 
 
 class Speciality(models.Model):
