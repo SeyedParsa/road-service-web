@@ -1,6 +1,7 @@
 from django.test import TestCase
 from accounts.models import User
-from core.models import Country, Province, County, CountryModerator, ProvinceModerator
+from core.models import Country, Province, County, CountryModerator, ProvinceModerator, Citizen, Serviceman, \
+    ServiceTeam, Speciality, CountyExpert, Issue, MachineryType, Machinery, MissionType
 
 
 class ModeratorsTestCase(TestCase):
@@ -35,3 +36,37 @@ class ModeratorsTestCase(TestCase):
         self.assertEqual(self.tehran.provincemoderator.user, self.mahdi)
         self.assertEqual(self.shiraz.provincemoderator.user, self.kiarash)
 
+
+class AppectIssueTestCase(TestCase):
+    def setUp(self):
+        iran = Country.objects.create(name='Iran')
+        tehran = Province.objects.create(name='Tehran', country=iran)
+        shemiran = County.objects.create(name='Shemiran', province=tehran)
+        worker_user = User.objects.create(username='worker')
+        reporter_user = User.objects.create(username='reporter')
+        expert_user = User.objects.create(username='expert')
+        self.asphalt_fixing = Speciality.objects.create(name='Fixing Asphalt')
+        self.team = ServiceTeam.objects.create(county=shemiran, speciality=self.asphalt_fixing)
+        worker = Serviceman.objects.create(user=worker_user, team=self.team, lat=1, long=1)
+        reporter = Citizen.objects.create(user=reporter_user)
+        self.expert = CountyExpert.objects.create(user=expert_user, county=shemiran)
+        self.issue = Issue.objects.create(title='Asphalt needs fixing',
+                                          description='.',
+                                          reporter=reporter,
+                                          county=shemiran)
+        self.crane_type = MachineryType.objects.create(name='Crane')
+        self.crane = Machinery.objects.create(type=self.crane_type, county=shemiran, total_count=10, available_count=10)
+        self.service_type = MissionType.objects.create(name='Service')
+
+    def test_assignment_fail(self):
+        self.expert.accept_issue(self.issue, self.service_type, [(self.asphalt_fixing, 2)], [(self.crane_type, 15)])
+        self.assertEqual(self.issue.state, Issue.State.FAILED)
+
+    def test_assignment_successful(self):
+        self.expert.accept_issue(self.issue, self.service_type, [(self.asphalt_fixing, 1)], [(self.crane_type, 3)])
+        self.issue.refresh_from_db()
+        self.team.refresh_from_db()
+        self.crane.refresh_from_db()
+        self.assertEqual(self.issue.state, Issue.State.ASSIGNED)
+        self.assertEqual(self.team.active_mission, self.issue.mission)
+        self.assertEqual(self.crane.available_count, 7)

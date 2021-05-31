@@ -183,7 +183,7 @@ class Citizen(models.Model):
 
 class Issue(GeoModel):
 
-    class IssueState(models.TextChoices):
+    class State(models.TextChoices):
         REPORTED = 'RP'
         REJECTED = 'RJ'
         ACCEPTED = 'AC'
@@ -197,10 +197,10 @@ class Issue(GeoModel):
     reporter = models.ForeignKey(Citizen, on_delete=models.SET_NULL, null=True)
     county = models.ForeignKey(County, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
-    state = models.CharField(max_length=2, choices=IssueState.choices, default=IssueState.REPORTED)
+    state = models.CharField(max_length=2, choices=State.choices, default=State.REPORTED)
 
     def __str__(self):
-        return '%s: %s (%s)' % (self.county, self.title, self.IssueState(self.state).label)
+        return '%s: %s (%s)' % (self.county, self.title, self.State(self.state).label)
 
 
 class SpecialityRequirement(models.Model):
@@ -256,7 +256,7 @@ class CountyExpert(models.Model):
         for machinery_type, amount in machinery_requirements:
             MachineryRequirement.objects.create(issue=issue, machinery_type=machinery_type, amount=amount)
 
-        issue.state = Issue.IssueState.ACCEPTED
+        issue.state = Issue.State.ACCEPTED
         issue.save()
         self.assign_resources_to_issue(issue, mission_type)
 
@@ -295,10 +295,10 @@ class CountyExpert(models.Model):
         for machinery, amount in required_machineries:
             machinery.available_count -= amount
             machinery.save()
-        issue.state = Issue.IssueState.ASSIGNED
+        issue.state = Issue.State.ASSIGNED
         issue.save()
 
     def postpone_assignment(self, issue, mission_type):
         # Right now we won't implement the queue, so the mission will just fail
-        issue.state = Issue.IssueState.FAILED
+        issue.state = Issue.State.FAILED
         issue.save()
