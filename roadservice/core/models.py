@@ -56,6 +56,26 @@ class Province(Region):
 class County(Region):
     province = models.ForeignKey(Province, on_delete=models.PROTECT)
 
+    def get_required_teams(self, speciality, amount, location):
+        special_teams = list(
+            self.serviceteam_set.filter(
+                speciality=speciality,
+                active_mission__isnull=True,
+                deleted_at__isnull=True
+            )
+        )
+        special_teams.sort(key=lambda t: t.farest_member_distance(location))
+        return special_teams[:amount]
+
+    def get_required_machinery(self, machinery_type, amount):
+        machinery_qs = self.machinery_set.filter(
+            type=machinery_type,
+            available_count__gte=amount
+        )
+        if not machinery_qs:
+            return None
+        return machinery_qs.get()
+
 
 class Moderator(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -182,7 +202,6 @@ class Citizen(models.Model):
 
 
 class Issue(GeoModel):
-
     class State(models.TextChoices):
         REPORTED = 'RP'
         REJECTED = 'RJ'
@@ -201,6 +220,48 @@ class Issue(GeoModel):
 
     def __str__(self):
         return '%s: %s (%s)' % (self.county, self.title, self.State(self.state).label)
+
+    def assign_resources(self, mission_type):
+        # TODO: requires lock
+        # TODO: check if the issue is the proper state (reported)
+        required_teams = []
+        for speciality_requirement in self.specialityrequirement_set.all():
+            special_teams = self.county.get_required_teams(
+                speciality_requirement.speciality,
+                speciality_requirement.amount,
+                self.location
+            )
+            if len(special_teams) < speciality_requirement.amount:
+                self.postpone_assignment(mission_type)
+                return
+            required_teams += special_teams
+
+        required_machineries = []
+        for machinery_requirement in self.machineryrequirement_set.all():
+            machinery = self.county.get_required_machinery(
+                machinery_requirement.machinery_type,
+                machinery_requirement.amount
+            )
+            if machinery is None:
+                self.postpone_assignment(mission_type)
+                return
+            required_machineries.append((machinery, machinery_requirement.amount))
+
+        mission = Mission.objects.create(issue=self, type=mission_type)
+        for team in required_teams:
+            mission.service_teams.add(team)
+            team.active_mission = mission
+            team.save()
+        for machinery, amount in required_machineries:
+            machinery.available_count -= amount
+            machinery.save()
+        self.state = Issue.State.ASSIGNED
+        self.save()
+
+    def postpone_assignment(self, mission_type):
+        # Right now we won't implement the queue, so the mission will just fail
+        self.state = Issue.State.FAILED
+        self.save()
 
 
 class SpecialityRequirement(models.Model):
@@ -250,6 +311,7 @@ class CountyExpert(models.Model):
             speciality_requirements is a list of tuples in the form of (Speciality, Amount) in which the
                 specialities are distinct. The same goes for machinery_requirements.
         """
+        # TODO: check if the issue is in the same county as the expert
         for speciality, amount in speciality_requirements:
             SpecialityRequirement.objects.create(issue=issue, speciality=speciality, amount=amount)
 
@@ -258,47 +320,4 @@ class CountyExpert(models.Model):
 
         issue.state = Issue.State.ACCEPTED
         issue.save()
-        self.assign_resources_to_issue(issue, mission_type)
-
-    def assign_resources_to_issue(self, issue, mission_type):
-        # TODO: requires lock
-        # TODO: check if the issue is in the same county as the expert
-        # TODO: check if the issue is the proper state (reported)
-        required_teams = []
-        for speciality_requirement in issue.specialityrequirement_set.all():
-            service_team_qs = ServiceTeam.objects.filter(county=issue.county,
-                                                         speciality=speciality_requirement.speciality,
-                                                         active_mission__isnull=True,
-                                                         deleted_at__isnull=True)
-            special_teams = list(service_team_qs)
-            if len(special_teams) < speciality_requirement.amount:
-                self.postpone_assignment(issue, mission_type)
-                return
-            special_teams.sort(key=lambda t: t.farest_member_distance(issue.location))
-            required_teams += special_teams[:speciality_requirement.amount]
-
-        required_machineries = []
-        for machinery_requirement in issue.machineryrequirement_set.all():
-            machinery_qs = Machinery.objects.filter(county=issue.county,
-                                                    type=machinery_requirement.machinery_type,
-                                                    available_count__gte=machinery_requirement.amount)
-            if not machinery_qs:
-                self.postpone_assignment(issue, mission_type)
-                return
-            required_machineries.append((machinery_qs.get(), machinery_requirement.amount))
-
-        mission = Mission.objects.create(issue=issue, type=mission_type)
-        for team in required_teams:
-            mission.service_teams.add(team)
-            team.active_mission = mission
-            team.save()
-        for machinery, amount in required_machineries:
-            machinery.available_count -= amount
-            machinery.save()
-        issue.state = Issue.State.ASSIGNED
-        issue.save()
-
-    def postpone_assignment(self, issue, mission_type):
-        # Right now we won't implement the queue, so the mission will just fail
-        issue.state = Issue.State.FAILED
-        issue.save()
+        issue.assign_resources(mission_type)
