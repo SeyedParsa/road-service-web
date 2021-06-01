@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from core.models import Speciality, SpecialityRequirement, Issue, MachineryRequirement, MachineryType, MissionType
+from core.models import Speciality, SpecialityRequirement, Issue, MachineryRequirement, MachineryType, MissionType, \
+    Serviceman
 
 
 class SpecialitySerializer(serializers.ModelSerializer):
@@ -38,3 +39,9 @@ class IssueAcceptanceSerializer(serializers.Serializer):
     mission_type = serializers.PrimaryKeyRelatedField(queryset=MissionType.objects.all())
     speciality_requirements = serializers.ListField(child=SpecialityRequirementSerializer(), required=False)
     machinery_requirements = serializers.ListField(child=MachineryRequirementSerializer(), required=False)
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Serviceman
+        fields = ['lat', 'long']

@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import CountyExpert
-from core.serializers import IssueAcceptanceSerializer
+from core.models import CountyExpert, Serviceman, Location
+from core.serializers import IssueAcceptanceSerializer, LocationSerializer
 
 
 class AcceptIssue(APIView):
@@ -20,4 +20,17 @@ class AcceptIssue(APIView):
             county_expert = CountyExpert.objects.all()[0]
             result = county_expert.accept_issue(issue, mission_type, speciality_requirements, machinery_requirements)
             return Response(result)
+        return Response(serializer.error_messages)
+
+
+class UpdateLocation(APIView):
+    def post(self, request, format=None):
+        # TODO: select the corresponding serviceman (this is for EAB)
+        serializer = LocationSerializer(data=request.data)
+        if serializer.is_valid():
+            lat = serializer.validated_data['lat']
+            long = serializer.validated_data['long']
+            service_man = Serviceman.objects.all()[0]
+            service_man.update_location(Location(lat, long))
+            return Response("Updated!")
         return Response(serializer.error_messages)

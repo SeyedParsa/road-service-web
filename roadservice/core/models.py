@@ -193,6 +193,10 @@ class Serviceman(GeoModel):
     def __str__(self):
         return str(self.user)
 
+    def update_location(self, location):
+        self.location = location
+        self.save()
+
 
 class Citizen(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
