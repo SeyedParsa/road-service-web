@@ -68,6 +68,7 @@ class TimeReport(Report):
 #         def __str__(self):
 #             return repr(self) + self.val
 #     instance = None
+
 #
 #     def __init__(self, arg):
 #         if not GraphGenerator.instance:
@@ -163,20 +164,15 @@ class ReportGenerator:
             daily_missions = list(mission for mission in region_missions
                                                       if mission.get_created_at_date() == start_time)
             mission_scores = [mission.score for mission in daily_missions if mission.get_state() == Issue.State.SCORED]
-            print('day:', start_time, 'missions:', daily_missions, 'scores:', mission_scores)
-            for mission in missions:
-                print('oOOOo', mission.get_state(), Issue.State.SCORED)
             score_sum += sum(mission_scores)
             score_cnt += len(mission_scores)
             time_report.add_item(start_time, score_sum/score_cnt if score_cnt > 0 else 0)
             start_time += datetime.timedelta(days=1)
         return time_report
 
-
     def time_report(self, region, start_time, end_time):
         result = [self.region_teams_time_report(region, start_time, end_time),
                   self.region_issues_time_report(region, start_time, end_time),
                   self.region_missions_time_report(region, start_time, end_time),
                   self.region_scores_time_report(region, start_time, end_time)]
-        print('Results: ', result[0].name, result[1].name)
         return result

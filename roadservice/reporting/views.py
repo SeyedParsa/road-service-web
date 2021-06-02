@@ -23,9 +23,7 @@ from reporting.models import TimeReport, ReportGenerator
 
 class TimeReportView(View):
     def get(self, request, *args, **kwargs):
-        print('heey! get request')
         time_report_form = TimeReportForm()
-        print(time_report_form.regions)
         # print(time_report_form.region.choices)
         return render(request=request,
                       template_name='timereports.html',
@@ -33,7 +31,6 @@ class TimeReportView(View):
 
     def post(self, request, *args, **kwargs):
         form = TimeReportForm(request.POST)
-        print('hoy! post request')
         context = {'form': form}
         if form.is_valid():
             start_date = form.cleaned_data['start_date']
@@ -42,8 +39,6 @@ class TimeReportView(View):
             region = form.region_instances[region_id]
             time_report = ReportGenerator(0).time_report(region, start_date, end_date)
             # context['report'] = time_report
-            print(time_report[0].name)
-            print(time_report[1].name)
             # teams_chart = GraphGenerator(0).get_bar_chart(time_report[0])
             # issues_chart = GraphGenerator(0).get_bar_chart(time_report[1])
             #
