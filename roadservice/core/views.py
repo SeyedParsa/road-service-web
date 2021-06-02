@@ -1,8 +1,12 @@
+from django.contrib import messages
 from django.shortcuts import render
+from django.views import View
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import CountyExpert, Serviceman, Location
+from accounts.models import User
+from core.forms import AssignModeratorForm
+from core.models import CountyExpert, Serviceman, Location, Region, CountryModerator, ProvinceModerator
 from core.serializers import IssueAcceptanceSerializer, LocationSerializer
 
 
@@ -34,3 +38,30 @@ class UpdateLocation(APIView):
             service_man.update_location(Location(lat, long))
             return Response("Updated!")
         return Response(serializer.error_messages)
+
+
+class AssignModerator(View):
+    def get(self, request, *args, **kwargs):
+        assign_moderator_form = AssignModeratorForm()
+        return render(request=request,
+                      template_name='core/assignmoderator.html',
+                      context={'form': assign_moderator_form})
+
+    def post(self, request, *args, **kwargs):
+        form = AssignModeratorForm(request.POST)
+        context = {'form': form}
+        if form.is_valid():
+            region_id = int(form.cleaned_data['region'])
+            region = form.region_instances[region_id]
+            user_id = form.cleaned_data['user']
+            user = User.objects.get(id=user_id)
+            if region.type == Region.Type.PROVINCE:
+                CountryModerator.assign_province_moderator(user, region)
+            else:
+                ProvinceModerator.assign_county_moderator(user, region)
+            messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
+        else:
+            print('invalid form!')
+        return render(request=request,
+                      template_name='core/assignmoderator.html',
+                      context=context)

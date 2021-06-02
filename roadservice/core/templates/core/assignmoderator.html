@@ -1,0 +1,13 @@
+{% extends 'reporting/base.html' %}
+{% load static %}
+{% block content %}
+
+<form  method="post">
+{% csrf_token %}
+{{ form }}
+
+    <input type="submit" value="اضافه کردن">
+
+</form>
+
+{% endblock %}
