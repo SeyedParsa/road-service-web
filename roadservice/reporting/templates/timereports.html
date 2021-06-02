@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+
+
+<html class="gr__semantic-ui_com" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+  <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport" />
+  <meta content="Migikala, to sell your kala!" name="description" />
+  <meta content="Semantic-UI, Theme, Design, Template" name="keywords" />
+  <meta content="PPType" name="author" />
+  <meta content="#ffffff" name="theme-color" />
+  <title>RoadService</title>
+</head>
+<body>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+
+
+قالب روزها: yyyy-mm-dd
+
+<form  method="post">
+{% csrf_token %}
+{{ form }}
+
+    <input type="submit" value="فیلتر">
+
+</form>
+  <div class="ui container">
+    {% block content %}
+    {% endblock %}
+    
+  </div>
+
+{% include 'parts/simple_bar.html' with name='teams_chart' color='green' objs=teams_report.data description="تعداد تیم‌های فعال در طول زمان" %}
+{% include 'parts/simple_bar.html' with name='issues_chart' color='green' objs=issues_report.data description="تعداد مشکلات در طول زمان" %}
+{% include 'parts/simple_bar.html' with name='missions_chart' color='green' objs=missions_report.data description="تعداد ماموریت‌ها در طول زمان" %}
+{% include 'parts/simple_bar.html' with name='scores_chart' color='green' objs=scores_report.data description="امتیاز در طول زمان" %}
+
+{#<canvas id="teamChart"></canvas>#}
+{##}
+{#<canvas id="issueChart"></canvas>#}
+{##}
+{#<script>#}
+{#    var team_chart = new Chart(document.getElementById("teamChart").getContext('2d'), {{ teamChartJSON | safe }});#}
+{##}
+{#    var issue_chart = new Chart(document.getElementById("issueChart").getContext('2d'), {{ issuesChartJSON | safe }});#}
+{#</script>#}
+
+
+
+</body>
+</html>

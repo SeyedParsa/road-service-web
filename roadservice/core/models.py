@@ -36,6 +36,12 @@ class GeoModel(models.Model):
 
 
 class Region(models.Model):
+    class Type(models.TextChoices):
+        COUNTRY = 'CR',
+        PROVINCE = 'PR',
+        COUNTY = 'CY'
+
+    type = models.CharField(max_length=2, choices=Type.choices)
     name = models.CharField(max_length=20)
 
     class Meta:
@@ -46,11 +52,17 @@ class Region(models.Model):
 
 
 class Country(Region):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = Region.Type.COUNTRY
 
 
 class Province(Region):
     country = models.ForeignKey(Country, on_delete=models.PROTECT)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = Region.Type.PROVINCE
 
 
 class County(Region):
@@ -75,6 +87,10 @@ class County(Region):
         if not machinery_qs:
             return None
         return machinery_qs.get()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = Region.Type.COUNTY
 
 
 class Moderator(models.Model):
@@ -301,6 +317,15 @@ class Mission(models.Model):
 
     def __str__(self):
         return str(self.issue)
+
+    def get_state(self):
+        return self.issue.state
+
+    def get_county(self):
+        return self.issue.county
+
+    def get_created_at_date(self):
+        return self.issue.created_at.date()
 
 
 class CountyExpert(models.Model):
