@@ -56,5 +56,5 @@ class TimeReportView(View):
         else:
             print('invalid form!')
         return render(request=request,
-                      template_name='timereports.html',
+                      template_name='reporting/timereports.html',
                       context=context)
