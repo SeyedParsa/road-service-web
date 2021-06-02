@@ -37,8 +37,8 @@ class Report:
         STATE_REPORT = 'S',
         LIST_REPORT = 'L'
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.name = models.CharField(max_length=40)
         self.type = models.CharField(max_length=2, choices=self.Type.choices)
         self.data = []
@@ -53,8 +53,8 @@ class TimeReport(Report):
         print('adding', time, value)
         self.data.append((time, value))
 
-    def __init__(self, name, y_axis_name):
-        super().__init__()
+    def __init__(self, name, y_axis_name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.name = name
         self.y_axis_name = y_axis_name
         self.Type = Report.Type.TIME_REPORT

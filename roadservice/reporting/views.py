@@ -39,7 +39,7 @@ class TimeReportView(View):
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
             region_id = int(form.cleaned_data['region'])
-            region = form.regionInstances[region_id]
+            region = form.region_instances[region_id]
             time_report = ReportGenerator(0).time_report(region, start_date, end_date)
             # context['report'] = time_report
             print(time_report[0].name)
