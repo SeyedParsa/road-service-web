@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render
 
 # Create your views here.
@@ -56,6 +57,7 @@ class TimeReportView(View):
             context["issues_report"] = time_report[1]
             context["missions_report"] = time_report[2]
             context["scores_report"] = time_report[3]
+            messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
         else:
             print('invalid form!')
         return render(request=request,
