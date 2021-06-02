@@ -138,6 +138,7 @@ class ReportGenerator:
         return time_report
 
     def region_missions_time_report(self, region, start_time, end_time):
+        # TODO: Report different types of missions
         time_report = TimeReport(name="تعداد ماموریت‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد ماموریت‌ها")
         missions = list(Mission.objects.all())
         region_missions = [mission for mission in missions if self.is_county_matching_region(mission.get_county(), region)]
@@ -150,6 +151,7 @@ class ReportGenerator:
         return time_report
 
     def region_scores_time_report(self, region, start_time, end_time):
+        # TODO: add service teams scores
         time_report = TimeReport(name="تعداد ماموریت‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد ماموریت‌ها")
         missions = list(Mission.objects.all())
         region_missions = [mission for mission in missions if
@@ -168,7 +170,6 @@ class ReportGenerator:
             score_cnt += len(mission_scores)
             time_report.add_item(start_time, score_sum/score_cnt if score_cnt > 0 else 0)
             start_time += datetime.timedelta(days=1)
-
         return time_report
 
 
