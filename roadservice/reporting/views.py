@@ -26,7 +26,7 @@ class TimeReportView(View):
         time_report_form = TimeReportForm()
         # print(time_report_form.region.choices)
         return render(request=request,
-                      template_name='timereports.html',
+                      template_name='reporting/timereports.html',
                       context={'form': time_report_form})
 
     def post(self, request, *args, **kwargs):
