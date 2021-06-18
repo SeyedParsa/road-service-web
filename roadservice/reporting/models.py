@@ -50,7 +50,7 @@ class Report:
 class TimeReport(Report):
 
     def add_item(self, time, value):
-        print('adding', time, value)
+        # print('adding', time, value)
         self.data.append((time, value))
 
     def __init__(self, name, y_axis_name, *args, **kwargs):

@@ -48,12 +48,6 @@ class Home(View):
                       template_name='core/home.html')
 
 
-@login_required
-def logmeout(request):
-    logout(request)
-    return render(request, 'core/logout.html')
-
-
 class AssignModerator(View):
     def get(self, request, *args, **kwargs):
         assign_moderator_form = AssignModeratorForm()
