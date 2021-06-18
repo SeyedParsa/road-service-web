@@ -27,6 +27,12 @@ class AcceptIssue(APIView):
         return Response(serializer.error_messages)
 
 
+class Home(View):
+    def get(self, request, *args, **kwargs):
+        return render(request=request,
+                      template_name='core/home.html')
+
+
 class UpdateLocation(APIView):
     def post(self, request, format=None):
         # TODO: select the corresponding serviceman (this is for EAB)
