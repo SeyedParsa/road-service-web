@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views import View
 from rest_framework.response import Response
@@ -27,12 +29,6 @@ class AcceptIssue(APIView):
         return Response(serializer.error_messages)
 
 
-class Home(View):
-    def get(self, request, *args, **kwargs):
-        return render(request=request,
-                      template_name='core/home.html')
-
-
 class UpdateLocation(APIView):
     def post(self, request, format=None):
         # TODO: select the corresponding serviceman (this is for EAB)
@@ -44,6 +40,18 @@ class UpdateLocation(APIView):
             service_man.update_location(Location(lat, long))
             return Response("Updated!")
         return Response(serializer.error_messages)
+
+
+class Home(View):
+    def get(self, request, *args, **kwargs):
+        return render(request=request,
+                      template_name='core/home.html')
+
+
+@login_required
+def logmeout(request):
+    logout(request)
+    return render(request, 'core/logout.html')
 
 
 class AssignModerator(View):

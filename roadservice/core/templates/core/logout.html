@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+{% block content %}
+
+  <div class="ui middle aligned center aligned grid">
+    <div class="eight wide column" style = "min-height:30vh"></div>
+    <div class="eight wide column" style = "min-height:30vh"></div>
+    <div class="four wide column" style = "min-height:40vh"></div>
+    <div class="eight wide column"  style = "min-height:40vh">
+      <h2 class="ui teal image header">
+        <div class="content" style = "font-size:150%">
+          خدا نگهدار! امیدواریم زودی بازم ببینیمتون!
+        </div>
+      </h2>
+    </div>
+    <div class="four wide column" style = "min-height:40vh"></div>
+    <div class="eight wide column" style = "min-height:30vh"></div>
+    <div class="eight wide column" style = "min-height:30vh"></div>
+  </div>
+</body>
+
+<script>
+  $(window).on('load', function() {
+    floatMessage("شما با موفقیت خارج شدید.");
+  });
+</script>
+{% endblock %}
