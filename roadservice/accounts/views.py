@@ -56,5 +56,5 @@ class PasswordSet(View):
                       template_name='accounts/setnewpassword.html')
 
     def post(self, request):
-        messages.success(request, "گذرواژه شما با موفقیت بروز شد!")
+        messages.success(request, "گذرواژه جدید شما با موفقیت ذخیره شد!")
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
