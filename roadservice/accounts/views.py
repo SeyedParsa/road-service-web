@@ -38,3 +38,23 @@ class Login(View):
         messages.success(request, "شما با موافقیت وارد شدید!")
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
+
+class PasswordReset(View):
+    def get(self, request):
+        return render(request=request,
+                      template_name='accounts/resetpassword.html')
+
+    def post(self, request):
+        messages.success(request, "لینک بازیابی گذرواژه برای شما پیامک شد!")
+        return render(request=request,
+                      template_name='accounts/resetpassword.html')
+
+
+class PasswordSet(View):
+    def get(self, request):
+        return render(request=request,
+                      template_name='accounts/setnewpassword.html')
+
+    def post(self, request):
+        messages.success(request, "گذرواژه شما با موفقیت بروز شد!")
+        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
