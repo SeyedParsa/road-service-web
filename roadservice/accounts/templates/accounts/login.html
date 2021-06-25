@@ -12,17 +12,19 @@
                 <p class="ui hidden divider"></p>
 
 
-                <div class="ui stacked segments" style="border: none">
+
+
+                <div class="ui stacked segments" style="border: none; background: whitesmoke">
 
 
                         <div class="ui segment center-text">
                             <div class="ui small header">
-                                ثبت‌نام مدیران
+                                ورود مدیران
                             </div>
                         </div>
 
     <div class="ui segment">
-        <form class="ui large form" style="text-align: center" method="post" action="/signup/" novalidate>
+        <form class="ui large form" style="text-align: center" method="post" action="/login/" novalidate>
             {% csrf_token %}
             <div class="field">
                 <div class="ui right icon input">
@@ -32,14 +34,7 @@
                 </div>
 
             </div>
-            <div class="field">
-                <div class="ui right icon input">
-                    <input dir="ltr" type="text" name="phone" autocomplete="phone" placeholder="شماره تلفن">
 
-                    <i class="phone icon"></i>
-                </div>
-
-            </div>
             <div class="field">
                 <div class="ui right icon input">
                     <i class="lock icon"></i>
@@ -47,14 +42,6 @@
                 </div>
 
             </div>
-             <div class="field">
-                <div class="ui right icon input">
-                    <i class="lock icon"></i>
-                    <input dir="ltr" type="password" name="password2" placeholder="تکرار گذرواژه">
-                </div>
-
-            </div>
-
             <button type="submit" class="ui fluid large primary submit button">ثبت‌نام</button>
         </form>
 
@@ -89,12 +76,6 @@
                         identifier: 'password',
                         rules: [
                             {type: 'empty', prompt: 'لطفا گذرواژه خود را وارد کنید.'}
-                        ]
-                    },
-                    password2: {
-                        identifier: 'password2',
-                        rules: [
-                            {type: 'empty', prompt: 'لطفا تکرار گذرواژه خود را وارد کنید.'}
                         ]
                     }
                 }

@@ -28,3 +28,13 @@ class Signup(View):
         messages.success(request, "شما با موافقیت ثبت‌نام شدید!")
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
+
+class Login(View):
+    def get(self, request):
+        return render(request=request,
+                      template_name='accounts/login.html')
+
+    def post(self, request):
+        messages.success(request, "شما با موافقیت وارد شدید!")
+        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+
