@@ -56,12 +56,11 @@
 
           <a href = "/reports" class="item"><i class="newspaper icon" style="margin: 10px"></i> گزارش‌ها</a>
 
-          <a href = "/admin" class="item"><i class="cogs icon" style="margin: 10px;"></i>  تنظیمات  </a>
+          <a href = "/admin" class="item"><i class="cogs icon" style="margin: 10px;"></i>  مدیریت  </a>
 
 
         <div class="right menu"></div>
 
-        {% if user.is_authenticated %}
 
             <div  class="ui dropdown item">
                 <i class="bell icon"></i>
@@ -107,18 +106,29 @@
                 {%if user.profile_picture %}
                     <img class="item" style="width:auto;height:60px;border:0;padding:0;" src = "{{user.profile_picture.url}}" >
                 {% else %}
-                    <img class="item" style="width:auto;height:60px;border:0;padding:0;" src =  "{% static "images/profile.png" %}" >
+                    <img class="item" style="width:auto;height:60px;border:0;padding:0;" src =  "{% static "images/repairer2.png" %}" >
                 {% endif %}
                 <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a class="item" href="/editprofile">تغییر پروفایل</a>
-                    <a class = "item" href = "/logout"> خروج </a>
+               <div class="menu" id="top-bar-menu">
+
+
+
+                    <div class="header" style="text-align: center">محمد مهدی شکری</div>
+                    <div class="divider hide-in-mobile"></div>
+                    <a class="item" href="/password/set" style="text-align: right">
+                        <i class="key icon"></i>
+
+                        تغییر رمز عبور
+                    </a>
+
+                    <a class="item" href="/logout" style="text-align: right">
+                        <i class="sign out icon"></i>
+                        خروج
+
+                    </a>
                 </div>
             </div>
-        {% else %}
-            <a class = "item" href = "/signup"> ثبت‌نام </a>
-            <a class = "item" href = "/login"> ورود </a>
-        {% endif %}
+
       </div>
       <div class="tablet mobile only row">
         <a class="header item"> ساج</a>
