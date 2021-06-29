@@ -5,7 +5,7 @@ from django.db import models
 # Create your models here.
 
 
-from pychartjs import BaseChart, ChartType, Color
+# from pychartjs import BaseChart, ChartType, Color
 from pytz import utc
 
 from core.models import ServiceTeam, Region, Issue, Mission
