@@ -13,7 +13,7 @@ from accounts.forms import SignUpForm
 class Logout(View):
     def get(self, request):
         logout(request)
-        messages.success(request, "شما با موفقیت از اکانت خود خارج شدید")
+        messages.success(request, "شما با موفقیت از اکانت خود خارج شدید!")
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
 
@@ -25,7 +25,7 @@ class Signup(View):
                       context={'form': form})
 
     def post(self, request):
-        messages.success(request, "شما با موافقیت ثبت‌نام شدید!")
+        messages.success(request, "کاربر جدید با موافقیت اضافه شد!")
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
 
