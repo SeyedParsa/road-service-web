@@ -4,7 +4,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views import View
 
-from reporting.forms import TimeReportForm
+from reporting.forms import TimeReportForm, StatusReportForm
 from reporting.models import TimeReport, ReportGenerator
 
 
@@ -20,13 +20,51 @@ from reporting.models import TimeReport, ReportGenerator
 #                       template_name='chart.html',
 #                       context={"chartJSON": chart_json})
 
+class StatusReport(View):
+    def get(self, request, *args, **kwargs):
+        status_report_form = StatusReportForm()
+        # print(time_report_form.region.choices)
+        return render(request=request,
+                      template_name='reporting/statusreport.html',
+                      context={'form': status_report_form })
 
-class TimeReportView(View):
+    def post(self, request, *args, **kwargs):
+        form = StatusReportForm(request.POST)
+        context = {'form': form}
+        if form.is_valid():
+            region_id = int(form.cleaned_data['region'])
+            region = form.region_instances[region_id]
+            #status_report = ReportGenerator(0).st(region, start_date, end_date)
+            # context['report'] = time_report
+            # teams_chart = GraphGenerator(0).get_bar_chart(time_report[0])
+            # issues_chart = GraphGenerator(0).get_bar_chart(time_report[1])
+            #
+            # print(teams_chart.data.label)
+            # print(issues_chart.data.label)
+            # team_chart_json = teams_chart.get()
+            # issues_chart_json = issues_chart.get()
+            # context["teamChartJSON"] = team_chart_json
+            # context["issuesChartJSON"] = issues_chart_json
+            # context["teams_report"] = time_report[0]
+            # context["issues_report"] = time_report[1]
+            # context["missions_report"] = time_report[2]
+            # context["scores_report"] = time_report[3]
+            messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
+        else:
+            print('invalid form!')
+        return render(request=request,
+                      template_name='reporting/statusreport.html',
+                      context=context)
+
+
+
+
+class TimeReport(View):
     def get(self, request, *args, **kwargs):
         time_report_form = TimeReportForm()
         # print(time_report_form.region.choices)
         return render(request=request,
-                      template_name='reporting/timereports.html',
+                      template_name='reporting/timereport.html',
                       context={'form': time_report_form})
 
     def post(self, request, *args, **kwargs):
@@ -56,5 +94,5 @@ class TimeReportView(View):
         else:
             print('invalid form!')
         return render(request=request,
-                      template_name='reporting/timereports.html',
+                      template_name='reporting/timereport.html',
                       context=context)

@@ -1,0 +1,297 @@
+{% extends 'reporting/../../../core/templates/core/base.html' %}
+{% load static %}
+{% block content %}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/item-series.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<div class="ui grid">
+    <div class="sixteen wide column">
+        <div class="ui row">
+
+            <form  method="post">
+            {% csrf_token %}
+            {{ form }}
+
+                <input type="submit" value="فیلتر">
+
+            </form>
+        </div>
+            <div class="ui deviding header" style="height: 20px"></div>
+
+        <div class="ui row" style=" background-color: rgba(255, 255, 255, 0.5)">
+             <figure class="highcharts-figure" style="width: 800px;  margin: auto;">
+                <div id="missiontypereport" style="width:100%; margin: auto;"></div>
+
+            </figure>
+
+        </div>
+    <div class="ui deviding header" style="height: 20px"></div>
+
+        <div class="ui row" style=" background-color: rgba(255, 255, 255, 0.5)">
+             <figure class="highcharts-figure" style="width: 800px;  margin: auto;">
+                <div id="expertisereport" style="width:100%; margin: auto;"></div>
+
+            </figure>
+
+        </div>
+    <div class="ui deviding header" style="height: 20px"></div>
+
+        <div class="ui row" style=" background-color: rgba(255, 255, 255, 0.5)">
+             <figure class="highcharts-figure" style="width: 800px;  margin: auto;">
+                <div id="machineryreport" style="width:100%; margin: auto;"></div>
+
+            </figure>
+
+        </div>
+    <div class="ui deviding header" style="height: 20px"></div>
+
+        <div class="ui row" style=" background-color: rgba(255, 255, 255, 0.5)">
+             <figure class="highcharts-figure" style="width: 800px;  margin: auto;">
+                <div id="scoresreport" style="width:100%; margin: auto;"></div>
+
+            </figure>
+
+        </div>
+    </div>
+</div>
+
+
+
+{#{% include 'reporting/parts/simple_bar.html' with name='teams_chart' color='green' objs=teams_report.data description="تعداد تیم‌های فعال در طول زمان" %}#}
+{#{% include 'reporting/parts/simple_bar.html' with name='issues_chart' color='green' objs=issues_report.data description="تعداد مشکلات در طول زمان" %}#}
+{#{% include 'reporting/parts/simple_bar.html' with name='missions_chart' color='green' objs=missions_report.data description="تعداد ماموریت‌ها در طول زمان" %}#}
+{#{% include 'reporting/parts/simple_bar.html' with name='scores_chart' color='green' objs=scores_report.data description="امتیاز در طول زمان" %}#}
+
+{#<canvas id="teamChart"></canvas>#}
+{##}
+{#<canvas id="issueChart"></canvas>#}
+{##}
+{#<script>#}
+{#    var team_chart = new Chart(document.getElementById("teamChart").getContext('2d'), {{ teamChartJSON | safe }});#}
+{##}
+{#    var issue_chart = new Chart(document.getElementById("issueChart").getContext('2d'), {{ issuesChartJSON | safe }});#}
+{#</script>#}
+
+<script>
+
+
+Highcharts.chart('missiontypereport', {
+
+    chart: {
+        type: 'item',
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    },
+
+    title: {
+        text: 'توزیع انواع ماموریت'
+    },
+
+
+    legend: {
+        labelFormat: '{name} <span style="opacity: 0.4">{y}</span>'
+    },
+
+    series: [{
+        name: 'تعداد ماموریت',
+        keys: ['name', 'y', 'color', 'label'],
+        data: [
+            ['تعمیر آسفالت', 38, '#BE3075', 'ASPHALT'],
+            ['پر کردن چاله', 33, '#EB001F', 'HOLE'],
+            ['تعمیر گاردریل', 57, '#64A12D', 'GUARDRAIL'],
+            ['تعویض درب چاه فاضلاب', 22, '#FFED00', 'WW'],
+            ['برف‌روبی', 72, '#000000', 'SNOW'],
+            ['ریزش سنگ', 21, '#009EE0', 'ROCK']
+        ],
+        dataLabels: {
+            enabled: true,
+            format: '{point.label}'
+        },
+
+        // Circular options
+        center: ['50%', '88%'],
+        size: '170%',
+        startAngle: -100,
+        endAngle: 100
+    }]
+});
+
+
+
+
+Highcharts.chart('expertisereport', {
+
+    chart: {
+        type: 'item',
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    },
+
+    title: {
+        text: 'توزیع انواع تخصص'
+    },
+
+
+    legend: {
+        labelFormat: '{name} <span style="opacity: 0.4">{y}</span>'
+    },
+
+    series: [{
+        name: 'تعداد تیم',
+        keys: ['name', 'y', 'color', 'label'],
+        data: [
+            ['تعمیرکار آسفالت', 12, '#BE3075', 'ASPHALT'],
+            ['متخصص چاه', 6, '#EB001F', 'HOLE'],
+            ['متخصص ماموریت‌های زمستانی', 18, '#5f9aa1', 'WINTER'],
+            ['متخصص فضای سبز شهری', 9, '#50ff3d', 'GRIN']
+        ],
+        dataLabels: {
+            enabled: true,
+            format: '{point.label}'
+        },
+
+        // Circular options
+        center: ['50%', '88%'],
+        size: '170%',
+        startAngle: -100,
+        endAngle: 100
+    }]
+});
+
+
+
+
+
+Highcharts.chart('machineryreport', {
+
+    chart: {
+        type: 'item',
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    },
+
+    title: {
+        text: 'توزیع انواع ماشین‌آلات'
+    },
+
+
+    legend: {
+        labelFormat: '{name} <span style="opacity: 0.4">{y}</span>'
+    },
+
+    series: [{
+        name: 'تعداد',
+        keys: ['name', 'y', 'color', 'label'],
+        data: [
+            ['بولدوزر', 12, '#BE3075', 'BULLDOZER'],
+            ['غلتک', 20, '#EB001F', 'ROLLER'],
+            ['جرثقیل', 8, '#64A12D', 'CRANE'],
+            ['باب کت', 34, '#FFED00', 'BOBCAT'],
+            ['بیل مکانیکی', 6, '#000000', 'EXCAVATOR'],
+            ['لودر', 8, '#009EE0', 'LOADER']
+        ],
+        dataLabels: {
+            enabled: true,
+            format: '{point.label}'
+        },
+
+        // Circular options
+        center: ['50%', '88%'],
+        size: '170%',
+        startAngle: -100,
+        endAngle: 100
+    }]
+});
+
+
+
+
+Highcharts.chart('scoresreport', {
+
+    chart: {
+        type: 'item',
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    },
+
+    title: {
+        text: 'توزیع انواع ماشین‌آلات'
+    },
+
+
+    legend: {
+        labelFormat: '{name} <span style="opacity: 0.4">{y}</span>'
+    },
+
+    series: [{
+        name: 'تعداد',
+        keys: ['name', 'y', 'color', 'label'],
+        data: [
+            ['1', 33, '#be271f', '1'],
+            ['2', 20, '#eb9145', '2'],
+            ['3', 18, '#fff153', '3'],
+            ['4', 34, '#d3ff5a', '4'],
+            ['5', 26, '#00ff07', '5']
+        ],
+        dataLabels: {
+            enabled: true,
+            format: '{point.label}'
+        },
+
+        // Circular options
+        center: ['50%', '88%'],
+        size: '170%',
+        startAngle: -100,
+        endAngle: 100
+    }]
+});
+
+
+</script>
+
+
+  <style type="text/css">
+
+        .highcharts-figure, .highcharts-data-table table {
+            min-width: 320px;
+            max-width: 800px;
+            margin: 1em auto;
+        }
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #EBEBEB;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+        .highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+            padding: 0.5em;
+        }
+        .highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
+        }
+
+
+        input[type="number"] {
+            min-width: 50px;
+        }
+   </style>
+
+{% endblock %}

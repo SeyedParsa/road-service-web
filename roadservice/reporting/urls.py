@@ -8,8 +8,9 @@ from reporting import views
 
 app_name = 'reporting'
 urlpatterns = [
-    path('timereports/', views.TimeReportView.as_view()),
-    url('reports/', RedirectView.as_view(url='/timereports/', permanent=False), name='reports')
+    path('timereport/', views.TimeReport.as_view()),
+    path('statusreport/', views.StatusReport.as_view()),
+    url('reports/', RedirectView.as_view(url='/timereport/', permanent=False), name='reports')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
