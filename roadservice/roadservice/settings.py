@@ -137,7 +137,7 @@ STATICFILES_DIRS = [
 
 STATIC_DIR = os.path.join(BASE_DIR,  'www', 'static')
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'dashboard'
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'www','static')
 

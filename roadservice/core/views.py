@@ -48,6 +48,23 @@ class Home(View):
                       template_name='core/dashboard.html')
 
 
+class IssueCard(View):
+    def get(self, request, *args, **kwargs):
+        issue_id = kwargs['issues_id']
+        context = {'card': issue_id}
+        return render(request=request,
+                      template_name='core/issuecard.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        issue_id = kwargs['issues_id']
+        context = {'card': issue_id}
+        print('post', issue_id)
+        return render(request=request,
+                      template_name='core/issuecard.html', context=context)
+
+
+
+
 class AssignModerator(View):
     def get(self, request, *args, **kwargs):
         assign_moderator_form = AssignModeratorForm()
