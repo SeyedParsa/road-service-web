@@ -45,7 +45,7 @@ class UpdateLocation(APIView):
 class Home(View):
     def get(self, request, *args, **kwargs):
         return render(request=request,
-                      template_name='core/home.html')
+                      template_name='core/dashboard.html')
 
 
 class AssignModerator(View):
