@@ -63,43 +63,6 @@
         <div class="right menu"></div>
 
 
-            <div  class="ui dropdown item">
-                <i class="bell icon"></i>
-            {% if notifications|length %}
-            <div class="ui teal circular mini label">{{notifications|length}}</div>
-            {% endif %}
-                <div class="ui stackable menu" style="width: 300px;white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    <div class="ui link celled selection list"  style ="padding: 20px;width: 300px;">
-                        {% if notifications|length %}
-                          {% for notification in notifications %}
-
-                          <a class='item' href ='/dashboard/open/{{notification.question.id}}'>
-                          <div class='item'>
-                           <div class='content'>
-                            <div class='header'>{{ notification.sender.get_full_name }}</div>
-                            <span class='time'>{{notification.created_at|timesince:curtime}}</span>
-                            <div class='description' style="word-wrap: break-word; white-space: pre-wrap; font-size:17px">{{notification.description}}</div>
-                          </div>
-                          </div>
-                        </a>
-
-                          {% endfor %}
-                        {% else %}
-
-                              <div class='item'>
-                               <div class='content'>
-                                <div class='header' style='height:30px'>پیغامی ندارید!</div>
-                                <div class='description' style="word-wrap: break-word; white-space: pre-wrap; font-size:17px">کمی استراحت کنید :)</div>
-                              </div>
-                              </div>
-
-                        {% endif %}
-
-                    </div>
-
-
-                </div>
-            </div>
 
 
 
