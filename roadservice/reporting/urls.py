@@ -10,6 +10,7 @@ app_name = 'reporting'
 urlpatterns = [
     path('timereport/', views.TimeReport.as_view()),
     path('statusreport/', views.StatusReport.as_view()),
+    path('regionreport/', views.RegionReport.as_view()),
     url('reports/', RedirectView.as_view(url='/timereport/', permanent=False), name='reports')
 ]
 

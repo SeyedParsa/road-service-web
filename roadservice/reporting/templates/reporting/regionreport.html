@@ -1,0 +1,94 @@
+{% extends 'reporting/../../../core/templates/core/base.html' %}
+{% load static %}
+{% block content %}
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://semantic-ui.com/javascript/library/tablesort.js"></script>
+
+<div class="ui grid">
+    <div class="sixteen wide column">
+        <div class="ui row">
+
+            <form  method="post">
+            {% csrf_token %}
+            {{ form }}
+
+                <input type="submit" value="فیلتر">
+
+            </form>
+        </div>
+        <div class="ui deviding header" style="min-height: 20px; text-align: center"><h1>زیربخش‌های استان فارس</h1></div>
+        <div class="ui row" style="text-align: center"> <h4>
+            ستون‌ها قابل مرتب‌سازی هستند!
+        </h4></div>
+
+        <table class="ui sortable striped  basic table" id="table" style="text-align: right; background-color: rgba(255, 255, 255, 0.3)">
+  <thead>
+    <tr>
+      <th class="sorted descending">زیربخش</th>
+      <th class="">تعداد ماموریت</th>
+      <th class="">تعداد مشکل</th>
+      <th class="">میانگین امتیاز</th>
+      <th class="">درصد موفقیت ماموریت‌ها</th>
+      <th class="">تعداد تیم</th>
+    </tr>
+  </thead>
+  <tbody>
+
+
+
+  <tr>
+      <td>شیراز</td>
+      <td>12</td>
+      <td>56</td>
+      <td>4.3</td>
+      <td>20%</td>
+      <td>6</td>
+  </tr>
+  <tr>
+      <td>مرودشت</td>
+      <td>5</td>
+      <td>34</td>
+      <td>4.1</td>
+      <td>60%</td>
+      <td>3</td>
+  </tr>
+  <tr>
+      <td>کازرون</td>
+      <td>2</td>
+      <td>53</td>
+      <td>4.6</td>
+      <td>42%</td>
+      <td>7</td>
+  </tr>
+  <tr>
+      <td>سروستان</td>
+      <td>32</td>
+      <td>164</td>
+      <td>3.8</td>
+      <td>34%</td>
+      <td>4</td>
+  </tr>
+  <tr>
+      <td>دشت ارژن</td>
+      <td>4</td>
+      <td>33</td>
+      <td>4.8</td>
+      <td>73%</td>
+      <td>3</td>
+  </tr>
+</table>
+
+    </div>
+</div>
+
+
+    <script>
+    $(document).ready(function(){
+                    $('table').tablesort()
+        console.log('hello!');
+    });
+    </script>
+
+{% endblock %}
