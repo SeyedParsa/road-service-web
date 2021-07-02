@@ -90,3 +90,15 @@ class AssignModerator(View):
         return render(request=request,
                       template_name='core/assignmoderator.html',
                       context=context)
+
+
+class ResourcesView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request=request,
+                      template_name='core/resources.html')
+
+    def post(self, request, *args, **kwargs):
+        return render(request=request,
+                      template_name='core/resources.html')
+
+
