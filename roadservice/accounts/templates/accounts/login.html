@@ -8,83 +8,82 @@
             <div id="auth-form" class="center-text" style="max-width: 352px; margin: auto">
                 <a href="/">
 
-                <h1 style="margin: auto; text-align: center">
-               ساج | سامانه امداد جاده‌ای
+                    <h1 style="margin: auto; text-align: center">
+                        ساج | سامانه امداد جاده‌ای
                     </h1>
-                    </a>
+                </a>
                 <p class="ui hidden divider"></p>
-
-
 
 
                 <div class="ui stacked segments" style="border: none; background: whitesmoke">
 
 
-                        <div class="ui segment center-text">
-                            <div class="ui small header">
-                                ورود مدیران
-                            </div>
+                    <div class="ui segment center-text">
+                        <div class="ui small header">
+                            ورود مدیران
                         </div>
+                    </div>
 
-    <div class="ui segment">
-        <form class="ui large form" style="text-align: center" method="post" action="/login/" novalidate>
-            {% csrf_token %}
-            <div class="field">
-                <div class="ui right icon input">
-                    <i class="id card icon"></i>
-                    <input dir="ltr" id="identification_number" type="text" name="identification_number" autocomplete="identification_number" required="" placeholder="کد ملی">
+                    <div class="ui segment">
+                        <form class="ui large form" style="text-align: center" method="post" action="/login/"
+                              novalidate>
+                            {% csrf_token %}
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <i class="id card icon"></i>
+                                    <input dir="ltr" id="identification_number" type="text" name="identification_number"
+                                           autocomplete="identification_number" required="" placeholder="کد ملی">
 
-                </div>
-
-            </div>
-
-            <div class="field">
-                <div class="ui right icon input">
-                    <i class="lock icon"></i>
-                    <input dir="ltr" type="password" name="password" placeholder="گذرواژه">
-                </div>
-
-            </div>
-            <button type="submit" class="ui fluid large primary submit button">ورود</button>
-        </form>
-
-    </div>
-
-
-                        <div class="ui segment center-text">
-                            <div class="ui horizontal link list">
-    <a href="/password/reset" class="item">بازیابی گذرواژه</a>
+                                </div>
 
                             </div>
+
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <i class="lock icon"></i>
+                                    <input dir="ltr" type="password" name="password" placeholder="گذرواژه">
+                                </div>
+
+                            </div>
+                            <button type="submit" class="ui fluid large primary submit button">ورود</button>
+                        </form>
+
+                    </div>
+
+
+                    <div class="ui segment center-text">
+                        <div class="ui horizontal link list">
+                            <a href="/password/reset" class="item">بازیابی گذرواژه</a>
+
                         </div>
+                    </div>
 
                 </div>
             </div>
         </div>
 
 
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            $('.ui.form').form({
-                inline: true,
-                fields: {
-                    identification_number: {
-                        identifier: 'identification_number',
-                        rules: [
-                            {type: 'empty', prompt: 'لطفا کد ملی خود را وارد کنید.'}
-                        ]
-                    },
-                    password: {
-                        identifier: 'password',
-                        rules: [
-                            {type: 'empty', prompt: 'لطفا گذرواژه خود را وارد کنید.'}
-                        ]
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                $('.ui.form').form({
+                    inline: true,
+                    fields: {
+                        identification_number: {
+                            identifier: 'identification_number',
+                            rules: [
+                                {type: 'empty', prompt: 'لطفا کد ملی خود را وارد کنید.'}
+                            ]
+                        },
+                        password: {
+                            identifier: 'password',
+                            rules: [
+                                {type: 'empty', prompt: 'لطفا گذرواژه خود را وارد کنید.'}
+                            ]
+                        }
                     }
-                }
+                });
             });
-        });
-    </script>
+        </script>
 
     </div>
 

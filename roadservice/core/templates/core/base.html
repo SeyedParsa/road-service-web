@@ -4,77 +4,77 @@
 
 <html class="gr__semantic-ui_com" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
-  <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport" />
-  <meta content="ساج، سامانه امداد جاده‌ای" name="description" />
-  <meta content="Semantic-UI, Theme, Design, Template" name="keywords" />
-  <meta content="PPType" name="author" />
-  <meta content="#ffffff" name="theme-color" />
-  <title>ساج</title>
-  <link rel="stylesheet" type="text/css" href=" {% static "semantic.min.css" %}">
-  <link rel="stylesheet" type="text/css" href=" {% static "base.css" %}">
-  <link rel="stylesheet" type="text/css" href=" {% static "pandoc-code-highlight.css" %}">
-  <script src="{% static "jquery.min.js" %}"></script>
-  <script src="{% static "semantic.min.js" %}"></script>
-  <script src="{% static "moment.js" %}"></script>
+    <meta charset="utf-8"/>
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport"/>
+    <meta content="ساج، سامانه امداد جاده‌ای" name="description"/>
+    <meta content="Semantic-UI, Theme, Design, Template" name="keywords"/>
+    <meta content="PPType" name="author"/>
+    <meta content="#ffffff" name="theme-color"/>
+    <title>ساج</title>
+    <link rel="stylesheet" type="text/css" href=" {% static "semantic.min.css" %}">
+    <link rel="stylesheet" type="text/css" href=" {% static "base.css" %}">
+    <link rel="stylesheet" type="text/css" href=" {% static "pandoc-code-highlight.css" %}">
+    <script src="{% static "jquery.min.js" %}"></script>
+    <script src="{% static "semantic.min.js" %}"></script>
+    <script src="{% static "moment.js" %}"></script>
 </head>
 <body>
 
 
-  <div id="secretbox" class="ui long coupled modal">
-  </div>
+<div id="secretbox" class="ui long coupled modal">
+</div>
 
 
-  <link rel="shortcut icon" type="image/png" style="width:auto;height:60px;border:0;padding:0;" href="{% static "images/logo.png" %}"/>
-  <div id="messagebox" class="messages">
-  </div>
+<link rel="shortcut icon" type="image/png" style="width:auto;height:60px;border:0;padding:0;"
+      href="{% static "images/logo.png" %}"/>
+<div id="messagebox" class="messages">
+</div>
 
 
-  <div class="ui borderless huge menu" style ="z-index:50;position:relative;filter: alpha(opacity=90);-moz-opacity: 0.9;-khtml-opacity: 0.9;opacity: 0.9;">
+<div class="ui borderless huge menu"
+     style="z-index:50;position:relative;filter: alpha(opacity=90);-moz-opacity: 0.9;-khtml-opacity: 0.9;opacity: 0.9;">
     <div class="ui container grid">
-      <div class="computer only row">
-      <a href = "/" class="item">
-        <div>
-          <img class="item" style="width:auto;height:70px;" src = "{% static "images/logo.png" %}" >
-        </div>
+        <div class="computer only row">
+            <a href="/" class="item">
+                <div>
+                    <img class="item" style="width:auto;height:70px;" src="{% static "images/logo.png" %}">
+                </div>
 
 
-          <h style="font-size:120%" class="header item">ساج</h>
-      <span style="background-color: black; width: 2px; height: 30px;"></span>
+                <h style="font-size:120%" class="header item">ساج</h>
+                <span style="background-color: black; width: 2px; height: 30px;"></span>
                 <h style="font-size:100%" class="header item">
                     سامانه امداد جاده‌ای
                 </h>
 
 
-      </a>
+            </a>
 
 
-        {% if user.is_authenticated %}
-        {% endif %}
+            {% if user.is_authenticated %}
+            {% endif %}
 
 
-          <a href = "/reports" class="item"><i class="newspaper icon" style="margin: 10px"></i> گزارش‌ها</a>
+            <a href="/reports" class="item"><i class="newspaper icon" style="margin: 10px"></i> گزارش‌ها</a>
 
-          <a href = "/admin" class="item"><i class="cogs icon" style="margin: 10px;"></i>  مدیریت  </a>
+            <a href="/admin" class="item"><i class="cogs icon" style="margin: 10px;"></i> مدیریت </a>
 
-          <a href = "/signup" class="item"><i class="user plus icon" style="margin: 10px;"></i>  کاربر جدید  </a>
+            <a href="/signup" class="item"><i class="user plus icon" style="margin: 10px;"></i> کاربر جدید </a>
 
-        <div class="right menu"></div>
-
-
+            <div class="right menu"></div>
 
 
-
-            <div  class="ui dropdown item">
-                {%if user.profile_picture %}
-                    <img class="item" style="width:auto;height:60px;border:0;padding:0;" src = "{{user.profile_picture.url}}" >
+            <div class="ui dropdown item">
+                {% if user.profile_picture %}
+                    <img class="item" style="width:auto;height:60px;border:0;padding:0;"
+                         src="{{ user.profile_picture.url }}">
                 {% else %}
-                    <img class="item" style="width:auto;height:60px;border:0;padding:0;" src =  "{% static "images/repairer2.png" %}" >
+                    <img class="item" style="width:auto;height:60px;border:0;padding:0;"
+                         src="{% static "images/repairer2.png" %}">
                 {% endif %}
                 <i class="dropdown icon"></i>
-               <div class="menu" id="top-bar-menu">
-
+                <div class="menu" id="top-bar-menu">
 
 
                     <div class="header" style="text-align: center">محمد مهدی شکری</div>
@@ -93,267 +93,279 @@
                 </div>
             </div>
 
-      </div>
-      <div class="tablet mobile only row">
-        <a class="header item"> ساج</a>
-        <div class="right menu">
-          <a class="menu item">
-            <div class="ui basic icon toggle button">
-              <i class="content icon"></i>
+        </div>
+        <div class="tablet mobile only row">
+            <a class="header item"> ساج</a>
+            <div class="right menu">
+                <a class="menu item">
+                    <div class="ui basic icon toggle button">
+                        <i class="content icon"></i>
+                    </div>
+                </a>
             </div>
-          </a>
+            <div class="ui vertical accordion borderless fluid menu">
+                <a class="active item"> خانه </a>
+                <a class="item">خروج </a>
+                <div class="ui divider"></div>
+            </div>
         </div>
-        <div class="ui vertical accordion borderless fluid menu">
-          <a class="active item"> خانه </a>
-          <a class="item">خروج </a>
-          <div class="ui divider"></div>
-        </div>
-      </div>
     </div>
-  </div>
-  <div class="ui container">
+</div>
+<div class="ui container">
     {% block content %}
     {% endblock %}
 
-  </div>
-  <style type="text/css">
+</div>
+<style type="text/css">
 
-     body {
-            background-color: #f0f4f7;
-            background-image: url({% static "/images/spanner.png" %});
-            min-height: 20px;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-attachment: fixed;
-           font-family: Tahoma, Helvetica, sans-serif;
+    body {
+        background-color: #f0f4f7;
+        background-image: url({% static "/images/spanner.png" %});
+        min-height: 20px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        font-family: Tahoma, Helvetica, sans-serif;
 
-        }
+    }
 
 
     .center-text {
         text-align: center !important;
     }
+
     #auth-form input {
         text-align: center;
     }
+
     .ui.borderless.huge.menu {
-      background-color: #f8f8f8;
-      margin-top: 0;
-      margin-bottom: 1em;
+        background-color: #f8f8f8;
+        margin-top: 0;
+        margin-bottom: 1em;
     }
+
     .ui.borderless.huge.menu .row > a.header.item {
-      font-size: 1.2em;
+        font-size: 1.2em;
     }
 
     .ui.vertical.menu {
-      display: none;
-      border: none;
-      box-shadow: none;
-      background-color: #f8f8f8;
+        display: none;
+        border: none;
+        box-shadow: none;
+        background-color: #f8f8f8;
     }
+
     .ui.vertical.menu > .item {
-      padding-left: 1.428em;
+        padding-left: 1.428em;
     }
+
     .ui.vertical.menu .item .title .dropdown.icon {
-      float: none;
+        float: none;
     }
+
     .ui.vertical.menu .item .content .item {
-      padding: 0.5em 1em;
+        padding: 0.5em 1em;
     }
+
     .ui.vertical.menu .header.item {
-      text-transform: uppercase;
+        text-transform: uppercase;
     }
 
     .ui.message {
-      background-color: rga(238, 238, 238);
-      box-shadow: none;
-      padding: 2em 2em;
+        background-color: rga(238, 238, 238);
+        box-shadow: none;
+        padding: 2em 2em;
     }
+
     .ui.message h1.ui.header {
-      font-size: 4.5em;
+        font-size: 4.5em;
     }
+
     .ui.message p.lead {
-      font-size: 1.3em;
-      color: #333333;
-      line-height: 1.4;
-      font-weight: 300;
+        font-size: 1.3em;
+        color: #333333;
+        line-height: 1.4;
+        font-weight: 300;
     }
 
     .messages {
-      filter: alpha(opacity=70);
-      -moz-opacity: 0.7;
-      -khtml-opacity: 0.7;
-      opacity: 0.7;
-      left: 100%;
-      margin-left: -33%;
-      position: fixed;
-      top: 45px;
-      width: 30%;
-      height: 10%;
-      z-index: 1000000000000;
+        filter: alpha(opacity=70);
+        -moz-opacity: 0.7;
+        -khtml-opacity: 0.7;
+        opacity: 0.7;
+        left: 100%;
+        margin-left: -33%;
+        position: fixed;
+        top: 45px;
+        width: 30%;
+        height: 10%;
+        z-index: 1000000000000;
     }
 
-    .shafaf{
-      filter: alpha(opacity=20);
-      -moz-opacity: 0.2;
-      -khtml-opacity: 0.2;
-      opacity: 0.2;
+    .shafaf {
+        filter: alpha(opacity=20);
+        -moz-opacity: 0.2;
+        -khtml-opacity: 0.2;
+        opacity: 0.2;
     }
 
     /* Tablet */
 
     @media only screen and (min-width: 768px) and (max-width: 991px) {
-      .messages {
-        margin-left: -361.5px;
-        width: 723px;
-      }
+        .messages {
+            margin-left: -361.5px;
+            width: 723px;
+        }
     }
 
     /* Small Monitor */
 
     @media only screen and (min-width: 992px) and (max-width: 1199px) {
-      .messages {
-        margin-left: -466.5px;
-        width: 933px;
-      }
+        .messages {
+            margin-left: -466.5px;
+            width: 933px;
+        }
     }
 
     /* Large Monitor */
 
     @media only screen and (min-width: 1200px) {
-      .messages {
-        margin-left: -33%;
-        width: 30%;
-      }
+        .messages {
+            margin-left: -33%;
+            width: 30%;
+        }
     }
 
-        .ui.message {
-      background-color: rga(238, 238, 238);
-      box-shadow: none;
-      padding: 2em 2em;
+    .ui.message {
+        background-color: rga(238, 238, 238);
+        box-shadow: none;
+        padding: 2em 2em;
     }
+
     .ui.message h1.ui.header {
-      font-size: 4.5em;
+        font-size: 4.5em;
     }
+
     .ui.message p.lead {
-      font-size: 1.3em;
-      color: #333333;
-      line-height: 1.4;
-      font-weight: 300;
+        font-size: 1.3em;
+        color: #333333;
+        line-height: 1.4;
+        font-weight: 300;
     }
 
     .messages {
-      filter: alpha(opacity=70);
-      -moz-opacity: 0.7;
-      -khtml-opacity: 0.7;
-      opacity: 0.7;
-      left: 100%;
-      margin-left: -33%;
-      position: fixed;
-      top: 45px;
-      width: 30%;
-      height: 10%;
-      z-index: 2000;
+        filter: alpha(opacity=70);
+        -moz-opacity: 0.7;
+        -khtml-opacity: 0.7;
+        opacity: 0.7;
+        left: 100%;
+        margin-left: -33%;
+        position: fixed;
+        top: 45px;
+        width: 30%;
+        height: 10%;
+        z-index: 2000;
     }
 
     /* Tablet */
 
     @media only screen and (min-width: 768px) and (max-width: 991px) {
-      .messages {
-        margin-left: -361.5px;
-        width: 723px;
-      }
+        .messages {
+            margin-left: -361.5px;
+            width: 723px;
+        }
     }
 
     /* Small Monitor */
 
     @media only screen and (min-width: 992px) and (max-width: 1199px) {
-      .messages {
-        margin-left: -466.5px;
-        width: 933px;
-      }
+        .messages {
+            margin-left: -466.5px;
+            width: 933px;
+        }
     }
 
     /* Large Monitor */
 
     @media only screen and (min-width: 1200px) {
-      .messages {
-        margin-left: -33%;
-        width: 30%;
-      }
+        .messages {
+            margin-left: -33%;
+            width: 30%;
+        }
     }
 
     .thesecret {
-      filter: alpha(opacity=70);
-      -moz-opacity: 0.7;
-      -khtml-opacity: 0.7;
-      opacity: 0.7;
-      position: static;
-      top: 45px;
-      width: 100vw;
-      height: 20vh;
-      z-index: 70; /*TODO: it should be bigger than normal page and smaller than the messages*/
+        filter: alpha(opacity=70);
+        -moz-opacity: 0.7;
+        -khtml-opacity: 0.7;
+        opacity: 0.7;
+        position: static;
+        top: 45px;
+        width: 100vw;
+        height: 20vh;
+        z-index: 70; /*TODO: it should be bigger than normal page and smaller than the messages*/
     }
 
     /* Tablet */
 
     @media only screen and (min-width: 768px) and (max-width: 991px) {
-      .thesecret {
-        margin-left: -361.5px;
-        width: 723px;
-      }
+        .thesecret {
+            margin-left: -361.5px;
+            width: 723px;
+        }
     }
 
     /* Small Monitor */
 
     @media only screen and (min-width: 992px) and (max-width: 1199px) {
-      .thesecret {
-        margin-left: -466.5px;
-        width: 933px;
-      }
+        .thesecret {
+            margin-left: -466.5px;
+            width: 933px;
+        }
     }
 
     /* Large Monitor */
 
     @media only screen and (min-width: 1200px) {
-      .thesecret {
-        margin-left: 10%;
-        width: 100vw;
-      }
+        .thesecret {
+            margin-left: 10%;
+            width: 100vw;
+        }
     }
-  </style>
-  <script>
-    $(document).ready(function() {
-      $('.ui.dropdown').dropdown();
-      $('.ui.accordion').accordion();
+</style>
+<script>
+    $(document).ready(function () {
+        $('.ui.dropdown').dropdown();
+        $('.ui.accordion').accordion();
 
-      // bind "hide and show vertical menu" event to top right icon button
-      $('.ui.toggle.button').mouseover(function() {
-        $('.ui.vertical.menu').toggle("250", "linear")
-      });
+        // bind "hide and show vertical menu" event to top right icon button
+        $('.ui.toggle.button').mouseover(function () {
+            $('.ui.vertical.menu').toggle("250", "linear")
+        });
     });
-  </script>
-  <script>
-    function floatMessage(title, detail, color){
-      $html = $("<div class=\"ui small "+color+" floating message\"><i class=\"close icon\"></i><div class=\"header\">"+title+"</div><p>"+detail+"</p></div>");
-      $html.find('.close.icon').on('click', function() { $(this).parent().transition('fade');});
-      $html.delay(5000).fadeOut();
-      $("#messagebox").append($html);
+</script>
+<script>
+    function floatMessage(title, detail, color) {
+        $html = $("<div class=\"ui small " + color + " floating message\"><i class=\"close icon\"></i><div class=\"header\">" + title + "</div><p>" + detail + "</p></div>");
+        $html.find('.close.icon').on('click', function () {
+            $(this).parent().transition('fade');
+        });
+        $html.delay(5000).fadeOut();
+        $("#messagebox").append($html);
     }
-  </script>
+</script>
 
-  {% if messages %}
+{% if messages %}
 
-  {% for message in messages %}
-  <script>
-    $(window).on('load', function() {
-      floatMessage("{{ message }}","", "{{ message.tags }}");
-    });
-  </script>
-  {% endfor %}
-  {% endif %}
-
+    {% for message in messages %}
+        <script>
+            $(window).on('load', function () {
+                floatMessage("{{ message }}", "", "{{ message.tags }}");
+            });
+        </script>
+    {% endfor %}
+{% endif %}
 
 
 </body>
