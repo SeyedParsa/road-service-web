@@ -7,11 +7,13 @@
           rel="stylesheet"/>
     <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/js/jquery-editable-poshytip.min.js"></script>
 
-    <div class="ui grid">
+    <div class="ui grid" id="resources">
         <div class="ui six wide column">
             <div class="ui segments" style="opacity: 0.9">
-                <div class="ui center aligned segment" style="width: 100%">
-                    <h2>لیست تیم&zwnj;ها</h2>
+                <div class="ui center aligned segment"
+                     style="display: flex; justify-content: space-between; align-items: center; height: 65px;">
+                    <h3>لیست تیم&zwnj;ها</h3>
+                    <i class="small plus icon"></i>
                 </div>
 
                 <div class="ui basic segment">
@@ -22,14 +24,19 @@
                                     <i class="ui angle left icon"></i>
                                     آهنگر
                                 </div>
-                                <div class="ui four wide column">
-                                    <i class="user icon"></i>
+                                <div class="ui three wide column">
                                     ۵ نفر
                                 </div>
 
-                                <div class="ui eight wide column">
-                                    <i class="map marker alternate icon"></i>
-                                    استان فارس، شیراز
+                                <div class="ui five wide column">
+                                    فارس، شیراز
+
+                                </div>
+                                <div class="ui four wide column">
+                                    <a style="color: black" href="">
+                                        <i class="times icon"></i>
+                                        <i class="edit icon"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -43,14 +50,19 @@
                                     <i class="ui angle left icon"></i>
                                     آهنگر
                                 </div>
-                                <div class="ui four wide column">
-                                    <i class="user icon"></i>
+                                <div class="ui three wide column">
                                     ۵ نفر
                                 </div>
 
-                                <div class="ui eight wide column">
-                                    <i class="map marker alternate icon"></i>
-                                    استان فارس، شیراز
+                                <div class="ui five wide column">
+                                    فارس، شیراز
+
+                                </div>
+                                <div class="ui four wide column">
+                                    <a style="color: black" href="">
+                                        <i class="times icon"></i>
+                                        <i class="edit icon"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -65,8 +77,8 @@
 
         <div class="ui four wide column">
             <div class="ui segments" style="opacity: 0.9">
-                  <div class="ui center aligned segment" style="width: 100%">
-                    <h2>لیست ماشین‌آلات</h2>
+                <div class="ui right aligned segment" style="width: 100%; height: 65px">
+                    <h3 style="text-align: right">لیست ماشین‌آلات</h3>
                 </div>
                 <div class="ui basic segment" style="margin-top: 5px">
                     <div class="ui segments">
@@ -75,10 +87,10 @@
                                 <div class="ui nine wide column">
                                     جرثقیل
                                 </div>
-                                <div class="ui seven wide column">
-                                    <i class="right floated plus icon"></i>
+                                <div class="ui seven wide column machinery">
+                                    <a href="" style="color: black"><i class="right floated plus icon"></i></a>
                                     18
-                                    <i class="left floated minus icon"></i>
+                                    <a href="" style="color: black"><i class="left floated minus icon"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -88,9 +100,9 @@
                                     لودر
                                 </div>
                                 <div class="ui seven wide column">
-                                    <i class="right floated plus icon"></i>
+                                    <a href="" style="color: black"><i class="right floated plus icon"></i></a>
                                     20
-                                    <i class="left floated minus icon"></i>
+                                    <a href="" style="color: black"><i class="left floated minus icon"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -101,92 +113,162 @@
         </div>
 
         <div class="ui three wide column">
-            <div class="ui segments" style="opacity: 0.9">
-                  <div class="ui center aligned segment" style="width: 100%">
-                    <h2>انواع ماموریت</h2>
+            <div class="ui segments" id="mission" style="opacity: 0.9; overflow: hidden">
+                <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
+                    <h3>انواع ماموریت</h3>
+                    <i class="left floated small plus icon"></i>
                 </div>
-                <div class="ui basic segment" style="margin-top: 5px">
-                    <div class="ui segments">
-                        <div class="ui segment">
-                                تعمیر گاردریل
-                            <i class="left floated times icon"></i>
+                <div class="ui basic segment" id="list"
+                     style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
+                    <div class="ui segments content">
+                        <div class="ui segment"
+                             style="display: flex; justify-content: space-between; align-items: center">
+                            تعمیر گاردریل
+                            <a style="color: black" href="">
+                                <i class="left floated times icon"></i></a>
                         </div>
-                        <div class="ui segment">
-                            تعمیر آسفالت
-                            <i class="left floated times icon"></i>
+                        <div class="ui segment"
+                             style="display: flex; justify-content: space-between; align-items: center">
+                            تعمیر گاردریل
+                            <a style="color: black" href="">
+                                <i class="left floated times icon"></i></a>
                         </div>
 
                     </div>
                 </div>
             </div>
         </div>
-
-
 
 
         <div class="ui three wide column">
-            <div class="ui segments" id="speciality" style="opacity: 0.9">
-                  <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
+            <div class="ui segments" id="speciality" style="opacity: 0.9; overflow: hidden">
+                <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
                     <h3>انواع تخصص</h3>
                     <i class="left floated small plus icon"></i>
                 </div>
-                <div class="ui basic segment" style="margin-top: 5px">
-                    <div class="ui segments content" id="abdollah">
-                        <div class="ui segment">
-                            نام تخصص ۱
-                            <i class="left floated times icon"></i>
+                <div class="ui basic segment" id="list"
+                     style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
+                    <div class="ui segments content">
+                        <div class="ui segment"
+                             style="display: flex; justify-content: space-between; align-items: center">
+                            نام تخصص
+                            <a style="color: black" href="">
+                                <i class="left floated times icon"></i></a>
                         </div>
-                        <div class="ui segment">
-                            نام تخصص ۲
-                            <i class="left floated times icon"></i>
+                        <div class="ui segment"
+                             style="display: flex; justify-content: space-between; align-items: center">
+                            نام تخصص
+                            <a style="color: black" href="">
+                                <i class="left floated times icon"></i></a>
                         </div>
-
                     </div>
+
                 </div>
             </div>
         </div>
 
-        </div>
     </div>
 
 
 
 
 
-<script>
+    <script>
+        $('#speciality .plus').on('click', function (event) {
+            $('#speciality').find('.content').append(' <div class="ui segment"\n' +
+                '                             style="display: flex; justify-content: space-between; align-items: center">\n' +
+                '                            <form class="ui form">\n' +
+                '                                <input type="text" placeholder="نام تخصص">\n' +
+                '                            </form>\n' +
+                '                        </div>');
 
-    $('#speciality .plus').on('click', function (event) {
-        console.log($(this).find('#abdollah'));
-        $('#speciality').find('#abdollah').append('<div class="ui segment">\n' +
-            '                            نام تخصص ۲\n' +
-            '                            <i class="left floated times icon"></i>\n' +
-            '                        </div>');
-    })
-
-    $('.circle.icon')
-        .popup()
-    ;
-</script>
-
-
-<script>
-    $(document).ready(function () {
-        $('.issuecard').click(function (event) {
-            var id = $(this).attr('id');
-            var path = "/resources/teamdetails/" + id;
-            $("#secretbox").load(path);
-            $("#secretbox").modal('show');
+            var element = document.getElementById("speciality-save-icon");
+            //If it isn't "undefined" and it isn't "null", then it exists.
+            if (typeof (element) != 'undefined' && element != null) {
+                console.log('save-icon already exists!!')
+            } else {
+                $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;">\n' +
+                    '                        <i class="blue save icon"></i>\n' +
+                    '                    </div>');
+            }
 
         });
-    });
-</script>
-{% if question_id != None %}
-    <script>
-        var path = "/resources/teamdetails/" + "{{question_id}}"
-        $("#secretbox").load(path);
-        $("#secretbox").modal('show');
+
+        $('#mission .plus').on('click', function (event) {
+            $('#mission').find('.content').append(' <div class="ui segment"\n' +
+                '                             style="display: flex; justify-content: space-between; align-items: center">\n' +
+                '                            <form class="ui form">\n' +
+                '                                <input type="text" placeholder="نام ماموریت">\n' +
+                '                            </form>\n' +
+                '                        </div>');
+
+            var element = document.getElementById("mission-save-icon");
+            //If it isn't "undefined" and it isn't "null", then it exists.
+            if (typeof (element) != 'undefined' && element != null) {
+                console.log('save-icon already exists!!')
+            } else {
+                $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;">\n' +
+                    '                        <i class="blue save icon"></i>\n' +
+                    '                    </div>');
+            }
+
+        });
+
+        $('.circle.icon')
+            .popup()
+        ;
     </script>
-{% endif %}
+
+
+    <script>
+        $(document).ready(function () {
+            $('.issuecard').click(function (event) {
+                var id = $(this).attr('id');
+                var path = "/resources/teamdetails/" + id;
+                $("#secretbox").load(path);
+                $("#secretbox").modal('show');
+
+            });
+
+            $('#resources').find('.times.icon').mouseover(function () {
+                $(this).css('color', 'red');
+            });
+            $('#resources').find('.times.icon').mouseout(function () {
+                $(this).css('color', 'black');
+            });
+
+
+            $('#resources').find('.plus.icon').mouseover(function () {
+                $(this).css('color', 'green');
+            });
+            $('#resources').find('.plus.icon').mouseout(function () {
+                $(this).css('color', 'black');
+            });
+
+
+            $('#resources').find('.minus.icon').mouseover(function () {
+                $(this).css('color', 'red');
+            });
+            $('#resources').find('.minus.icon').mouseout(function () {
+                $(this).css('color', 'black');
+            });
+
+
+            $('#resources').find('.edit.icon').mouseover(function () {
+                $(this).css('color', 'orange');
+            });
+            $('#resources').find('.edit.icon').mouseout(function () {
+                $(this).css('color', 'black');
+            });
+        });
+    </script>
+    {% if question_id != None %}
+        <script>
+            var path = "/resources/teamdetails/" + "{{question_id}}";
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+        </script>
+    {% endif %}
 
 
 
