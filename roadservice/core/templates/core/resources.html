@@ -13,7 +13,8 @@
                 <div class="ui center aligned segment"
                      style="display: flex; justify-content: space-between; align-items: center; height: 65px;">
                     <h3>لیست تیم&zwnj;ها</h3>
-                    <a href="#" style="color:black;"> <i class="left floated small plus icon" id="add-team-icon"></i></a>
+                    <a href="#" style="color:black;"> <i class="left floated small plus icon"
+                                                         id="add-team-icon"></i></a>
                 </div>
 
                 <div class="ui basic segment">
@@ -121,15 +122,23 @@
                     <div class="ui segments content">
                         <div class="ui segment"
                              style="display: flex; justify-content: space-between; align-items: center">
-                            تعمیر گاردریل
-                            <a style="color: black" href="">
-                                <i class="left floated times icon"></i></a>
+                            گاردریل
+                            <div>
+                                <a style="color: black" href="">
+                                    <i class="left floated times icon"></i></a>
+                                <a style="color: black" href="#">
+                                    <i class="left floated edit icon" id="2"></i></a>
+                            </div>
                         </div>
                         <div class="ui segment"
                              style="display: flex; justify-content: space-between; align-items: center">
-                            تعمیر گاردریل
-                            <a style="color: black" href="">
-                                <i class="left floated times icon"></i></a>
+                            گاردریل
+                            <div>
+                                <a style="color: black" href="">
+                                    <i class="left floated times icon"></i></a>
+                                <a style="color: black" href="#">
+                                    <i class="left floated edit icon" id="2"></i></a>
+                            </div>
                         </div>
 
                     </div>
@@ -186,7 +195,7 @@
                 console.log('save-icon already exists!!')
             } else {
                 $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;">\n' +
-                    '                        <i class="blue save icon"></i>\n' +
+                    '                        <i class="green save icon"></i>\n' +
                     '                    </div>');
             }
 
@@ -206,7 +215,7 @@
                 console.log('save-icon already exists!!')
             } else {
                 $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;">\n' +
-                    '                        <i class="blue save icon"></i>\n' +
+                    '                        <i class="green save icon"></i>\n' +
                     '                    </div>');
             }
 
@@ -246,6 +255,15 @@
             });
 
 
+            $('#mission .edit.icon').click(function () {
+                var id = $(this).attr('id');
+                var path = "/resources/changemission/" + id;
+                {#$("#1-content").load(path);#}
+                $("#secretbox").load(path);
+                $("#secretbox").modal('show');
+
+            });
+
             $('#resources').find('.times.icon').mouseover(function () {
                 $(this).css('color', 'red');
             });
@@ -280,14 +298,14 @@
     </script>
 
 
-<script>
-    $(document).ready(function () {
+    <script>
+        $(document).ready(function () {
 
-        $('.ui.checkbox')
-            .checkbox()
-        ;
-    });
+            $('.ui.checkbox')
+                .checkbox()
+            ;
+        });
 
-</script>
+    </script>
 
 {% endblock %}

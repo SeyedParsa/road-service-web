@@ -91,6 +91,20 @@ class ChangeTeam(View):
                       template_name='core/changeteam.html', context=context)
 
 
+class ChangeMission(View):
+    def get(self, request, *args, **kwargs):
+        mission_id = kwargs['mission_id']
+        context = {'mission': mission_id}
+        return render(request=request,
+                      template_name='core/changemission.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        mission_id = kwargs['mission_id']
+        context = {'mission': mission_id}
+        return render(request=request,
+                      template_name='core/changemission.html', context=context)
+
+
 class AssignModerator(View):
     def get(self, request, *args, **kwargs):
         assign_moderator_form = AssignModeratorForm()

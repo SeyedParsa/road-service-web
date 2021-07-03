@@ -1,0 +1,28 @@
+{% load static %}
+
+<div class="ui mini modal" style="display: block !important;">
+{#<div class="ui segment" style="display: block !important;">#}
+    <div class="header" style="text-align: right">
+        ویرایش نوع ماموریت
+    </div>
+    <div class="content">
+        <form class="ui form" method="post">
+            {% csrf_token %}
+                <div class="ui left icon input">
+                    <i class="truck icon"> </i>
+                    <input type="text" value="گاردریل">
+                </div>
+
+        </form>
+
+    </div>
+    <div class="left aligned actions" style="overflow: hidden;">
+        <div class="ui positive right labeled icon button" style="float: left;">
+            ذخیره
+            <i class="checkmark icon"></i>
+        </div>
+        <div class="ui black deny button" style="float: left;">
+            انصراف
+        </div>
+    </div>
+</div>
