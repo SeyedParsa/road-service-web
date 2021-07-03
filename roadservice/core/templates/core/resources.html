@@ -8,6 +8,55 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/js/jquery-editable-poshytip.min.js"></script>
 
     <div class="ui grid" id="resources">
+    <div class="ui row">
+
+                 <form class="ui form" method="post">
+                    {% csrf_token %}
+                    <div class="fields">
+                        <div class="field" style="width: 400px">
+                            <select class="ui fluid right aligned search dropdown" multiple="">
+                                <option value="">بخش</option>
+                                <option value="AL">کشور سوئد</option>
+                                <option value="AK">استان البرز</option>
+                                <option value="AZ">استان تهران</option>
+                                <option value="AR">استان فارس</option>
+                                <option value="CA">شهرستان شیراز</option>
+                                <option value="CO">شهرستان فیروزکوه</option>
+                                <option value="CT">شهرستان تهران</option>
+                                <option value="DE">شهرستان کرج</option>
+                                <option value="DC">شهرستان قم</option>
+                                <option value="FL">شهرستان دماوند</option>
+                                <option value="GA">شهرستان اصفهان</option>
+                                <option value="HI">استان اصفهان</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="IA">Iowa</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="ME">Maine</option>
+                                <option value="MD">Maryland</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MI">Michigan</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MT">Montana</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NV">Nevada</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <input type="submit" class="ui button" value="فیلتر"></input>
+                        </div>
+                    </div>
+
+
+                </form>
+
+    </div>
         <div class="ui six wide column">
             <div class="ui segments" id="teams" style="opacity: 0.9">
                 <div class="ui center aligned segment"
@@ -204,8 +253,8 @@
             if (typeof (element) != 'undefined' && element != null) {
                 console.log('save-icon already exists!!')
             } else {
-                $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;">\n' +
-                    '                        <i class="green save icon"></i>\n' +
+                $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;color: black">\n' +
+                    '                        <i class="save icon"></i>\n' +
                     '                    </div>');
             }
 
@@ -224,8 +273,8 @@
             if (typeof (element) != 'undefined' && element != null) {
                 console.log('save-icon already exists!!')
             } else {
-                $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;">\n' +
-                    '                        <i class="green save icon"></i>\n' +
+                $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;color: black">\n' +
+                    '                        <i class="save icon"></i>\n' +
                     '                    </div>');
             }
 
@@ -312,6 +361,15 @@
                 $(this).css('color', 'orange');
             });
             $('#resources').find('.edit.icon').mouseout(function () {
+                $(this).css('color', 'black');
+            });
+
+
+
+            $('#resources').find('.save.icon').mouseover(function () {
+                $(this).css('color', 'green');
+            });
+            $('#resources').find('.save.icon').mouseout(function () {
                 $(this).css('color', 'black');
             });
         });
