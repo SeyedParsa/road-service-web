@@ -158,15 +158,25 @@
                     <div class="ui segments content">
                         <div class="ui segment"
                              style="display: flex; justify-content: space-between; align-items: center">
-                            نام تخصص
-                            <a style="color: black" href="">
-                                <i class="left floated times icon"></i></a>
+                            آهنگر
+
+                            <div>
+                                <a style="color: black" href="">
+                                    <i class="left floated times icon"></i></a>
+                                <a style="color: black" href="#">
+                                    <i class="left floated edit icon" id="2"></i></a>
+                            </div>
                         </div>
                         <div class="ui segment"
                              style="display: flex; justify-content: space-between; align-items: center">
-                            نام تخصص
-                            <a style="color: black" href="">
-                                <i class="left floated times icon"></i></a>
+                            متخصص گاو
+
+                            <div>
+                                <a style="color: black" href="">
+                                    <i class="left floated times icon"></i></a>
+                                <a style="color: black" href="#">
+                                    <i class="left floated edit icon" id="2"></i></a>
+                            </div>
                         </div>
                     </div>
 
@@ -258,6 +268,16 @@
             $('#mission .edit.icon').click(function () {
                 var id = $(this).attr('id');
                 var path = "/resources/changemission/" + id;
+                {#$("#1-content").load(path);#}
+                $("#secretbox").load(path);
+                $("#secretbox").modal('show');
+
+            });
+
+
+            $('#speciality .edit.icon').click(function () {
+                var id = $(this).attr('id');
+                var path = "/resources/changespeciality/" + id;
                 {#$("#1-content").load(path);#}
                 $("#secretbox").load(path);
                 $("#secretbox").modal('show');

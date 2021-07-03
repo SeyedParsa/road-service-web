@@ -105,6 +105,21 @@ class ChangeMission(View):
                       template_name='core/changemission.html', context=context)
 
 
+
+class ChangeSpeciality(View):
+    def get(self, request, *args, **kwargs):
+        speciality_id = kwargs['speciality_id']
+        context = {'speciality': speciality_id}
+        return render(request=request,
+                      template_name='core/changespeciality.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        speciality_id = kwargs['speciality_id']
+        context = {'speciality': speciality_id}
+        return render(request=request,
+                      template_name='core/changespeciality.html', context=context)
+
+
 class AssignModerator(View):
     def get(self, request, *args, **kwargs):
         assign_moderator_form = AssignModeratorForm()
