@@ -37,6 +37,7 @@ class StatusReport(View):
             messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
         else:
             print('invalid form!')
+        messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
         return render(request=request,
                       template_name='reporting/statusreport.html',
                       context=context)
@@ -78,6 +79,7 @@ class TimeReport(View):
             messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
         else:
             print('invalid form!')
+        messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
         return render(request=request,
                       template_name='reporting/timereport.html',
                       context=context)
@@ -100,7 +102,7 @@ class RegionReport(View):
             messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
         else:
             print('invalid form!')
+        messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
         return render(request=request,
-                      template_name='reporting/regionreport.html',
-                      context=context)
+                      template_name='reporting/regionreport.html')
 
