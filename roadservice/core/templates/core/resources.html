@@ -9,17 +9,17 @@
 
     <div class="ui grid" id="resources">
         <div class="ui six wide column">
-            <div class="ui segments" style="opacity: 0.9">
+            <div class="ui segments" id="teams" style="opacity: 0.9">
                 <div class="ui center aligned segment"
                      style="display: flex; justify-content: space-between; align-items: center; height: 65px;">
                     <h3>لیست تیم&zwnj;ها</h3>
-                    <i class="small plus icon"></i>
+                    <a href="#" style="color:black;"> <i class="left floated small plus icon" id="add-team-icon"></i></a>
                 </div>
 
                 <div class="ui basic segment">
-                    <div class="ui styled fluid accordion" style="line-height: 2; margin-top: 5px">
+                    <div class="ui styled fluid accordion" id="accordion" style="line-height: 2; margin-top: 5px">
                         <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                            <div class="ui  grid">
+                            <div class="ui  grid" id="1">
                                 <div class="ui four wide column">
                                     <i class="ui angle left icon"></i>
                                     آهنگر
@@ -34,18 +34,17 @@
                                 </div>
                                 <div class="ui four wide column">
                                     <a style="color: black" href="">
-                                        <i class="times icon"></i>
-                                        <i class="edit icon"></i>
-                                    </a>
+                                        <i class="times icon"></i></a>
+                                    <i class="edit icon"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="content">
+                        <div class="content" id="1-content">
                             {% include 'core/teamdetails.html' %}
                         </div>
 
                         <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                            <div class="ui  grid">
+                            <div class="ui  grid" id="2">
                                 <div class="ui four wide column">
                                     <i class="ui angle left icon"></i>
                                     آهنگر
@@ -60,9 +59,8 @@
                                 </div>
                                 <div class="ui four wide column">
                                     <a style="color: black" href="">
-                                        <i class="times icon"></i>
-                                        <i class="edit icon"></i>
-                                    </a>
+                                        <i class="times icon"></i> </a>
+                                    <i class="edit icon"></i>
                                 </div>
                             </div>
                         </div>
@@ -116,7 +114,7 @@
             <div class="ui segments" id="mission" style="opacity: 0.9; overflow: hidden">
                 <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
                     <h3>انواع ماموریت</h3>
-                    <i class="left floated small plus icon"></i>
+                    <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
                 </div>
                 <div class="ui basic segment" id="list"
                      style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
@@ -144,7 +142,7 @@
             <div class="ui segments" id="speciality" style="opacity: 0.9; overflow: hidden">
                 <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
                     <h3>انواع تخصص</h3>
-                    <i class="left floated small plus icon"></i>
+                    <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
                 </div>
                 <div class="ui basic segment" id="list"
                      style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
@@ -222,13 +220,31 @@
 
     <script>
         $(document).ready(function () {
-            $('.issuecard').click(function (event) {
+
+            $('.issuecard').click(function () {
                 var id = $(this).attr('id');
                 var path = "/resources/teamdetails/" + id;
                 $("#secretbox").load(path);
                 $("#secretbox").modal('show');
 
             });
+
+            $('#add-team-icon').click(function () {
+                var path = "/resources/changeteam/" + 0;
+                $("#secretbox").load(path);
+                $("#secretbox").modal('show');
+
+            });
+
+            $('#teams .edit.icon').click(function () {
+                var id = $(this).parent().parent().attr('id');
+                var path = "/resources/changeteam/" + id;
+                {#$("#1-content").load(path);#}
+                $("#secretbox").load(path);
+                $("#secretbox").modal('show');
+
+            });
+
 
             $('#resources').find('.times.icon').mouseover(function () {
                 $(this).css('color', 'red');
@@ -262,15 +278,16 @@
             });
         });
     </script>
-    {% if question_id != None %}
-        <script>
-            var path = "/resources/teamdetails/" + "{{question_id}}";
-            $("#secretbox").load(path);
-            $("#secretbox").modal('show');
-        </script>
-    {% endif %}
 
 
+<script>
+    $(document).ready(function () {
 
+        $('.ui.checkbox')
+            .checkbox()
+        ;
+    });
+
+</script>
 
 {% endblock %}

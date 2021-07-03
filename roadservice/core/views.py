@@ -50,13 +50,13 @@ class Home(View):
 
 class IssueCard(View):
     def get(self, request, *args, **kwargs):
-        issue_id = kwargs['issues_id']
+        issue_id = kwargs['issue_id']
         context = {'card': issue_id}
         return render(request=request,
                       template_name='core/issuecard.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        issue_id = kwargs['issues_id']
+        issue_id = kwargs['issue_id']
         context = {'card': issue_id}
         return render(request=request,
                       template_name='core/issuecard.html', context=context)
@@ -76,6 +76,19 @@ class TeamDetails(View):
         return render(request=request,
                       template_name='core/teamdetails.html', context=context)
 
+
+class ChangeTeam(View):
+    def get(self, request, *args, **kwargs):
+        team_id = kwargs['team_id']
+        context = {'team': team_id}
+        return render(request=request,
+                      template_name='core/changeteam.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        team_id = kwargs['team_id']
+        context = {'team': team_id}
+        return render(request=request,
+                      template_name='core/changeteam.html', context=context)
 
 
 class AssignModerator(View):
