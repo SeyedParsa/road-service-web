@@ -1,18 +1,79 @@
 {% extends 'reporting/../../../core/templates/core/base.html' %}
 {% load static %}
+{%  block semantic-css %}
+    <link
+  rel="stylesheet"
+  href="https://cdn.rtlcss.com/semantic-ui/2.4.1/semantic.rtl.min.css"
+  integrity="sha384-yXUIpeQfH3cuk6u6Mwu8uyJXB2R3UOLvcha1343UCMA2TA7lQ14BFmrudI6LAP8A"
+  crossorigin="anonymous">
+{%  endblock %}
 {% block content %}
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
 
-    قالب روزها: yyyy-mm-dd
 
-    <form method="post">
+
+    <form class="ui form" method="post">
         {% csrf_token %}
-        {{ form }}
+        <div class="fields">
+            <div class="field" style="width: 400px">
+                <select class="ui fluid right aligned search dropdown">
+                    <option value="">بخش</option>
+                    <option value="AL">کشور سوئد</option>
+                    <option value="AK">استان البرز</option>
+                    <option value="AZ">استان تهران</option>
+                    <option value="AR">استان فارس</option>
+                    <option value="CA">شهرستان شیراز</option>
+                    <option value="CO">شهرستان فیروزکوه</option>
+                    <option value="CT">شهرستان تهران</option>
+                    <option value="DE">شهرستان کرج</option>
+                    <option value="DC">شهرستان قم</option>
+                    <option value="FL">شهرستان دماوند</option>
+                    <option value="GA">شهرستان اصفهان</option>
+                    <option value="HI">استان اصفهان</option>
+                    <option value="ID">Idaho</option>
+                    <option value="IL">Illinois</option>
+                    <option value="IN">Indiana</option>
+                    <option value="IA">Iowa</option>
+                    <option value="KS">Kansas</option>
+                    <option value="KY">Kentucky</option>
+                    <option value="LA">Louisiana</option>
+                    <option value="ME">Maine</option>
+                    <option value="MD">Maryland</option>
+                    <option value="MA">Massachusetts</option>
+                    <option value="MI">Michigan</option>
+                    <option value="MN">Minnesota</option>
+                    <option value="MS">Mississippi</option>
+                    <option value="MO">Missouri</option>
+                    <option value="MT">Montana</option>
+                    <option value="NE">Nebraska</option>
+                    <option value="NV">Nevada</option>
+                </select>
+            </div>
 
-        <input type="submit" value="فیلتر">
+            <div class="field">
+                <input type="text" class="example1"/>
+            </div>
+
+            <div class="field">
+                <input type="text" class="example1"/>
+            </div>
+
+
+            <div class="field">
+                <input type="submit" class="ui button" value="فیلتر"></input>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $(".example1").pDatepicker(
+                    {format: 'YYYY/MM/DD'});
+            });
+        </script>
 
     </form>
 
