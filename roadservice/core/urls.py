@@ -12,5 +12,6 @@ urlpatterns = [
     path('dashboard/<int:issues_id>/', views.IssueCard.as_view()),
     path('dashboard/', views.Home.as_view()),
     path('resources/', views.ResourcesView.as_view()),
+    path('resources/teamdetails/<int:issues_id>/', views.IssueCard.as_view()),
     path('', RedirectView.as_view(url='/dashboard/', permanent=False), name='dashboard'),
 ]

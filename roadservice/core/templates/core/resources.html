@@ -9,7 +9,7 @@
 
     <div class="ui grid">
         <div class="ui six wide column">
-            <div class="ui segments">
+            <div class="ui segments" style="opacity: 0.9">
                 <div class="ui center aligned segment" style="width: 100%">
                     <h2>لیست تیم&zwnj;ها</h2>
                 </div>
@@ -29,15 +29,12 @@
 
                                 <div class="ui eight wide column">
                                     <i class="map marker alternate icon"></i>
-                                    استان فارس، شهرستان شیراز
+                                    استان فارس، شیراز
                                 </div>
                             </div>
                         </div>
                         <div class="content">
-                            <p class="transition hidden">A dog is a type of domesticated animal. Known for its loyalty
-                                and
-                                faithfulness, it can be found as a welcome guest in many households across the
-                                world.</p>
+                            {% include 'core/teamdetails.html' %}
                         </div>
 
                         <div class="title" style="color: rgba(0, 0, 0, 0.87)">
@@ -53,15 +50,12 @@
 
                                 <div class="ui eight wide column">
                                     <i class="map marker alternate icon"></i>
-                                    استان فارس، شهرستان شیراز
+                                    استان فارس، شیراز
                                 </div>
                             </div>
                         </div>
                         <div class="content">
-                            <p class="transition hidden">A dog is a type of domesticated animal. Known for its loyalty
-                                and
-                                faithfulness, it can be found as a welcome guest in many households across the
-                                world.</p>
+                            {% include 'core/teamdetails.html' %}
                         </div>
 
                     </div>
@@ -70,7 +64,7 @@
         </div>
 
         <div class="ui four wide column">
-            <div class="ui segments">
+            <div class="ui segments" style="opacity: 0.9">
                   <div class="ui center aligned segment" style="width: 100%">
                     <h2>لیست ماشین‌آلات</h2>
                 </div>
@@ -78,23 +72,25 @@
                     <div class="ui segments">
                         <div class="ui segment">
                             <div class="ui grid">
-                                <div class="ui ten wide column">
-                                    <i class="truck icon"></i>
+                                <div class="ui nine wide column">
                                     جرثقیل
                                 </div>
-                                <div class="ui six wide column">
-                                    تعداد: ۲۲
+                                <div class="ui seven wide column">
+                                    <i class="right floated plus icon"></i>
+                                    18
+                                    <i class="left floated minus icon"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="ui segment">
                             <div class="ui grid">
-                                <div class="ui ten wide column">
-                                    <i class="truck icon"></i>
+                                <div class="ui nine wide column">
                                     لودر
                                 </div>
-                                <div class="ui six wide column">
-                                    تعداد: ۲۱
+                                <div class="ui seven wide column">
+                                    <i class="right floated plus icon"></i>
+                                    20
+                                    <i class="left floated minus icon"></i>
                                 </div>
                             </div>
                         </div>
@@ -105,19 +101,19 @@
         </div>
 
         <div class="ui three wide column">
-            <div class="ui segments">
+            <div class="ui segments" style="opacity: 0.9">
                   <div class="ui center aligned segment" style="width: 100%">
-                    <h2>لیست ماموریت‌ها</h2>
+                    <h2>انواع ماموریت</h2>
                 </div>
                 <div class="ui basic segment" style="margin-top: 5px">
                     <div class="ui segments">
                         <div class="ui segment">
-                            <i class="tasks icon"></i>
-                            نام ماموریت ۱
+                                تعمیر گاردریل
+                            <i class="left floated times icon"></i>
                         </div>
                         <div class="ui segment">
-                            <i class="tasks icon"></i>
-                            نام ماموریت ۲
+                            تعمیر آسفالت
+                            <i class="left floated times icon"></i>
                         </div>
 
                     </div>
@@ -125,20 +121,24 @@
             </div>
         </div>
 
+
+
+
         <div class="ui three wide column">
-            <div class="ui segments">
-                  <div class="ui center aligned segment" style="width: 100%">
-                    <h2>لیست تخصص‌ها</h2>
+            <div class="ui segments" id="speciality" style="opacity: 0.9">
+                  <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
+                    <h3>انواع تخصص</h3>
+                    <i class="left floated small plus icon"></i>
                 </div>
                 <div class="ui basic segment" style="margin-top: 5px">
-                    <div class="ui segments">
+                    <div class="ui segments content" id="abdollah">
                         <div class="ui segment">
-                            <i class="wrench icon"></i>
                             نام تخصص ۱
+                            <i class="left floated times icon"></i>
                         </div>
                         <div class="ui segment">
-                            <i class="wrench icon"></i>
                             نام تخصص ۲
+                            <i class="left floated times icon"></i>
                         </div>
 
                     </div>
@@ -148,6 +148,46 @@
 
         </div>
     </div>
+
+
+
+
+
+<script>
+
+    $('#speciality .plus').on('click', function (event) {
+        console.log($(this).find('#abdollah'));
+        $('#speciality').find('#abdollah').append('<div class="ui segment">\n' +
+            '                            نام تخصص ۲\n' +
+            '                            <i class="left floated times icon"></i>\n' +
+            '                        </div>');
+    })
+
+    $('.circle.icon')
+        .popup()
+    ;
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        $('.issuecard').click(function (event) {
+            var id = $(this).attr('id');
+            var path = "/resources/teamdetails/" + id;
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+
+        });
+    });
+</script>
+{% if question_id != None %}
+    <script>
+        var path = "/resources/teamdetails/" + "{{question_id}}"
+        $("#secretbox").load(path);
+        $("#secretbox").modal('show');
+    </script>
+{% endif %}
+
 
 
 
