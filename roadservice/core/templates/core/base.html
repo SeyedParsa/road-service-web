@@ -12,12 +12,21 @@
     <meta content="PPType" name="author"/>
     <meta content="#ffffff" name="theme-color"/>
     <title>ساج</title>
-    <link rel="stylesheet" type="text/css" href=" {% static "semantic.min.css" %}">
+
+    {% block semantic-css %}
+        <link rel="stylesheet" type="text/css" href=" {% static "semantic.min.css" %}">
+    {% endblock %}
+
+
     <link rel="stylesheet" type="text/css" href=" {% static "base.css" %}">
     <link rel="stylesheet" type="text/css" href=" {% static "pandoc-code-highlight.css" %}">
     <script src="{% static "jquery.min.js" %}"></script>
     <script src="{% static "semantic.min.js" %}"></script>
     <script src="{% static "moment.js" %}"></script>
+    <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js" ></script>
+    <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js" ></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css" ></link>
+
 </head>
 <body>
 
@@ -118,6 +127,15 @@
 </div>
 <style type="text/css">
 
+    @font-face {
+        font-family: "yekan";
+        src: url("{% static "font/yekan.ttf" %}");
+    }
+
+    *:not(.icon) {
+        font-family: yekan, Tahoma, Helvetica, sans-serif !important;
+    }
+
     body {
         background-color: #f0f4f7;
         background-image: url({% static "/images/spanner.png" %});
@@ -126,8 +144,6 @@
         background-repeat: no-repeat;
         background-size: cover;
         background-attachment: fixed;
-        font-family: Tahoma, Helvetica, sans-serif;
-
     }
 
 
