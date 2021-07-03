@@ -142,6 +142,7 @@ class AssignModerator(View):
             messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
         else:
             print('invalid form!')
+        messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
         return render(request=request,
                       template_name='core/assignmoderator.html',
                       context=context)
@@ -153,6 +154,7 @@ class ResourcesView(View):
                       template_name='core/resources.html')
 
     def post(self, request, *args, **kwargs):
+        messages.add_message(request, messages.INFO, 'جدول بروز شد!')
         return render(request=request,
                       template_name='core/resources.html')
 

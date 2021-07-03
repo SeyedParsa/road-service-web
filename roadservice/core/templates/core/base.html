@@ -14,12 +14,12 @@
     <title>ساج</title>
 
     {% block semantic-css %}
-{#        <link rel="stylesheet" type="text/css" href=" {% static "semantic.min.css" %}">#}
-           <link
-  rel="stylesheet"
-  href="https://cdn.rtlcss.com/semantic-ui/2.4.1/semantic.rtl.min.css"
-  integrity="sha384-yXUIpeQfH3cuk6u6Mwu8uyJXB2R3UOLvcha1343UCMA2TA7lQ14BFmrudI6LAP8A"
-  crossorigin="anonymous">
+        {#        <link rel="stylesheet" type="text/css" href=" {% static "semantic.min.css" %}">#}
+        <link
+                rel="stylesheet"
+                href="https://cdn.rtlcss.com/semantic-ui/2.4.1/semantic.rtl.min.css"
+                integrity="sha384-yXUIpeQfH3cuk6u6Mwu8uyJXB2R3UOLvcha1343UCMA2TA7lQ14BFmrudI6LAP8A"
+                crossorigin="anonymous">
     {% endblock %}
 
 
@@ -28,9 +28,10 @@
     <script src="{% static "jquery.min.js" %}"></script>
     <script src="{% static "semantic.min.js" %}"></script>
     <script src="{% static "moment.js" %}"></script>
-    <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js" ></script>
-    <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js" ></script>
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css" ></link>
+    <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js"></script>
+    <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css"></link>
 
 </head>
 <body>
@@ -70,16 +71,39 @@
             {% endif %}
 
 
-            <a href="/reports" class="item"><i class="newspaper icon" style="margin: 10px"></i> گزارش‌ها</a>
 
-            <a href="/admin" class="item"><i class="cogs icon" style="margin: 10px;"></i> مدیریت </a>
+            <div class="ui dropdown link item" id="reports_dropdown">
+                <i class="newspaper icon" style="margin: 10px"></i>
+                <span class="text">گزارش‌ها</span>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="/timereport"> <div class="item">گزارش‌های زمانی</div></a>
+                    <a href="/statusreport"><div class="item">گزارش وضعیت بخش</div> </a>
+                    <a href="/regionreport"> <div class="item">گزارش زیربخش‌ها</div></a>
+                </div>
+            </div>
 
-            <a href="/signup" class="item"><i class="user plus icon" style="margin: 10px;"></i> کاربر جدید </a>
+
+            <div class="ui dropdown link item" id="users_dropdown">
+                <i class="user icon" style="margin: 10px"></i>
+                <span class="text">مدیریت کاربرها</span>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="/assignmoderator"> <div class="item">تعیین کارشناس</div></a>
+                    <a href="/signup"><div class="item">ثبت‌نام کاربر جدید</div> </a>
+                </div>
+            </div>
+
+
+            <a href="/resources" class="item"><i class="bullseye icon" style="margin: 10px;"></i> مدیریت منابع </a>
+
+
+
 
             <div class="right menu"></div>
 
 
-            <div class="ui dropdown item">
+            <div class="ui dropdown item" id="profile_dropdown">
                 {% if user.profile_picture %}
                     <img class="item" style="width:auto;height:60px;border:0;padding:0;"
                          src="{{ user.profile_picture.url }}">
@@ -96,7 +120,7 @@
                     <a class="item" href="/password/set" style="text-align: right">
                         <i class="key icon"></i>
 
-                        تغییر رمز عبور
+                        تغییر گذرواژه
                     </a>
 
                     <a class="item" href="/logout" style="text-align: right">
@@ -104,6 +128,13 @@
                         خروج
 
                     </a>
+
+
+                     <a href="/admin" class="item">
+                         <i class="cogs icon" style="margin: 10px;">
+
+                         </i> مدیریت
+                     </a>
                 </div>
             </div>
 
@@ -358,6 +389,10 @@
 <script>
     $(document).ready(function () {
         $('.ui.dropdown').dropdown();
+        $('#reports_dropdown').dropdown({transition: 'drop', on: 'hover', action: 'select'});
+        $('#users_dropdown').dropdown({transition: 'drop', on: 'hover', action: 'select'});
+        $('#profile_dropdown').dropdown({transition: 'drop', on: 'hover', action: 'select'});
+
         $('.ui.accordion').accordion();
 
         // bind "hide and show vertical menu" event to top right icon button

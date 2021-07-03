@@ -8,7 +8,7 @@ app_name = 'core'
 urlpatterns = [
     path('accept-issue/', views.AcceptIssue.as_view()),
     path('update-location/', views.UpdateLocation.as_view()),
-    path('assign-moderator/', views.AssignModerator.as_view()),
+    path('assignmoderator/', views.AssignModerator.as_view()),
     path('dashboard/<int:issue_id>/', views.IssueCard.as_view()),
     path('dashboard/', views.Home.as_view()),
     path('resources/', views.ResourcesView.as_view()),
