@@ -50,7 +50,7 @@
 <div class="ui borderless huge menu"
      style="z-index:50;position:relative;filter: alpha(opacity=90);-moz-opacity: 0.9;-khtml-opacity: 0.9;opacity: 0.9;">
     <div class="ui container grid">
-        <div class="computer only row">
+        <div class="row">
             <a href="/" class="item">
                 <div>
                     <img class="item" style="width:auto;height:70px;" src="{% static "images/logo.png" %}">
@@ -139,22 +139,35 @@
             </div>
 
         </div>
-        <div class="tablet mobile only row">
-            <a class="header item"> ساج</a>
-            <div class="right menu">
-                <a class="menu item">
-                    <div class="ui basic icon toggle button">
-                        <i class="content icon"></i>
-                    </div>
-                </a>
-            </div>
-            <div class="ui vertical accordion borderless fluid menu">
-                <a class="active item"> خانه </a>
-                <a class="item">خروج </a>
-                <div class="ui divider"></div>
-            </div>
-        </div>
+{#        <div class="tablet mobile only row">#}
+{#            <a class="header item"> ساج</a>#}
+{#            <div class="right menu">#}
+{#                <a class="menu item">#}
+{#                    <div class="ui basic icon toggle button">#}
+{#                        <i class="content icon"></i>#}
+{#                    </div>#}
+{#                </a>#}
+{#            </div>#}
+{##}
+{##}
+{#            <div class="ui vertical accordion borderless fluid menu">#}
+{#                   <div class="ui dropdown link item">#}
+{#                        <span class="text">گزارش‌ها</span>#}
+{#                        <i class="dropdown icon"></i>#}
+{#                        <div class="menu">#}
+{#                            <a href="/timereport"> <div class="item">گزارش‌های زمانی</div></a>#}
+{#                            <a href="/statusreport"><div class="item">گزارش وضعیت بخش</div> </a>#}
+{#                            <a href="/regionreport"> <div class="item">گزارش زیربخش‌ها</div></a>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{##}
+{#                <a class="item">خروج </a>#}
+{#                <div class="ui divider"></div>#}
+{#            </div>#}
+{#        </div>#}
     </div>
+
 </div>
 <div class="ui container">
     {% block content %}
