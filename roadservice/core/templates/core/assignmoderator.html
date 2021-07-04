@@ -31,7 +31,7 @@
                             </div>
 
                             <div class="field">
-                                <select class="ui fluid right aligned search dropdown">
+                                <select class="ui fluid right aligned search dropdown" id="reg">
                                     <option value="">بخش</option>
                                     <option value="AL">کشور سوئد</option>
                                     <option value="AK">استان البرز</option>
@@ -72,4 +72,27 @@
         </div>
     </div>
 
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                $('.ui.form').form({
+                    inline: true,
+                    fields: {
+                        identification_number: {
+                            identifier: 'identification_number',
+                            rules: [
+                                {type: 'empty', prompt: 'لطفا کد ملی را وارد کنید.'}
+                            ]
+                        },
+                        password2: {
+                            identifier: 'reg',
+                            rules: [
+                                {type: 'empty', prompt: 'لطفا بخش مورد نظر را وارد کنید.'}
+                            ]
+                        }
+                    }
+                });
+            });
+        </script>
 {% endblock %}
