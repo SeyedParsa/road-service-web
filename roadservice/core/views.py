@@ -62,7 +62,6 @@ class IssueCard(View):
                       template_name='core/issuecard.html', context=context)
 
 
-
 class TeamDetails(View):
     def get(self, request, *args, **kwargs):
         team_id = kwargs['team_id']
