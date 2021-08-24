@@ -43,7 +43,7 @@ class Region(models.Model):
 
     type = models.CharField(max_length=2, choices=Type.choices)
     name = models.CharField(max_length=20)
-    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, on_delete=models.PROTECT)
+    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, blank=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -51,17 +51,31 @@ class Region(models.Model):
     def has_moderator(self):
         return hasattr(self, 'moderator')
 
+    def get_concrete(self):
+        if self.type == Region.Type.COUNTRY:
+            return self.country
+        elif self.type == Region.Type.PROVINCE:
+            return self.province
+        elif self.type == Region.Type.COUNTY:
+            return self.county
+
 
 class Country(Region):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.type = Region.Type.COUNTRY
 
+    def get_concrete(self):
+        return self
+
 
 class Province(Region):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.type = Region.Type.PROVINCE
+
+    def get_concrete(self):
+        return self
 
 
 class County(Region):
@@ -89,6 +103,9 @@ class County(Region):
             return None
         return machinery_qs.get()
 
+    def get_concrete(self):
+        return self
+
 
 class Moderator(Role):
     region = models.OneToOneField(Region, on_delete=models.PROTECT)
@@ -97,14 +114,33 @@ class Moderator(Role):
         return ' '.join([str(self.user), str(self.region)])
 
     def pre_assign_moderator(self, user, region):
-        if region.region_ptr not in self.region.sub_regions.all():
+        """Check if the assignment is valid and dismiss the previous moderator if applicable.\
+
+        Keyword arguments:
+        user -- the User that becomes moderator
+        region -- the Region that becomes moderated
+        """
+        if region not in self.region.sub_regions.all():
             raise Exception('The region is not in the moderator\'s subregions')
-        elif region.has_moderator() and region.moderator.user is user:
+        elif region.has_moderator() and region.moderator.user == user:
             raise Exception('The user is already the moderator of the region')
         elif user.has_role():
             raise Exception('The user has a role')
         elif region.has_moderator():
             region.moderator.delete()
+            region.refresh_from_db()
+
+    @abstractmethod
+    def assign_moderator(self, user, region):
+        pass
+
+    def get_concrete(self):
+        if self.type == Role.Type.COUNTRY_MODERATOR:
+            return self.countrymoderator
+        elif self.type == Role.Type.PROVINCE_MODERATOR:
+            return self.provincemoderator
+        elif self.type == Role.Type.COUNTY_MODERATOR:
+            return self.countymoderator
 
 
 class CountryModerator(Moderator):
@@ -112,13 +148,22 @@ class CountryModerator(Moderator):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.COUNTRY_MODERATOR
 
-    @property
-    def country(self):
-        return self.region
-
     def assign_moderator(self, user, region):
+        """Assign user as the moderator of country if applicable and return the created Role.
+
+        Keyword arguments:
+        user -- the User that becomes moderator
+        region -- the Region that becomes moderated
+        """
         self.pre_assign_moderator(user, region)
-        return ProvinceModerator.objects.create(user=user, region=region)
+        province_moderator = ProvinceModerator.objects.create(user=user, region=region)
+        province_moderator.refresh_from_db()
+        region.refresh_from_db()
+        user.refresh_from_db()
+        return province_moderator
+
+    def get_concrete(self):
+        return self
 
 
 class ProvinceModerator(Moderator):
@@ -126,13 +171,22 @@ class ProvinceModerator(Moderator):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.PROVINCE_MODERATOR
 
-    @property
-    def province(self):
-        return self.region
-
     def assign_moderator(self, user, region):
+        """Assign user as the moderator of country if applicable and return the created Role.
+
+        Keyword arguments:
+        user -- the User that becomes moderator
+        region -- the Region that becomes moderated
+        """
         self.pre_assign_moderator(user, region)
-        return CountyModerator.objects.create(user=user, region=region)
+        county_moderator = CountyModerator.objects.create(user=user, region=region)
+        county_moderator.refresh_from_db()
+        region.refresh_from_db()
+        user.refresh_from_db()
+        return county_moderator
+
+    def get_concrete(self):
+        return self
 
 
 class CountyModerator(Moderator):
@@ -140,13 +194,12 @@ class CountyModerator(Moderator):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.COUNTY_MODERATOR
 
-    @property
-    def county(self):
-        return self.region
-
     # TODO
     def assign_county_expert(self):
         pass
+
+    def get_concrete(self):
+        return self
 
 
 class Speciality(models.Model):
@@ -182,11 +235,17 @@ class Serviceman(Role, GeoModel):
         self.location = location
         self.save()
 
+    def get_concrete(self):
+        return self
+
 
 class Citizen(Role):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.CITIZEN
+
+    def get_concrete(self):
+        return self
 
 
 class MachineryType(models.Model):
@@ -333,7 +392,7 @@ class CountyExpert(Role):
             speciality_requirements is a list of tuples in the form of (Speciality, Amount) in which the
                 specialities are distinct. The same goes for machinery_requirements.
         """
-        if issue.county is not self.county:
+        if issue.county != self.county:
             raise Exception('The county expert can only accept the issues in its county')
 
         for speciality, amount in speciality_requirements:
@@ -345,3 +404,6 @@ class CountyExpert(Role):
         issue.state = Issue.State.ACCEPTED
         issue.save()
         issue.assign_resources(mission_type)
+
+    def get_concrete(self):
+        return self

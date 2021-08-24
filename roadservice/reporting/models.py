@@ -105,9 +105,9 @@ class ReportGenerator:
         return getattr(self.instance, name)
 
     def is_county_matching_region(self, county, region):
-        return region.type is Region.Type.COUNTY and county.name == region.name\
-        or (region.type is Region.Type.PROVINCE and county.province.name == region.name)\
-        or (region.type is Region.Type.COUNTRY and county.province.country.name == region.name)
+        return region.type == Region.Type.COUNTY and county.name == region.name\
+        or (region.type == Region.Type.PROVINCE and county.province.name == region.name)\
+        or (region.type == Region.Type.COUNTRY and county.province.country.name == region.name)
 
     def region_teams_time_report(self, region, start_time, end_time):
         time_report = TimeReport(name="تعداد تیم‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد تیم")
@@ -142,7 +142,7 @@ class ReportGenerator:
         # TODO: Report different types of missions
         time_report = TimeReport(name="تعداد ماموریت‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد ماموریت‌ها")
         missions = list(Mission.objects.all())
-        region_missions = [mission for mission in missions if self.is_county_matching_region(mission.county, region)]
+        region_missions = [mission for mission in missions if self.is_county_matching_region(mission.county, region.get_concrete())]
 
         while start_time <= end_time:
             time_report.add_item(start_time, len(list(mission for mission in region_missions
@@ -156,7 +156,7 @@ class ReportGenerator:
         time_report = TimeReport(name="تعداد ماموریت‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد ماموریت‌ها")
         missions = list(Mission.objects.all())
         region_missions = [mission for mission in missions if
-                           self.is_county_matching_region(mission.county, region)]
+                           self.is_county_matching_region(mission.county, region.get_concrete())]
 
         score_sum = 0
         score_cnt = 0

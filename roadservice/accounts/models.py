@@ -25,5 +25,19 @@ class Role(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=Type.choices)
 
+    def get_concrete(self):
+        if self.type == Role.Type.CITIZEN:
+            return self.citizen
+        elif self.type == Role.Type.SERVICEMAN:
+            return self.serviceman
+        elif self.type == Role.Type.COUNTRY_MODERATOR:
+            return self.moderator.countrymoderator
+        elif self.type == Role.Type.PROVINCE_MODERATOR:
+            return self.moderator.provincemoderator
+        elif self.type == Role.Type.COUNTY_MODERATOR:
+            return self.moderator.countymoderator
+        elif self.type == Role.Type.countyexpert:
+            return self.countyexpert
+
     def __str__(self):
-        return '%s %s' % (self.user, self.type)
+        return '%s %s' % (self.type, self.user)

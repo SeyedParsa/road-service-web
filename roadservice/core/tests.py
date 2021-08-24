@@ -12,27 +12,33 @@ class ModeratorsTestCase(TestCase):
         self.mahdi = User.objects.create(username='mahdi', phone_number='3')
         self.iran = Country.objects.create(name='Iran')
         self.tehran = Province.objects.create(name='Tehran', super_region=self.iran)
+        self.tehran.refresh_from_db()
         self.shiraz = Province.objects.create(name='Shiraz', super_region=self.iran)
+        self.shiraz.refresh_from_db()
         self.damavand = County.objects.create(name='Damavand', super_region=self.tehran)
+        self.damavand.refresh_from_db()
         self.firoozkooh = County.objects.create(name='Firoozkooh', super_region=self.tehran)
+        self.firoozkooh.refresh_from_db()
         self.president = CountryModerator.objects.create(user=self.parsa, region=self.iran)
+        self.president.refresh_from_db()
 
     def test_moderator_assignment(self):
         self.assertEqual(self.iran.moderator.user, self.parsa)
-        tehran_moderator = self.president.assign_moderator(self.kiarash, self.tehran)
+        tehran_moderator = self.president.assign_moderator(self.kiarash, self.tehran.region_ptr)
         self.assertEqual(self.tehran.moderator.user, self.kiarash)
-        tehran_moderator.assign_moderator(self.majid, self.damavand)
+        tehran_moderator.assign_moderator(self.majid, self.damavand.region_ptr)
         self.assertEqual(self.damavand.moderator.user, self.majid)
         with self.assertRaisesMessage(Exception, 'The region is not in the moderator\'s subregions'):
-            tehran_moderator.assign_moderator(self.mahdi, self.shiraz)
+            tehran_moderator.assign_moderator(self.mahdi, self.shiraz.region_ptr)
         with self.assertRaisesMessage(Exception, 'The user is already the moderator of the region'):
-            self.president.assign_moderator(self.kiarash, self.tehran)
+            self.president.assign_moderator(self.kiarash, self.tehran.region_ptr)
         with self.assertRaisesMessage(Exception, 'The user has a role'):
-            self.president.assign_moderator(self.majid, self.shiraz)
+            self.president.assign_moderator(self.majid, self.shiraz.region_ptr)
 
-        self.president.assign_moderator(self.mahdi, self.tehran)
+        self.president.assign_moderator(self.mahdi, self.tehran.region_ptr)
         self.kiarash.refresh_from_db()
-        self.president.assign_moderator(self.kiarash, self.shiraz)
+        self.tehran.refresh_from_db()
+        self.president.assign_moderator(self.kiarash, self.shiraz.region_ptr)
         self.assertEqual(self.tehran.moderator.user, self.mahdi)
         self.assertEqual(self.shiraz.moderator.user, self.kiarash)
 
