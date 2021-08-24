@@ -105,9 +105,9 @@ class ReportGenerator:
         return getattr(self.instance, name)
 
     def is_county_matching_region(self, county, region):
-        return region.type is Region.Type.COUNTY and county.name == region.name\
-        or (region.type is Region.Type.PROVINCE and county.province.name == region.name)\
-        or (region.type is Region.Type.COUNTRY and county.province.country.name == region.name)
+        return region.type == Region.Type.COUNTY and county.name == region.name\
+        or (region.type == Region.Type.PROVINCE and county.province.name == region.name)\
+        or (region.type == Region.Type.COUNTRY and county.province.country.name == region.name)
 
     def region_teams_time_report(self, region, start_time, end_time):
         time_report = TimeReport(name="تعداد تیم‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد تیم")
@@ -142,11 +142,11 @@ class ReportGenerator:
         # TODO: Report different types of missions
         time_report = TimeReport(name="تعداد ماموریت‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد ماموریت‌ها")
         missions = list(Mission.objects.all())
-        region_missions = [mission for mission in missions if self.is_county_matching_region(mission.get_county(), region)]
+        region_missions = [mission for mission in missions if self.is_county_matching_region(mission.county, region.get_concrete())]
 
         while start_time <= end_time:
             time_report.add_item(start_time, len(list(mission for mission in region_missions
-                                                      if mission.get_created_at_date() == start_time)))
+                                                      if mission.created_at_date == start_time)))
             start_time += datetime.timedelta(days=1)
 
         return time_report
@@ -156,14 +156,14 @@ class ReportGenerator:
         time_report = TimeReport(name="تعداد ماموریت‌های بخش انتخابی در بازه انتخابی", y_axis_name="تعداد ماموریت‌ها")
         missions = list(Mission.objects.all())
         region_missions = [mission for mission in missions if
-                           self.is_county_matching_region(mission.get_county(), region)]
+                           self.is_county_matching_region(mission.county, region.get_concrete())]
 
         score_sum = 0
         score_cnt = 0
         while start_time <= end_time:
             daily_missions = list(mission for mission in region_missions
-                                                      if mission.get_created_at_date() == start_time)
-            mission_scores = [mission.score for mission in daily_missions if mission.get_state() == Issue.State.SCORED]
+                                                      if mission.created_at_date == start_time)
+            mission_scores = [mission.score for mission in daily_missions if mission.state == Issue.State.SCORED]
             score_sum += sum(mission_scores)
             score_cnt += len(mission_scores)
             time_report.add_item(start_time, score_sum/score_cnt if score_cnt > 0 else 0)
