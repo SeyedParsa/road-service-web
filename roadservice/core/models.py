@@ -181,6 +181,34 @@ class Moderator(Role):
                     res |= county.issue_set.all()
         return res
 
+    def create_new_user(self, username, password):
+        # TODO: Check whether the username and the password are valid
+        if User.objects.filter(username=username).exists():
+            return False
+        user = User.objects.create(username=username, password=password)
+        user.save()
+        return user
+
+    def get_teams_in_county(self, *counties_under_moderation):
+        service_teams_under_moderation = []
+        for county_under_moderation in counties_under_moderation:
+            for a_service_team in ServiceTeam.objects.all():
+                if a_service_team.county == county_under_moderation:
+                    service_teams_under_moderation.append(a_service_team)
+        return service_teams_under_moderation
+
+    def get_teams_list(self):
+        teams_list = []
+        if self.type == Role.Type.COUNTRY_MODERATOR:
+            for province_in_country in self.region.sub_regions:
+                for county_in_province in province_in_country.sub_regions:
+                    teams_list.append(self.get_teams_in_county(county_in_province))
+        elif self.type == Role.Type.PROVINCE_MODERATOR:
+            for county_in_province in self.region.sub_regions:
+                teams_list.append(self.get_teams_in_county(county_in_province))
+        elif self.type == Role.Type.COUNTY_MODERATOR:
+            return self.get_teams_in_county(self.region.sub_regions)
+
 
 class CountryModerator(Moderator):
     def __init__(self, *args, **kwargs):
@@ -202,7 +230,12 @@ class CountryModerator(Moderator):
         return province_moderator
 
     def get_concrete(self):
-        return self
+        if self.type == Role.Type.COUNTRY_MODERATOR:
+            return self.countrymoderator
+        elif self.type == Role.Type.PROVINCE_MODERATOR:
+            return self.provincemoderator
+        elif self.type == Role.Type.COUNTY_MODERATOR:
+            return self.countymoderator
 
 
 class ProvinceModerator(Moderator):
@@ -240,6 +273,40 @@ class CountyModerator(Moderator):
     def get_concrete(self):
         return self
 
+    def add_service_team(self, *team_members, new_team_speciality):
+        for team_member in team_members:
+            if team_member.user.has_role():
+                return False
+        new_team = ServiceTeam(county=self.region.county, speciality=new_team_speciality)
+        for team_member in team_members:
+            new_serviceman = Serviceman(team=new_team, user=team_member.user)
+        return True
+
+    def add_speciality(self, name):
+        if not Speciality.objects.filter(name=name).exists():
+            raise Exception('Already exists')
+        else:
+            speciality = Speciality.objects.create(name=name)
+            speciality.save()
+            return speciality
+
+    def rename_speciality(self, old_name, new_name):
+        if Speciality.objects.filter(name=old_name).exists():
+            speciality = Speciality.objects.get(name=old_name)
+            speciality.name = new_name
+            speciality.save()
+            return speciality
+        raise Exception('Not Found')
+
+    def delete_speciality(self, name):
+        if Speciality.objects.filter(name=name).exists():
+            speciality = Speciality.objects.get(name=name)
+            try:
+                speciality.delete()
+                return True
+            except Exception:
+                return False
+        return False
 
 class Speciality(models.Model):
     name = models.CharField(max_length=20)
