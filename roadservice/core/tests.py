@@ -367,6 +367,13 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.tehran_moderator.moderator_ptr.get_concrete(), self.tehran_moderator)
         self.assertEqual(self.tehran_moderator.moderator_ptr.role_ptr.get_concrete(), self.tehran_moderator)
 
+    def test_manipulating_speciality(self):
+        self.assertEqual(self.mohammadali.add_speciality('barricade removal').name, 'barricade removal')
+        self.assertEqual(self.mohammadali.rename_speciality('barricade removal', 'sade mabar').name, 'sade mabar')
+        self.mohammadali.delete_speciality('sade mabar')
+        # makes sure that sade mabar has been deleted
+        self.assertEqual(self.mohammadali.add_speciality('barricade removal').name, 'barricade removal')
+
     def test_can_moderate(self):
         self.setUpModerators()
         self.assertTrue(self.iran_moderator.moderator_ptr.can_moderate(self.iran.region_ptr))
