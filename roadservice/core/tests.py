@@ -20,7 +20,7 @@ class ModeratorsTestCase(TestCase):
         self.firoozkooh = County.objects.create(name='Firoozkooh', super_region=self.tehran)
         self.firoozkooh.refresh_from_db()
         self.president = CountryModerator.objects.create(user=self.parsa, region=self.iran)
-        self.president.refresh_from_db()
+        self.iran.refresh_from_db()
 
     def test_moderator_assignment(self):
         self.assertEqual(self.iran.moderator.user, self.parsa)
@@ -77,3 +77,25 @@ class AcceptIssueTestCase(TestCase):
         self.assertEqual(self.issue.state, Issue.State.ASSIGNED)
         self.assertEqual(self.serviceman.team.active_mission, self.issue.mission)
         self.assertEqual(self.crane.available_count, 7)
+
+
+class SubmitIssueTestCase(TestCase):
+    def setUp(self):
+        self.citizen_user = User.objects.create(username='parsa', phone_number='0')
+        self.citizen = Citizen.objects.create(user=self.citizen_user)
+
+        self.iran = Country.objects.create(name='Iran')
+        self.tehran = Province.objects.create(name='Tehran', super_region=self.iran)
+        self.tehran.refresh_from_db()
+        self.shemiranat = County.objects.create(name='Shemiranat', super_region=self.tehran)
+        self.shemiranat.refresh_from_db()
+
+        self.expert_user = User.objects.create(username='kiarash', phone_number='1')
+        self.expert = CountyExpert.objects.create(user=self.expert_user, county=self.shemiranat)
+
+    def test_submit_issue(self):
+        self.issue = self.citizen.submit_issue(title='The cow on the road',
+                                               description='There is a cow trapped in the Chamran Highway guard rails!',
+                                               county=self.shemiranat)
+        self.assertTrue(self.issue in self.expert.county.issue_set.all())
+        print(self.expert.get_reported_issues())
