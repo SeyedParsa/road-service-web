@@ -1,13 +1,16 @@
-from django.conf.urls import url
 from django.urls import path
 from django.views.generic.base import RedirectView
 
-from core import views
+from core import views, api_views
 
 app_name = 'core'
 urlpatterns = [
-    path('accept-issue/', views.AcceptIssue.as_view()),
-    path('update-location/', views.UpdateLocation.as_view()),
+    path('api/regions/', api_views.RegionsListView.as_view()),
+    path('api/citizen/issue/', api_views.CurrentIssueView.as_view()),
+    path('api/citizen/report-issue/', api_views.ReportIssueView.as_view()),
+    path('api/citizen/rate-issue/', api_views.RateIssueView.as_view()),
+    path('api/accept-issue/', api_views.AcceptIssueView.as_view()),
+    path('api/update-location/', api_views.UpdateLocationView.as_view()),
     path('assignmoderator/', views.AssignModerator.as_view()),
     path('dashboard/<int:issue_id>/', views.IssueCard.as_view()),
     path('dashboard/', views.Home.as_view()),
