@@ -1,7 +1,7 @@
 from django.test import TestCase
 from accounts.models import User
 from core.models import Country, Province, County, CountryModerator, ProvinceModerator, Citizen, Serviceman, \
-    ServiceTeam, Speciality, CountyExpert, Issue, MachineryType, Machinery, MissionType, Location, Region
+    ServiceTeam, Speciality, CountyExpert, Issue, MachineryType, Machinery, MissionType, CountyModerator, Speciality, Location, Region
 
 
 class BaseTestCase(TestCase):
@@ -412,6 +412,22 @@ class ModeratorTestCase(BaseTestCase):
         self.assertFalse(self.tehran_province_moderator.can_view_issue(self.issue2))
         self.assertFalse(self.tehran_moderator.can_view_issue(self.issue1))
         self.assertFalse(self.tehran_moderator.can_view_issue(self.issue2))
+
+    def getting_reports(self):
+        pass
+
+    def test_expert_assignment(self):
+        self.damavand_expert = CountyExpert.objects.create(user=self.asghar, county=self.damavand)
+        self.assertEqual(self.damavand.expert.user, self.asghar)
+        self.rey.moderator.get_concrete().assign_expert(self.akbar)
+        self.assertEqual(self.rey.expert.user, self.akbar)
+
+    def test_user_creation(self):
+        self.jfk = self.rey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald')
+        self.assertEqual(self.jfk.username, 'JohnFKennedy')
+        with self.assertRaisesMessage(Exception, 'Already exists'):
+            pass
+        self.team = ServiceTeam.objects.create(county=shemiran, speciality=self.asphalt_fixing)
 
 
 class RegionTestCase(BaseTestCase):
