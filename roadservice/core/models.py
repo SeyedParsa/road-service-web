@@ -70,19 +70,19 @@ class Region(models.Model):
 
     def get_including_regions(self):
         """returns a queryset consisting of regions that include this region"""
-        res = Region.objects.filter(pk=self.pk)
-        if self.type != Region.Type.COUNTRY:
-            res |= self.super_region.get_including_regions()
-        return res
+        return Region.objects.filter(pk=self.pk) | self.super_region.get_including_regions()
 
     def get_counties(self):
-        concrete = self.get_concrete()
-        if concrete.type == Region.Type.COUNTY:
-            return County.objects.filter(pk=self.pk)
         res = County.objects.none()
         for region in self.sub_regions.all():
-            res |= region.get_counties()
+            res |= region.get_concrete().get_counties()
         return res
+
+    def get_teams(self):
+        pass
+
+    def get_machineries(self):
+        pass
 
 
 class Country(Region):
@@ -92,6 +92,9 @@ class Country(Region):
 
     def get_concrete(self):
         return self
+
+    def get_including_regions(self):
+        return Region.objects.filter(pk=self.pk)
 
 
 class Province(Region):
@@ -110,6 +113,9 @@ class County(Region):
 
     def get_concrete(self):
         return self
+
+    def get_counties(self):
+        return County.objects.filter(pk=self.pk)
 
     def get_required_teams(self, speciality, amount, location):
         special_teams = list(
@@ -134,6 +140,8 @@ class County(Region):
     def notify_expert(self):
         pass # TODO
 
+    def has_expert(self):
+        return hasattr(self, 'expert')
 
 class Moderator(Role):
     region = models.OneToOneField(Region, on_delete=models.PROTECT)
@@ -181,33 +189,29 @@ class Moderator(Role):
                     res |= county.issue_set.all()
         return res
 
+    def get_teams(self, regions):
+        res = ServiceTeam.objects.none()
+        for region in regions:
+            if self.can_moderate(region):
+                for county in region.get_counties():
+                    res |= county.serviceteam_set.all()
+        return res
+
+    def get_machineries(self, regions):
+        res = Machinery.objects.none()
+        for region in regions:
+            if self.can_moderate(region):
+                for county in region.get_counties():
+                    res |= county.machinery_set.all()
+        return res
+
     def create_new_user(self, username, password):
         # TODO: Check whether the username and the password are valid
         if User.objects.filter(username=username).exists():
-            return False
+            raise Exception('Already exists')
         user = User.objects.create(username=username, password=password)
         user.save()
         return user
-
-    def get_teams_in_county(self, *counties_under_moderation):
-        service_teams_under_moderation = []
-        for county_under_moderation in counties_under_moderation:
-            for a_service_team in ServiceTeam.objects.all():
-                if a_service_team.county == county_under_moderation:
-                    service_teams_under_moderation.append(a_service_team)
-        return service_teams_under_moderation
-
-    def get_teams_list(self):
-        teams_list = []
-        if self.type == Role.Type.COUNTRY_MODERATOR:
-            for province_in_country in self.region.sub_regions:
-                for county_in_province in province_in_country.sub_regions:
-                    teams_list.append(self.get_teams_in_county(county_in_province))
-        elif self.type == Role.Type.PROVINCE_MODERATOR:
-            for county_in_province in self.region.sub_regions:
-                teams_list.append(self.get_teams_in_county(county_in_province))
-        elif self.type == Role.Type.COUNTY_MODERATOR:
-            return self.get_teams_in_county(self.region.sub_regions)
 
 
 class CountryModerator(Moderator):
@@ -266,24 +270,22 @@ class CountyModerator(Moderator):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.COUNTY_MODERATOR
 
-    # TODO
-    def assign_county_expert(self):
-        pass
-
     def get_concrete(self):
         return self
 
     def add_service_team(self, *team_members, new_team_speciality):
         for team_member in team_members:
             if team_member.user.has_role():
-                return False
+                raise Exception('The user has a role')
         new_team = ServiceTeam(county=self.region.county, speciality=new_team_speciality)
+        new_team.save()
         for team_member in team_members:
             new_serviceman = Serviceman(team=new_team, user=team_member.user)
-        return True
+            new_serviceman.save()
+        return new_team
 
     def add_speciality(self, name):
-        if not Speciality.objects.filter(name=name).exists():
+        if Speciality.objects.filter(name=name).exists():
             raise Exception('Already exists')
         else:
             speciality = Speciality.objects.create(name=name)
@@ -307,6 +309,30 @@ class CountyModerator(Moderator):
             except Exception:
                 return False
         return False
+
+    def pre_assign_expert(self, user): # TODO
+        """Check if the assignment is valid and dismiss the previous moderator if applicable.\
+
+        Keyword arguments:
+        user -- the User that becomes moderator
+        region -- the Region that becomes moderated
+        """
+        county = self.region.get_concrete()
+        if county.has_expert() and county.expert.user == user:
+            raise Exception('The user is already the expert of the county')
+        elif user.has_role():
+            raise Exception('The user has a role')
+        elif county.has_expert():
+            county.expert.delete()
+            county.refresh_from_db()
+            return True
+        else:
+            return False
+
+    def assign_expert(self, user):
+        self.pre_assign_expert(user)
+        CountyExpert.objects.create(user=user, county=self.region.get_concrete())
+
 
 class Speciality(models.Model):
     name = models.CharField(max_length=20)
