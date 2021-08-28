@@ -1,22 +1,31 @@
 from django.contrib import messages
 from django.shortcuts import render
 from django.views import View
+from khayyam import *
 
 from accounts.models import User
-from core.forms import AssignModeratorForm
-from core.models import Region, CountryModerator, ProvinceModerator
+from core.forms import AssignModeratorForm, RegionMultipleFilterForm
+from core.models import Region, CountryModerator, ProvinceModerator, Issue
 
 
 class Home(View):
     def get(self, request, *args, **kwargs):
+        issues = Issue.objects.all()
+        # TODO: filter issues by user @Kiarash
+        context = {'issues': issues}
         return render(request=request,
-                      template_name='core/dashboard.html')
+                      template_name='core/dashboard.html',
+                      context=context)
 
 
 class IssueCard(View):
     def get(self, request, *args, **kwargs):
         issue_id = kwargs['issue_id']
-        context = {'card': issue_id}
+        context = {'id': issue_id}
+        print('ISSUE ID = ', issue_id)
+        issue = Issue.objects.get(id=issue_id)
+        context['issue'] = issue
+        context['persian_datetime'] = JalaliDatetime(issue.created_at).strftime("%C")
         return render(request=request,
                       template_name='core/issuecard.html', context=context)
 
@@ -111,12 +120,24 @@ class AssignModerator(View):
                       context=context)
 
 
-class ResourcesView(View):
+class Resources(View):
     def get(self, request, *args, **kwargs):
+        form = RegionMultipleFilterForm()
+        context = {'filter_form': form}
         return render(request=request,
-                      template_name='core/resources.html')
+                      template_name='core/resources.html',
+                      context=context)
 
     def post(self, request, *args, **kwargs):
-        messages.add_message(request, messages.INFO, 'جدول بروز شد!')
+        form = RegionMultipleFilterForm(request.POST)
+        context = {'filter_form': form}
+        if form.is_valid():
+            messages.add_message(request, messages.INFO, 'جدول بروز شد!')
+            regions = form.cleaned_data.get('regions')
+            print(regions)
+            # TODO: lab lab lab @KIARASH!
+        else:
+            messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
         return render(request=request,
-                      template_name='core/resources.html')
+                      template_name='core/resources.html',
+                      context=context)

@@ -25,7 +25,7 @@ urlpatterns = [
     path('assignmoderator/', views.AssignModerator.as_view()),
     path('dashboard/<int:issue_id>/', views.IssueCard.as_view()),
     path('dashboard/', views.Home.as_view()),
-    path('resources/', views.ResourcesView.as_view()),
+    path('resources/', views.Resources.as_view()),
     path('resources/teamdetails/<int:issue_id>/', views.IssueCard.as_view()),
     path('resources/changeteam/<int:team_id>/', views.ChangeTeam.as_view()),
     path('resources/changemission/<int:mission_id>/', views.ChangeMission.as_view()),
