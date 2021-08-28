@@ -52,7 +52,8 @@ class Region(models.Model):
 
     type = models.CharField(max_length=2, choices=Type.choices)
     name = models.CharField(max_length=20)
-    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, blank=True, on_delete=models.PROTECT)
+    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, blank=True,
+                                     on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -205,14 +206,44 @@ class Moderator(Role):
                     res |= county.machinery_set.all()
         return res
 
-    def create_new_user(self, username, password):
+    def create_new_user(self, username, password, phone_number):
         # TODO: Check whether the username and the password are valid
         if User.objects.filter(username=username).exists():
             raise Exception('Already exists')
-        user = User.objects.create(username=username, password=password)
-        user.save()
+        user = User.objects.create(username=username, password=password, phone_number=phone_number)
         return user
 
+    def is_under_moderation(self, *input_regions):
+        concrete_moderator = self.get_concrete()
+        for a_region in input_regions:
+            concrete_region = a_region.get_concrete()
+            if concrete_region.moderator == concrete_moderator:
+                pass
+            else:
+                return False
+        return True
+
+    def get_teams_list(self, *input_regions):
+        if not self.is_under_moderation(input_regions):
+            raise Exception('Fatal: Moderator not authorized to oversee some or all of inputted regions')
+        concrete_moderator = self.get_concrete()
+        teams_list = []
+        for a_region in input_regions:
+            for every_county in a_region.get_counties_within_this_region():
+                teams_list.append(every_county.get_teams_in_counties())
+        return teams_list
+
+    def get_machinery_list(self, *input_regions):
+        if not self.is_under_moderation(input_regions):
+            raise Exception('Fatal: Moderator not authorized to oversee some or all of inputted regions')
+        concrete_moderator = self.get_concrete()
+        machinery_list = []
+        for a_region in input_regions:
+            for every_county in a_region.get_counties_within_this_region():
+                machinery_list.append(every_county.get_machinery_in_counties())
+        return machinery_list
+
+>>>>>>> Update models.py
 
 class CountryModerator(Moderator):
     def __init__(self, *args, **kwargs):
@@ -234,12 +265,7 @@ class CountryModerator(Moderator):
         return province_moderator
 
     def get_concrete(self):
-        if self.type == Role.Type.COUNTRY_MODERATOR:
-            return self.countrymoderator
-        elif self.type == Role.Type.PROVINCE_MODERATOR:
-            return self.provincemoderator
-        elif self.type == Role.Type.COUNTY_MODERATOR:
-            return self.countymoderator
+        return self
 
 
 class ProvinceModerator(Moderator):
@@ -273,15 +299,13 @@ class CountyModerator(Moderator):
     def get_concrete(self):
         return self
 
-    def add_service_team(self, *team_members, new_team_speciality):
+    def add_service_team(self, speciality, *team_members):
         for team_member in team_members:
-            if team_member.user.has_role():
+            if team_member.has_role():
                 raise Exception('The user has a role')
-        new_team = ServiceTeam(county=self.region.county, speciality=new_team_speciality)
-        new_team.save()
+        new_team = ServiceTeam.objects.create(county=self.region.get_concrete(), speciality=speciality)
         for team_member in team_members:
-            new_serviceman = Serviceman(team=new_team, user=team_member.user)
-            new_serviceman.save()
+            new_serviceman = Serviceman.objects.create(team=new_team, user=team_member)
         return new_team
 
     def add_speciality(self, name):
