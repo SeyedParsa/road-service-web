@@ -422,6 +422,7 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.damavand.expert.user, self.asghar)
         self.rey.moderator.get_concrete().assign_expert(self.akbar)
         self.assertEqual(self.rey.expert.user, self.akbar)
+        self.assertEqual(self.rey.has_expert(), True)
 
     def test_user_creation(self):
         self.jfk = self.rey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555')
@@ -434,7 +435,23 @@ class ModeratorTestCase(BaseTestCase):
         self.team17 = self.rey.moderator.add_service_team(self.my_speciality, self.osama, self.vladimir)
         self.team17.refresh_from_db()
         self.assertEqual(self.vladimir.role.get_concrete().team, self.team17)
+        self.assertEqual(self.rey.moderator.get_teams_list(self.rey)[-1], self.team17)
+        self.edited_team = self.rey.moderator.edit_service_team(self.team17, self.my_speciality, self.osama, self.vladimir, self.abubakr)
+        self.assertEqual(self.edited_team, self.abubakr.team)
+        self.assertEqual(self.rey.moderator.delete_service_team(self.team17), True)
 
+    def test_machinery_manipulation(self):
+        self.tractor = Machinery.objects.create(type='tractor', total_count=1, available_count=1, county=self.rey)
+        self.rey.moderator.add_machinery('tractor')
+        self.tractor.refresh_from_db()
+        self.assertEqual(self.tractor.total_count, 2)
+        self.tractor.refresh_from_db()
+        self.rey.moderator.remove_machinery('tractor')
+        self.tractor.refresh_from_db()
+        self.assertEqual(self.tractor.total_count, 1)
+        self.snow_plow = self.rey.moderator.add_machinery('snow plow')
+        self.snow_plow.refresh_from_db()
+        self.assertEqual(self.snow_plow.total_count, 1)
 
 class RegionTestCase(BaseTestCase):
     def test_has_moderator(self):
