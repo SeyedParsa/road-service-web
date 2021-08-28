@@ -131,7 +131,7 @@ class County(Region):
             return None
         return machinery_qs.get()
 
-    def notify_expert_of_issue(self, issue):
+    def notify_expert(self):
         pass # TODO
 
 
@@ -392,7 +392,7 @@ class Issue(GeoModel):
         self.save()
 
     def notify_expert(self):
-        self.county.notify_expert_of_issue(self)
+        self.county.notify_expert()
 
     def rate(self, rating):
         if self.state == Issue.State.DONE:

@@ -52,23 +52,23 @@ class BaseTestCase(TestCase):
         self.maleki = User.objects.create(username='maleki', phone_number='12')
         self.amin = User.objects.create(username='amin', phone_number='13')
 
-        self.president = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
+        self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
         self.iran.refresh_from_db()
 
-        self.tehran_province_moderator = self.president.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
+        self.tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
         self.tehran_moderator = self.tehran_province_moderator.assign_moderator(self.pooyan, self.tehran.region_ptr)
         self.damavand_moderator = self.tehran_province_moderator.assign_moderator(self.amirkasra, self.damavand.region_ptr)
         self.shahrerey_moderator = self.tehran_province_moderator.assign_moderator(self.majid, self.shahrerey.region_ptr)
 
-        self.shiraz_province_moderator = self.president.assign_moderator(self.mahdi, self.shiraz_province.region_ptr)
+        self.shiraz_province_moderator = self.iran_moderator.assign_moderator(self.mahdi, self.shiraz_province.region_ptr)
         self.shiraz_moderator = self.shiraz_province_moderator.assign_moderator(self.amin, self.shiraz.region_ptr)
         self.marvdasht_moderator = self.shiraz_province_moderator.assign_moderator(self.ali, self.marvdasht.region_ptr)
 
-        self.khorasan_moderator = self.president.assign_moderator(self.maleki, self.khorasan.region_ptr)
+        self.khorasan_moderator = self.iran_moderator.assign_moderator(self.maleki, self.khorasan.region_ptr)
         self.mashhad_moderator = self.khorasan_moderator.assign_moderator(self.gorji, self.mashhad.region_ptr)
         self.neyshabur_moderator = self.khorasan_moderator.assign_moderator(self.alireza, self.neyshabur.region_ptr)
 
-        self.isfahan_province_moderator = self.president.assign_moderator(self.sina, self.isfahan_province.region_ptr)
+        self.isfahan_province_moderator = self.iran_moderator.assign_moderator(self.sina, self.isfahan_province.region_ptr)
         self.isfahan_moderator = self.isfahan_province_moderator.assign_moderator(self.erfan, self.isfahan.region_ptr)
         self.khansar_moderator = self.isfahan_province_moderator.assign_moderator(self.amoo, self.khansar.region_ptr)
 
@@ -308,49 +308,98 @@ class IssueTestCase(TestCase):
         pass
 
 
-class ModeratorTestCase(TestCase):
+class ModeratorTestCase(BaseTestCase):
     def setUp(self):
+        self.setUpRegions()
+        self.setUpCitizens()
         self.parsa = User.objects.create(username='parsa', phone_number='0')
         self.kiarash = User.objects.create(username='kiarash', phone_number='1')
         self.majid = User.objects.create(username='majid', phone_number='2')
         self.mahdi = User.objects.create(username='mahdi', phone_number='3')
-        self.iran = Country.objects.create(name='Iran')
-        self.tehran = Province.objects.create(name='Tehran', super_region=self.iran)
-        self.tehran.refresh_from_db()
-        self.shiraz = Province.objects.create(name='Shiraz', super_region=self.iran)
-        self.shiraz.refresh_from_db()
-        self.damavand = County.objects.create(name='Damavand', super_region=self.tehran)
-        self.damavand.refresh_from_db()
-        self.firoozkooh = County.objects.create(name='Firoozkooh', super_region=self.tehran)
-        self.firoozkooh.refresh_from_db()
-        self.president = CountryModerator.objects.create(user=self.parsa, region=self.iran)
-        self.iran.refresh_from_db()
+
+    def setUpModerators(self):
+        self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
+        self.tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
+        self.tehran_moderator = self.tehran_province_moderator.assign_moderator(self.majid, self.tehran.region_ptr)
+
+    def setUpIssues(self):
+        self.issue0 = self.citizen0.submit_issue(title='The cow on the road',
+                                                 description='There is a cow trapped in the Chamran Highway guard rails!',
+                                                 county=self.tehran)
+        self.issue1 = self.citizen1.submit_issue(title='The horse on the road',
+                                                 description='There is a horse trapped in the Chamran Highway guard rails!',
+                                                 county=self.damavand)
+        self.issue2 = self.citizen2.submit_issue(title='The fox on the road',
+                                                 description='There is a fox trapped in the Chamran Highway guard rails!',
+                                                 county=self.shiraz)
 
     def test_assign_moderator(self):
+        self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
+        self.iran.refresh_from_db()
         self.assertEqual(self.iran.moderator.user, self.parsa)
-        tehran_moderator = self.president.assign_moderator(self.kiarash, self.tehran.region_ptr)
-        self.assertEqual(self.tehran.moderator.user, self.kiarash)
-        tehran_moderator.assign_moderator(self.majid, self.damavand.region_ptr)
+        tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
+        self.assertEqual(self.tehran_province.moderator.user, self.kiarash)
+        tehran_province_moderator.assign_moderator(self.majid, self.damavand.region_ptr)
         self.assertEqual(self.damavand.moderator.user, self.majid)
         with self.assertRaisesMessage(Exception, 'The region is not in the moderator\'s subregions'):
-            tehran_moderator.assign_moderator(self.mahdi, self.shiraz.region_ptr)
+            tehran_province_moderator.assign_moderator(self.mahdi, self.shiraz_province.region_ptr)
         with self.assertRaisesMessage(Exception, 'The user is already the moderator of the region'):
-            self.president.assign_moderator(self.kiarash, self.tehran.region_ptr)
+            self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
         with self.assertRaisesMessage(Exception, 'The user has a role'):
-            self.president.assign_moderator(self.majid, self.shiraz.region_ptr)
+            self.iran_moderator.assign_moderator(self.majid, self.shiraz_province.region_ptr)
 
-        self.president.assign_moderator(self.mahdi, self.tehran.region_ptr)
+        self.iran_moderator.assign_moderator(self.mahdi, self.tehran_province.region_ptr)
         self.kiarash.refresh_from_db()
-        self.tehran.refresh_from_db()
-        self.president.assign_moderator(self.kiarash, self.shiraz.region_ptr)
-        self.assertEqual(self.tehran.moderator.user, self.mahdi)
-        self.assertEqual(self.shiraz.moderator.user, self.kiarash)
+        self.tehran_province.refresh_from_db()
+        self.iran_moderator.assign_moderator(self.kiarash, self.shiraz_province.region_ptr)
+        self.assertEqual(self.tehran_province.moderator.user, self.mahdi)
+        self.assertEqual(self.shiraz_province.moderator.user, self.kiarash)
+
+    def test_get_concrete(self):
+        self.setUpModerators()
+        self.assertEqual(self.iran_moderator.moderator_ptr.get_concrete(), self.iran_moderator)
+        self.assertEqual(self.tehran_province_moderator.moderator_ptr.get_concrete(), self.tehran_province_moderator)
+        self.assertEqual(self.tehran_moderator.moderator_ptr.get_concrete(), self.tehran_moderator)
+        self.assertEqual(self.tehran_moderator.moderator_ptr.role_ptr.get_concrete(), self.tehran_moderator)
+
+    def test_can_moderate(self):
+        self.setUpModerators()
+        self.assertTrue(self.iran_moderator.moderator_ptr.can_moderate(self.iran.region_ptr))
+        self.assertTrue(self.iran_moderator.moderator_ptr.can_moderate(self.shiraz_province.region_ptr))
+        self.assertTrue(self.iran_moderator.moderator_ptr.can_moderate(self.shiraz.region_ptr))
+        self.assertTrue(self.tehran_province_moderator.moderator_ptr.can_moderate(self.tehran_province.region_ptr))
+        self.assertTrue(self.tehran_province_moderator.moderator_ptr.can_moderate(self.tehran.region_ptr))
+        self.assertTrue(self.tehran_province_moderator.moderator_ptr.can_moderate(self.damavand.region_ptr))
+        self.assertFalse(self.tehran_province_moderator.can_moderate(self.shiraz_province.region_ptr))
+        self.assertFalse(self.tehran_province_moderator.can_moderate(self.shiraz.region_ptr))
+        self.assertFalse(self.tehran_moderator.can_moderate(self.tehran_province.region_ptr))
 
     def test_get_issues(self):
-        pass
+        self.setUpModerators()
+        self.setUpIssues()
+        self.assertEqual(list(self.tehran_moderator.get_issues([self.tehran])), [self.issue0])
+        self.assertEqual(set(self.tehran_province_moderator.get_issues(
+            [self.tehran.region_ptr, self.damavand.region_ptr, self.shahrerey.region_ptr])),
+                         set([self.issue0, self.issue1]))
+        self.assertEqual(set(self.iran_moderator.get_issues(
+            [self.tehran_province.region_ptr, self.shiraz.region_ptr, self.khorasan.region_ptr])),
+                         set([self.issue0, self.issue1, self.issue2]))
+        self.assertEqual(set(self.iran_moderator.get_issues(
+            [self.shiraz.region_ptr, self.khorasan.region_ptr])), set([self.issue2]))
+        self.assertEqual(set(self.iran_moderator.get_issues([self.khorasan.region_ptr])), set([]))
 
     def test_view_issue(self):
-        pass
+        self.setUpModerators()
+        self.setUpIssues()
+        self.assertTrue(self.iran_moderator.can_view_issue(self.issue0))
+        self.assertTrue(self.iran_moderator.can_view_issue(self.issue1))
+        self.assertTrue(self.iran_moderator.can_view_issue(self.issue2))
+        self.assertTrue(self.tehran_province_moderator.can_view_issue(self.issue0))
+        self.assertTrue(self.tehran_province_moderator.can_view_issue(self.issue1))
+        self.assertTrue(self.tehran_moderator.can_view_issue(self.issue0))
+        self.assertFalse(self.tehran_province_moderator.can_view_issue(self.issue2))
+        self.assertFalse(self.tehran_moderator.can_view_issue(self.issue1))
+        self.assertFalse(self.tehran_moderator.can_view_issue(self.issue2))
 
 
 class RegionTestCase(BaseTestCase):
