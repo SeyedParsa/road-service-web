@@ -13,6 +13,7 @@ class CurrentIssueView(APIView):
     permission_classes = [IsAuthenticated, IsCitizen]
 
     def get(self, request):
+        # TODO: maybe add a get_current_issue to citizen
         issue_qs = Issue.objects.filter(reporter=request.user.role.citizen).order_by('-created_at')
         if not issue_qs.exists():
             return Response({'state': Issue.State.SCORED.value})
@@ -32,9 +33,14 @@ class ReportIssueView(APIView):
     def post(self, request):
         serializer = IssueReporingSerializer(data=request.data)
         if serializer.is_valid():
+            lat = serializer.validated_data['lat']
+            long = serializer.validated_data['long']
+            title = serializer.validated_data['title']
+            description = serializer.validated_data['description']
             county = serializer.validated_data['county']
-            pass  # TODO: backend + error
-            issue = Issue.objects.first()
+            citizen = request.user.role.citizen
+            issue = citizen.submit_issue(title=title, description=description, county=county,
+                                         location=Location(lat, long))
             return Response(IssueSerializer(issue).data)
         return Response(serializer.error_messages)  # TODO
 
@@ -46,8 +52,14 @@ class RateIssueView(APIView):
         serializer = IssueRatingSerializer(data=request.data)
         if serializer.is_valid():
             rating = serializer.validated_data['rating']
-            pass  # TODO: backend + error
-            return Response({'status': True})
+            citizen = request.user.role.citizen
+            # TODO: use get_currnet_issue
+            issue_qs = Issue.objects.filter(reporter=request.user.role.citizen).order_by('-created_at')
+            if not issue_qs.exists():
+                return Response({'status': False})
+            issue = issue_qs.first()
+            result = citizen.rate_issue(issue, rating)
+            return Response({'status': result})
         return Response(serializer.error_messages)  # TODO
 
 
@@ -96,8 +108,9 @@ class FinishMissionView(APIView):
         serializer = MissionReportSerializer(data=request.data)
         if serializer.is_valid():
             report = serializer.validated_data['report']
-            pass  # TODO: backend
-            return Response({'status': True})
+            serviceman = request.user.role.serviceman
+            result = serviceman.end_mission(report)
+            return Response({'status': result})
         return Response(serializer.error_messages)  # TODO
 
 
@@ -105,8 +118,7 @@ class ReportedIssuesView(APIView):
     permission_classes = [IsAuthenticated, IsCountyExpert]
 
     def get(self, request):
-        issues = Issue.objects.filter(county=request.user.role.countyexpert.county,
-                                      state=Issue.State.REPORTED).order_by('-created_at')
+        issues = request.user.role.countyexpert.get_reported_issues().order_by('-created_at')
         return Response(IssueSerializer(issues, many=True).data)
 
 
@@ -139,8 +151,7 @@ class AcceptIssueView(APIView):
             machinery_requirements = [tuple(mr.values())
                                       for mr in serializer.validated_data['machinery_requirements']]
             county_expert = request.user.role.countyexpert
-            result = True
-            # result = county_expert.accept_issue(issue, mission_type, speciality_requirements, machinery_requirements)
+            result = county_expert.accept_issue(issue, mission_type, speciality_requirements, machinery_requirements)
             return Response({'status': result})
         print(serializer.__dict__)
         return Response(serializer.error_messages)
@@ -154,8 +165,6 @@ class RejectIssueView(APIView):
         if serializer.is_valid():
             issue = serializer.validated_data['issue']
             county_expert = request.user.role.countyexpert
-            # TODO: connect to backend
-            result = True
-            # result = county_expert.reject_issue(issue)
+            result = county_expert.reject_issue(issue)
             return Response({'status': result})
         return Response(serializer.error_messages)
