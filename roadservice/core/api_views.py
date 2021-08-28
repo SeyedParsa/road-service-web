@@ -2,29 +2,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import CountyExpert, Serviceman, Location, Issue, Country
-from core.permissions import IsCitizen, IsServiceman
+from core.models import Location, Issue, Country, Speciality, MachineryType
+from core.permissions import IsCitizen, IsServiceman, IsCountyExpert
 from core.serializers import IssueAcceptanceSerializer, LocationSerializer, IssueSerializer, NestedCountrySerializer, \
-    IssueReporingSerializer, IssueRatingSerializer, ServiceTeamSerializer, MissionSerializer, MissionReportSerializer
-
-
-class AcceptIssueView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, format=None):
-        serializer = IssueAcceptanceSerializer(data=request.data)
-        if serializer.is_valid():
-            issue = serializer.validated_data['issue']
-            mission_type = serializer.validated_data['mission_type']
-            speciality_requirements = [tuple(sr.values())
-                                       for sr in serializer.validated_data['speciality_requirements']]
-            machinery_requirements = [tuple(mr.values())
-                                      for mr in serializer.validated_data['machinery_requirements']]
-            # TODO: select the corresponding county expert (this is for EAB)
-            county_expert = CountyExpert.objects.all()[0]
-            result = county_expert.accept_issue(issue, mission_type, speciality_requirements, machinery_requirements)
-            return Response(result)
-        return Response(serializer.error_messages)
+    IssueReporingSerializer, IssueRatingSerializer, ServiceTeamSerializer, MissionSerializer, MissionReportSerializer, \
+    SpecialitySerializer, MachineryTypeSerializer, IssueRejectionSerializer
 
 
 class CurrentIssueView(APIView):
@@ -118,3 +100,62 @@ class FinishMissionView(APIView):
             return Response({'status': True})
         return Response(serializer.error_messages)  # TODO
 
+
+class ReportedIssuesView(APIView):
+    permission_classes = [IsAuthenticated, IsCountyExpert]
+
+    def get(self, request):
+        issues = Issue.objects.filter(county=request.user.role.countyexpert.county,
+                                      state=Issue.State.REPORTED).order_by('-created_at')
+        return Response(IssueSerializer(issues, many=True).data)
+
+
+class SpecialitiesView(APIView):
+    permission_classes = [IsAuthenticated, IsCountyExpert]
+
+    def get(self, request):
+        specialities = Speciality.objects.all()
+        return Response(SpecialitySerializer(specialities, many=True).data)
+
+
+class MachineryTypesView(APIView):
+    permission_classes = [IsAuthenticated, IsCountyExpert]
+
+    def get(self, request):
+        machinery_types = MachineryType.objects.all()
+        return Response(MachineryTypeSerializer(machinery_types, many=True).data)
+
+
+class AcceptIssueView(APIView):
+    permission_classes = [IsAuthenticated, IsCountyExpert]
+
+    def post(self, request, format=None):
+        serializer = IssueAcceptanceSerializer(data=request.data)
+        if serializer.is_valid():
+            issue = serializer.validated_data['issue']
+            mission_type = serializer.validated_data['mission_type']
+            speciality_requirements = [tuple(sr.values())
+                                       for sr in serializer.validated_data['speciality_requirements']]
+            machinery_requirements = [tuple(mr.values())
+                                      for mr in serializer.validated_data['machinery_requirements']]
+            county_expert = request.user.role.countyexpert
+            result = True
+            # result = county_expert.accept_issue(issue, mission_type, speciality_requirements, machinery_requirements)
+            return Response({'status': result})
+        print(serializer.__dict__)
+        return Response(serializer.error_messages)
+
+
+class RejectIssueView(APIView):
+    permission_classes = [IsAuthenticated, IsCountyExpert]
+
+    def post(self, request, format=None):
+        serializer = IssueRejectionSerializer(data=request.data)
+        if serializer.is_valid():
+            issue = serializer.validated_data['issue']
+            county_expert = request.user.role.countyexpert
+            # TODO: connect to backend
+            result = True
+            # result = county_expert.reject_issue(issue)
+            return Response({'status': result})
+        return Response(serializer.error_messages)

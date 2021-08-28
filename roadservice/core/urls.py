@@ -14,7 +14,12 @@ urlpatterns = [
     path('api/serviceman/mission/', api_views.CurrentMissionView.as_view()),
     path('api/serviceman/update-location/', api_views.UpdateLocationView.as_view()),
     path('api/serviceman/finish-mission/', api_views.FinishMissionView.as_view()),
-    path('api/accept-issue/', api_views.AcceptIssueView.as_view()),
+    path('api/expert/issues/', api_views.ReportedIssuesView.as_view()),
+    path('api/expert/specialities/', api_views.SpecialitiesView.as_view()),
+    path('api/expert/machinery-types/', api_views.MachineryTypesView.as_view()),
+    path('api/expert/accept-issue/', api_views.AcceptIssueView.as_view()),
+    path('api/expert/reject-issue/', api_views.RejectIssueView.as_view()),
+
     path('assignmoderator/', views.AssignModerator.as_view()),
     path('dashboard/<int:issue_id>/', views.IssueCard.as_view()),
     path('dashboard/', views.Home.as_view()),
@@ -23,7 +28,6 @@ urlpatterns = [
     path('resources/changeteam/<int:team_id>/', views.ChangeTeam.as_view()),
     path('resources/changemission/<int:mission_id>/', views.ChangeMission.as_view()),
     path('resources/changespeciality/<int:speciality_id>/', views.ChangeSpeciality.as_view()),
-
 
     path('', RedirectView.as_view(url='/dashboard/', permanent=False), name='dashboard'),
 ]

@@ -24,19 +24,15 @@ class MissionTypeSerializer(serializers.ModelSerializer):
 
 
 class SpecialityRequirementSerializer(serializers.ModelSerializer):
-    issue = serializers.PrimaryKeyRelatedField(queryset=Issue.objects.all())
-
     class Meta:
         model = SpecialityRequirement
-        fields = ['id', 'speciality', 'amount', 'issue']
+        fields = ['id', 'speciality', 'amount']
 
 
 class MachineryRequirementSerializer(serializers.ModelSerializer):
-    issue = serializers.PrimaryKeyRelatedField(queryset=Issue.objects.all())
-
     class Meta:
         model = MachineryRequirement
-        fields = ['id', 'machinery_type', 'amount', 'issue']
+        fields = ['id', 'machinery_type', 'amount']
 
 
 class IssueAcceptanceSerializer(serializers.Serializer):
@@ -44,6 +40,10 @@ class IssueAcceptanceSerializer(serializers.Serializer):
     mission_type = serializers.PrimaryKeyRelatedField(queryset=MissionType.objects.all())
     speciality_requirements = serializers.ListField(child=SpecialityRequirementSerializer(), required=False)
     machinery_requirements = serializers.ListField(child=MachineryRequirementSerializer(), required=False)
+
+
+class IssueRejectionSerializer(serializers.Serializer):
+    issue = serializers.PrimaryKeyRelatedField(queryset=Issue.objects.all())
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -83,6 +83,7 @@ class CountySerializer(serializers.ModelSerializer):
 class IssueSerializer(serializers.ModelSerializer):
     mission = serializers.PrimaryKeyRelatedField(queryset=Mission.objects.all(), allow_null=True)
     county = serializers.SerializerMethodField()
+    reporter = serializers.SerializerMethodField()
 
     class Meta:
         model = Issue
@@ -91,6 +92,9 @@ class IssueSerializer(serializers.ModelSerializer):
 
     def get_county(self, obj):
         return CountySerializer(obj.county).data
+
+    def get_reporter(self, obj):
+        return UserSerializer(obj.reporter.user).data
 
 
 class NestedCountySerializer(serializers.ModelSerializer):
@@ -179,7 +183,7 @@ class MissionSerializer(serializers.ModelSerializer):
         return IssueSerializer(obj.issue).data
 
     def get_service_teams(self, obj):
-        return ServiceTeamSerializer(obj.service_teams, many=True).data
+        return ServiceTeamSerializer(obj.service_teams.all(), many=True).data
 
     def get_type(self, obj):
         return MissionTypeSerializer(obj.type).data
