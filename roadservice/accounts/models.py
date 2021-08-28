@@ -25,9 +25,8 @@ class User(AbstractUser):
         if self.password == old_password:
             self.password = new_password
             self.save()
-            self.refresh_from_db()
             return True
-        raise Exception ('Login info authentication failed')
+        raise False
 
 
 class Role(models.Model):
