@@ -426,6 +426,8 @@ class CountyModerator(Moderator):
             speciality = Speciality.objects.get(name=name)
             speciality.delete()
             return True
+        else:
+            return False
 
     def pre_assign_expert(self, user): # TODO
         """Check if the assignment is valid and dismiss the previous moderator if applicable.\
@@ -434,6 +436,8 @@ class CountyModerator(Moderator):
         user -- the User that becomes moderator
         region -- the Region that becomes moderated
         """
+    def pre_assign_expert(self, user):
+        # Check whether the operation is valid and dismiss the previous moderator
         county = self.region.get_concrete()
         if county.has_expert() and county.expert.user == user:
             raise Exception('The user is already the expert of the county')
@@ -444,7 +448,7 @@ class CountyModerator(Moderator):
             county.refresh_from_db()
             return True
         else:
-            return False
+            return True
 
     def assign_expert(self, user):
         self.pre_assign_expert(user)
@@ -458,7 +462,7 @@ class CountyModerator(Moderator):
             machine.refresh_from_db()
             return True
         else:
-            Machinery.objects.create(type=type, total_count=1, available_count=1, county=self.get_concrete().county)
+            Machinery.objects.create(type=type, total_count=1, available_count=1, county=self.region.get_concrete().county)
 
     def remove_machinery(self, machine_type):
         machine = Machinery.objects.get(type=machine_type)
