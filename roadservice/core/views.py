@@ -172,27 +172,30 @@ class AssignModerator(View):
 
 class Resources(View):
     def get(self, request, *args, **kwargs):
-        context = {'filter_form': RegionMultipleFilterForm()}
-        context['machineries'] = Machinery.objects.all()
-        context['mission_types'] = MissionType.objects.all()
-        context['specialities'] = Speciality.objects.all()
+        context = {'filter_form': RegionMultipleFilterForm(),
+                   'machineries': Machinery.objects.all(),
+                   'mission_types': MissionType.objects.all(),
+                   'specialities': Speciality.objects.all()}
         # TODO: filter objects from above lines by user accessible objects @Kiarash
+        form = RegionMultipleFilterForm()
+        context = {'filter_form': form}
         return render(request=request,
                       template_name='core/resources.html',
                       context=context)
 
     def post(self, request, *args, **kwargs):
         form = RegionMultipleFilterForm(request.POST)
-        context = {'filter_form': form}
-        context['machineries'] = Machinery.objects.all()
-        context['mission_types'] = MissionType.objects.all()
-        context['specialities'] = Speciality.objects.all()
+        context = {'filter_form': form,
+                   'machineries': Machinery.objects.all(),
+                   'mission_types': MissionType.objects.all(),
+                   'specialities': Speciality.objects.all()}
         # TODO: filter objects from above lines by user accessible objects @Kiarash
         if form.is_valid():
             messages.add_message(request, messages.INFO, 'جدول بروز شد!')
             regions = form.cleaned_data.get('regions')
             print(regions)
             # TODO: Do the filtering! @Kiarash
+            # TODO: lab lab lab @KIARASH!
         else:
             messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
         return render(request=request,
