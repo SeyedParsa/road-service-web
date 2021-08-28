@@ -17,6 +17,15 @@ class Location:
     def to_tuple(self):
         return self.lat, self.long
 
+    def __str__(self):
+        return str(self.to_tuple())
+
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, Location):
+            return self.lat == other.lat and self.long == other.long
+        return False
+
 
 class GeoModel(models.Model):
     lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -267,9 +276,9 @@ class Serviceman(Role, GeoModel):
         self.location = location
         self.save()
 
-    def end_mission(self, mission, report):
-        if self.team.active_mission == mission:
-            return mission.finish(report)
+    def end_mission(self, report):
+        if self.team.active_mission is not None:
+            return self.team.active_mission.finish(report)
         else:
             return False
 
@@ -338,7 +347,7 @@ class Issue(GeoModel):
     def assign_resources(self, mission_type):
         # TODO: requires lock
         if self.state != Issue.State.ACCEPTED:
-            return False
+            return None
             # raise Exception('The issues must be an accepted issue for resource assignment')
         required_teams = []
         for speciality_requirement in self.specialityrequirement_set.all():
@@ -349,7 +358,7 @@ class Issue(GeoModel):
             )
             if len(special_teams) < speciality_requirement.amount:
                 self.postpone_assignment(mission_type)
-                return False
+                return None
             required_teams += special_teams
 
         required_machineries = []
@@ -360,7 +369,7 @@ class Issue(GeoModel):
             )
             if machinery is None:
                 self.postpone_assignment(mission_type)
-                return False
+                return None
             required_machineries.append((machinery, machinery_requirement.amount))
 
         mission = Mission.objects.create(issue=self, type=mission_type)
@@ -368,12 +377,13 @@ class Issue(GeoModel):
             mission.service_teams.add(team)
             team.active_mission = mission
             team.save()
+        mission.save()
         for machinery, amount in required_machineries:
             machinery.available_count -= amount
             machinery.save()
         self.state = Issue.State.ASSIGNED
         self.save()
-        return True
+        return mission
 
     def postpone_assignment(self, mission_type):
         # Right now we won't implement the queue, so the mission will just fail
@@ -392,6 +402,12 @@ class Issue(GeoModel):
             return True
         else:
             return False
+
+    def return_machineries(self):
+        for machinery_requirement in self.machineryrequirement_set.all():
+            machinery = self.county.machinery_set.get(type=machinery_requirement.machinery_type)
+            machinery.available_count += machinery_requirement.amount
+            machinery.save()
 
 
 class SpecialityRequirement(models.Model):
@@ -441,12 +457,19 @@ class Mission(models.Model):
     def created_at_date(self):
         return self.issue.created_at.date()
 
+    def return_machineries(self):
+        self.issue.return_machineries()
+
     def finish(self, report):
         if self.issue.state == Issue.State.ASSIGNED:
             self.report = report
             self.save()
             self.issue.state = Issue.State.DONE
             self.issue.save()
+            for team in self.service_teams.all():
+                team.active_mission = None
+                team.save()
+            self.return_machineries()
             return True
         else:
             return False
@@ -471,7 +494,7 @@ class CountyExpert(Role):
                 specialities are distinct. The same goes for machinery_requirements.
         """
         if issue.county != self.county:
-            return False
+            return None
             # raise Exception('The county expert can only accept the issues in its county')
 
         for speciality, amount in speciality_requirements:
