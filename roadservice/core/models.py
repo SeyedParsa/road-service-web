@@ -379,7 +379,7 @@ class Issue(GeoModel):
             mission.service_teams.add(team)
             team.active_mission = mission
             team.save()
-        mission.save()
+
         for machinery, amount in required_machineries:
             machinery.available_count -= amount
             machinery.save()
@@ -525,21 +525,17 @@ class CountyExpert(Role):
     def get_reported_issues(self):
         return self.county.issue_set.filter(state=Issue.State.REPORTED)
 
-    @staticmethod
-    def get_mission_types():
+    def get_mission_types(self):
         return MissionType.objects.all()
 
-    @staticmethod
-    def add_mission_type(name):
+    def add_mission_type(self, name):
         MissionType.objects.create(name=name)
 
-    @staticmethod
-    def rename_mission_type(mission_type, name):
+    def rename_mission_type(self, mission_type, name):
         mission_type.name = name
         mission_type.save()
 
-    @staticmethod
-    def delete_mission_type(mission_type):
+    def delete_mission_type(self, mission_type):
         mission_type.delete()
 
     def can_view_issue(self, issue):
