@@ -17,6 +17,15 @@ class Location:
     def to_tuple(self):
         return self.lat, self.long
 
+    def __str__(self):
+        return str(self.to_tuple())
+
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, Location):
+            return self.lat == other.lat and self.long == other.long
+        return False
+
 
 class GeoModel(models.Model):
     lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -59,6 +68,22 @@ class Region(models.Model):
         elif self.type == Region.Type.COUNTY:
             return self.county
 
+    def get_including_regions(self):
+        """returns a queryset consisting of regions that include this region"""
+        res = Region.objects.filter(pk=self.pk)
+        if self.type != Region.Type.COUNTRY:
+            res |= self.super_region.get_including_regions()
+        return res
+
+    def get_counties(self):
+        concrete = self.get_concrete()
+        if concrete.type == Region.Type.COUNTY:
+            return County.objects.filter(pk=self.pk)
+        res = County.objects.none()
+        for region in self.sub_regions.all():
+            res |= region.get_counties()
+        return res
+
 
 class Country(Region):
     def __init__(self, *args, **kwargs):
@@ -83,6 +108,9 @@ class County(Region):
         super().__init__(*args, **kwargs)
         self.type = Region.Type.COUNTY
 
+    def get_concrete(self):
+        return self
+
     def get_required_teams(self, speciality, amount, location):
         special_teams = list(
             self.serviceteam_set.filter(
@@ -103,8 +131,8 @@ class County(Region):
             return None
         return machinery_qs.get()
 
-    def get_concrete(self):
-        return self
+    def notify_expert(self):
+        pass # TODO
 
 
 class Moderator(Role):
@@ -130,10 +158,6 @@ class Moderator(Role):
             region.moderator.delete()
             region.refresh_from_db()
 
-    @abstractmethod
-    def assign_moderator(self, user, region):
-        pass
-
     def get_concrete(self):
         if self.type == Role.Type.COUNTRY_MODERATOR:
             return self.countrymoderator
@@ -141,6 +165,21 @@ class Moderator(Role):
             return self.provincemoderator
         elif self.type == Role.Type.COUNTY_MODERATOR:
             return self.countymoderator
+
+    def can_moderate(self, region):
+        return self.region in region.get_including_regions()
+
+    def can_view_issue(self, issue):
+        return self.can_moderate(issue.county.region_ptr)
+
+    def get_issues(self, regions):
+        """return a queryset containing issues of the regions list"""
+        res = Issue.objects.none()
+        for region in regions:
+            if self.can_moderate(region):
+                for county in region.get_counties():
+                    res |= county.issue_set.all()
+        return res
 
 
 class CountryModerator(Moderator):
@@ -231,12 +270,18 @@ class Serviceman(Role, GeoModel):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.SERVICEMAN
 
+    def get_concrete(self):
+        return self
+
     def update_location(self, location):
         self.location = location
         self.save()
 
-    def get_concrete(self):
-        return self
+    def end_mission(self, report):
+        if self.team.active_mission is not None:
+            return self.team.active_mission.finish(report)
+        else:
+            return False
 
 
 class Citizen(Role):
@@ -246,6 +291,21 @@ class Citizen(Role):
 
     def get_concrete(self):
         return self
+
+    def submit_issue(self, title, description, county, location):
+        issue = Issue.objects.create(title=title, description=description, reporter=self, county=county,
+                                     location=location)
+        issue.notify_expert()
+        return issue
+
+    def can_view_issue(self, issue):
+        return issue.reporter == self
+
+    def rate_issue(self, issue, rating):
+        if issue.reporter == self:
+            return issue.rate(rating)
+        else:
+            return False
 
 
 class MachineryType(models.Model):
@@ -281,6 +341,7 @@ class Issue(GeoModel):
     county = models.ForeignKey(County, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     state = models.CharField(max_length=2, choices=State.choices, default=State.REPORTED)
+    # image = models.ImageField() TODO
 
     def __str__(self):
         return '%s: %s (%s)' % (self.county, self.title, self.State(self.state).label)
@@ -288,7 +349,8 @@ class Issue(GeoModel):
     def assign_resources(self, mission_type):
         # TODO: requires lock
         if self.state != Issue.State.ACCEPTED:
-            raise Exception('The issues must be an accepted issue for resource assignment')
+            return None
+            # raise Exception('The issues must be an accepted issue for resource assignment')
         required_teams = []
         for speciality_requirement in self.specialityrequirement_set.all():
             special_teams = self.county.get_required_teams(
@@ -298,7 +360,7 @@ class Issue(GeoModel):
             )
             if len(special_teams) < speciality_requirement.amount:
                 self.postpone_assignment(mission_type)
-                return
+                return None
             required_teams += special_teams
 
         required_machineries = []
@@ -309,7 +371,7 @@ class Issue(GeoModel):
             )
             if machinery is None:
                 self.postpone_assignment(mission_type)
-                return
+                return None
             required_machineries.append((machinery, machinery_requirement.amount))
 
         mission = Mission.objects.create(issue=self, type=mission_type)
@@ -317,16 +379,37 @@ class Issue(GeoModel):
             mission.service_teams.add(team)
             team.active_mission = mission
             team.save()
+
         for machinery, amount in required_machineries:
             machinery.available_count -= amount
             machinery.save()
         self.state = Issue.State.ASSIGNED
         self.save()
+        return mission
 
     def postpone_assignment(self, mission_type):
         # Right now we won't implement the queue, so the mission will just fail
         self.state = Issue.State.FAILED
         self.save()
+
+    def notify_expert(self):
+        self.county.notify_expert()
+
+    def rate(self, rating):
+        if self.state == Issue.State.DONE:
+            self.mission.score = rating
+            self.mission.save()
+            self.state = Issue.State.SCORED
+            self.save()
+            return True
+        else:
+            return False
+
+    def return_machineries(self):
+        for machinery_requirement in self.machineryrequirement_set.all():
+            machinery = self.county.machinery_set.get(type=machinery_requirement.machinery_type)
+            machinery.available_count += machinery_requirement.amount
+            machinery.save()
 
 
 class SpecialityRequirement(models.Model):
@@ -376,16 +459,36 @@ class Mission(models.Model):
     def created_at_date(self):
         return self.issue.created_at.date()
 
+    def return_machineries(self):
+        self.issue.return_machineries()
+
+    def finish(self, report):
+        if self.issue.state == Issue.State.ASSIGNED:
+            self.report = report
+            self.save()
+            self.issue.state = Issue.State.DONE
+            self.issue.save()
+            for team in self.service_teams.all():
+                team.active_mission = None
+                team.save()
+            self.return_machineries()
+            return True
+        else:
+            return False
+
 
 class CountyExpert(Role):
+    county = models.OneToOneField(County, on_delete=models.PROTECT, related_name='expert')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.COUNTY_EXPERT
 
-    county = models.OneToOneField(County, on_delete=models.PROTECT)
-
     def __str__(self):
         return str(self.user)
+
+    def get_concrete(self):
+        return self
 
     def accept_issue(self, issue, mission_type, speciality_requirements, machinery_requirements):
         """
@@ -393,7 +496,11 @@ class CountyExpert(Role):
                 specialities are distinct. The same goes for machinery_requirements.
         """
         if issue.county != self.county:
-            raise Exception('The county expert can only accept the issues in its county')
+            return None
+            # raise Exception('The county expert can only accept the issues in its county')
+
+        if issue.state != Issue.State.REPORTED:
+            return None
 
         for speciality, amount in speciality_requirements:
             SpecialityRequirement.objects.create(issue=issue, speciality=speciality, amount=amount)
@@ -403,7 +510,33 @@ class CountyExpert(Role):
 
         issue.state = Issue.State.ACCEPTED
         issue.save()
-        issue.assign_resources(mission_type)
+        return issue.assign_resources(mission_type)
 
-    def get_concrete(self):
-        return self
+    def reject_issue(self, issue):
+        if self.county == issue.county:
+            issue.state = Issue.State.REJECTED
+            issue.save()
+            return True
+        return False
+
+    def get_issues(self):
+        return self.county.issue_set.all()
+
+    def get_reported_issues(self):
+        return self.county.issue_set.filter(state=Issue.State.REPORTED)
+
+    def get_mission_types(self):
+        return MissionType.objects.all()
+
+    def add_mission_type(self, name):
+        MissionType.objects.create(name=name)
+
+    def rename_mission_type(self, mission_type, name):
+        mission_type.name = name
+        mission_type.save()
+
+    def delete_mission_type(self, mission_type):
+        mission_type.delete()
+
+    def can_view_issue(self, issue):
+        return self.county == issue.county
