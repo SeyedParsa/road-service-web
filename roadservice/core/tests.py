@@ -219,6 +219,7 @@ class BaseTestCase(TestCase):
         self.setUpTeams()
         self.setUpIssues()
 
+
 class CitizenTestCase(BaseTestCase):
     def test_submit_issue(self):
         self.assertTrue(self.issue0 in self.issue0.county.issue_set.all())
@@ -423,11 +424,16 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.rey.expert.user, self.akbar)
 
     def test_user_creation(self):
-        self.jfk = self.rey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald')
+        self.jfk = self.rey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555')
         self.assertEqual(self.jfk.username, 'JohnFKennedy')
         with self.assertRaisesMessage(Exception, 'Already exists'):
-            pass
-        self.team = ServiceTeam.objects.create(county=shemiran, speciality=self.asphalt_fixing)
+            self.rey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+98 21')
+
+    def test_team_manipulation(self):
+        self.my_speciality = self.rey.moderator.add_speciality('snow plow')
+        self.team17 = self.rey.moderator.add_service_team(self.my_speciality, self.osama, self.vladimir)
+        self.team17.refresh_from_db()
+        self.assertEqual(self.vladimir.role.get_concrete().team, self.team17)
 
 
 class RegionTestCase(BaseTestCase):
