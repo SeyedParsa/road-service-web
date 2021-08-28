@@ -52,8 +52,7 @@ class Region(models.Model):
 
     type = models.CharField(max_length=2, choices=Type.choices)
     name = models.CharField(max_length=20)
-    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, blank=True,
-                                     on_delete=models.PROTECT)
+    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, blank=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -84,6 +83,19 @@ class Region(models.Model):
 
     def get_machineries(self):
         pass
+
+    def get_counties_within_this_region(self):
+        if self.type == Region.Type.COUNTRY:
+            this_country = self.get_concrete()
+            subset_counties = []
+            for every_province in this_country.get_provinces_within_this_country:
+                subset_counties.append(every_province.get_counties_within_this_province)
+        elif self.type == Region.Type.PROVINCE:
+            this_province = self.get_concrete()
+            return this_province.get_counties_within_this_province
+        elif self.type == Region.Type.COUNTY:
+            this_county = self.get_concrete()
+            return [this_county]
 
 
 class Country(Region):
@@ -143,6 +155,30 @@ class County(Region):
 
     def has_expert(self):
         return hasattr(self, 'expert')
+
+    def get_concrete(self):
+        return self
+
+    def get_teams_in_county(self):
+        service_teams_in_county = []
+        for service_team in ServiceTeam.objects.all():
+            if service_team.county == self:
+                service_teams_in_county.append(service_team)
+        return service_teams_in_county
+
+    def get_machinery_in_county(self):
+        machinery_in_county = []
+        for machinery in Machinery.objects.all():
+            if machinery.county == self:
+                machinery_in_county.append(machinery)
+        return machinery_in_county
+
+    def has_expert(self):
+        for expert in CountyExpert.objects.all():
+            if expert.county == self:
+                return True
+        return False
+
 
 class Moderator(Role):
     region = models.OneToOneField(Region, on_delete=models.PROTECT)
@@ -206,44 +242,73 @@ class Moderator(Role):
                     res |= county.machinery_set.all()
         return res
 
-    def create_new_user(self, username, password, phone_number):
+    def create_new_user(self, username, password, phone_number, firstname, surname):
         # TODO: Check whether the username and the password are valid
         if User.objects.filter(username=username).exists():
             raise Exception('Already exists')
-        user = User.objects.create(username=username, password=password, phone_number=phone_number)
+        user = User.objects.create(username=username, password=password, phone_number=phone_number, first_name=firstname, last_name=surname)
         return user
 
-    def is_under_moderation(self, *input_regions):
+    def is_moderator_of(self, *input_regions):
         concrete_moderator = self.get_concrete()
-        for a_region in input_regions:
-            concrete_region = a_region.get_concrete()
-            if concrete_region.moderator == concrete_moderator:
-                pass
-            else:
-                return False
+        if concrete_moderator.type == Role.Type.COUNTY_MODERATOR:
+            for region in input_regions:
+                if region[0].get_concrete() != concrete_moderator.region.get_concrete():
+                    return False
+        elif concrete_moderator.type == Role.Type.PROVINCE_MODERATOR:
+            for region in input_regions:
+                flag1 = False
+                flag2 = False
+                if region.get_concrete() == concrete_moderator.region.get_concrete():
+                    flag1 = True
+                for sub_region in concrete_moderator.region.get_concrete().sub_regions:
+                    if region.get_concrete() == sub_region:
+                        flag2 = True
+                if flag1 or flag2:
+                    pass
+                else:
+                    return False
+        elif concrete_moderator.type == Role.Type.COUNTRY_MODERATOR:
+            for region in input_regions:
+                flag1 = False
+                flag2 = False
+                flag3 = False
+                if region.get_concrete() == concrete_moderator.region.get_concrete():
+                    flag1 = True
+                for sub_region in concrete_moderator.region.get_concrete().sub_regions:
+                    if region.get_concrete() == sub_region.get_concrete():
+                        flag2 = True
+                for every_sub_region in concrete_moderator.region.get_concrete().sub_regions:
+                    for sub_sub_region in every_sub_region:
+                        if region.get_concrete() == sub_sub_region.get_concrete():
+                            flag3 = True
+                if flag1 or flag2 or flag3:
+                    pass
+                else:
+                    return False
         return True
 
+
     def get_teams_list(self, *input_regions):
-        if not self.is_under_moderation(input_regions):
+        if not self.is_moderator_of(input_regions):
             raise Exception('Fatal: Moderator not authorized to oversee some or all of inputted regions')
         concrete_moderator = self.get_concrete()
         teams_list = []
-        for a_region in input_regions:
-            for every_county in a_region.get_counties_within_this_region():
-                teams_list.append(every_county.get_teams_in_counties())
+        for region in input_regions:
+            for county in region.get_counties_within_this_region():
+                teams_list.extend(county.get_teams_in_county())
         return teams_list
 
     def get_machinery_list(self, *input_regions):
-        if not self.is_under_moderation(input_regions):
+        if not self.is_moderator_of(input_regions):
             raise Exception('Fatal: Moderator not authorized to oversee some or all of inputted regions')
         concrete_moderator = self.get_concrete()
         machinery_list = []
-        for a_region in input_regions:
-            for every_county in a_region.get_counties_within_this_region():
-                machinery_list.append(every_county.get_machinery_in_counties())
+        for region in input_regions:
+            for county in region.get_counties_within_this_region():
+                machinery_list.append(county.get_machinery_in_county())
         return machinery_list
 
->>>>>>> Update models.py
 
 class CountryModerator(Moderator):
     def __init__(self, *args, **kwargs):
@@ -308,6 +373,38 @@ class CountyModerator(Moderator):
             new_serviceman = Serviceman.objects.create(team=new_team, user=team_member)
         return new_team
 
+    def edit_service_team(self, team, speciality, *team_members):
+        for team_member in team_members:
+            if team_member.has_role() and team_member.role != Serviceman:
+                raise Exception('The user has a role')
+        for team_member in team_members:
+            serviceman = Serviceman.objects.filter(user=team_member)
+            if serviceman.exists():
+                if serviceman.team == team:
+                    pass
+                else:
+                    serviceman.team = team
+                    serviceman.save()
+                    serviceman.refresh_from_db()
+                    team.refresh_from_db()
+            else:
+                Serviceman.objects.create(user=team_member, team=team)
+        for every_member in team.members:
+            needs_be_deleted = True
+            for team_member in team_members:
+                if every_member == team_member:
+                    needs_be_deleted = False
+            if needs_be_deleted:
+                every_member.objects.delete()
+                team.refresh_from_db()
+
+    def delete_service_team(self, team):
+        for every_member in team.members:
+            every_member.objects.delete()
+            team.refresh_from_db()
+        team.objects.delete()
+        return True
+
     def add_speciality(self, name):
         if Speciality.objects.filter(name=name).exists():
             raise Exception('Already exists')
@@ -327,12 +424,8 @@ class CountyModerator(Moderator):
     def delete_speciality(self, name):
         if Speciality.objects.filter(name=name).exists():
             speciality = Speciality.objects.get(name=name)
-            try:
-                speciality.delete()
-                return True
-            except Exception:
-                return False
-        return False
+            speciality.delete()
+            return True
 
     def pre_assign_expert(self, user): # TODO
         """Check if the assignment is valid and dismiss the previous moderator if applicable.\
@@ -355,8 +448,30 @@ class CountyModerator(Moderator):
 
     def assign_expert(self, user):
         self.pre_assign_expert(user)
-        CountyExpert.objects.create(user=user, county=self.region.get_concrete())
+        return CountyExpert.objects.create(user=user, county=self.region.get_concrete())
 
+    def add_machinery(self, machine_type):
+        machine = Machinery.objects.get(type=machine_type)
+        if machine.exists():
+            machine.total_count += 1
+            machine.save()
+            machine.refresh_from_db()
+            return True
+        else:
+            Machinery.objects.create(type=type, total_count=1, available_count=1, county=self.get_concrete().county)
+
+    def remove_machinery(self, machine_type):
+        machine = Machinery.objects.get(type=machine_type)
+        if machine.exists() and machine.total_count > 0:
+            machine.total_count -= 1
+            machine.save()
+            machine.refresh_from_db()
+            return True
+        elif machine.exists and machine.total_count <= 0:
+            machine.objects.delete()
+            return True
+        else:
+            raise Exception ('No such machinery')
 
 class Speciality(models.Model):
     name = models.CharField(max_length=20)
