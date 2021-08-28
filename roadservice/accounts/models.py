@@ -12,6 +12,23 @@ class User(AbstractUser):
     def has_role(self):
         return hasattr(self, 'role')
 
+    def login(self):
+        pass
+
+    def request_password_recovery(self):
+        pass
+
+    def request_phone_authentication(self):
+        pass
+
+    def change_password(self, old_password, new_password):
+        if self.password == old_password:
+            self.password = new_password
+            self.save()
+            self.refresh_from_db()
+            return True
+        raise Exception ('Login info authentication failed')
+
 
 class Role(models.Model):
     class Type(models.TextChoices):
@@ -22,7 +39,7 @@ class Role(models.Model):
         COUNTY_MODERATOR = 'CM'
         COUNTY_EXPERT = 'CE'
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='role', on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=Type.choices)
 
     def get_concrete(self):
