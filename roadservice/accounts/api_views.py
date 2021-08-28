@@ -18,4 +18,4 @@ class SignUpView(APIView):
         if serializer.is_valid():
             pass  # TODO
             return Response({'error': 'PHONE_DUPLICATE'})
-        return Response(False)
+        return Response({'status': False})
