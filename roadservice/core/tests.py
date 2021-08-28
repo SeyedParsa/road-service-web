@@ -200,10 +200,12 @@ class BaseTestCase(TestCase):
     def setUpIssues(self):
         self.issue0 = self.citizen0.submit_issue(title='The cow on the road',
                                                  description='There is a cow trapped in the Chamran Highway guard rails!',
-                                                 county=self.tehran)
+                                                 county=self.tehran,
+                                                 location=Location(1.5, 2))
         self.issue1 = self.citizen1.submit_issue(title='Slippery road',
                                                  description='The road is slippery',
-                                                 county=self.shahrerey)
+                                                 county=self.shahrerey,
+                                                 location=Location(1.5, 1))
 
     def setUp(self):
         self.setUpRegions()
@@ -325,13 +327,16 @@ class ModeratorTestCase(BaseTestCase):
     def setUpIssues(self):
         self.issue0 = self.citizen0.submit_issue(title='The cow on the road',
                                                  description='There is a cow trapped in the Chamran Highway guard rails!',
-                                                 county=self.tehran)
+                                                 county=self.tehran,
+                                                 location=Location(1.5, 2))
         self.issue1 = self.citizen1.submit_issue(title='The horse on the road',
                                                  description='There is a horse trapped in the Chamran Highway guard rails!',
-                                                 county=self.damavand)
+                                                 county=self.damavand,
+                                                 location=Location(1.1, 1.1))
         self.issue2 = self.citizen2.submit_issue(title='The fox on the road',
                                                  description='There is a fox trapped in the Chamran Highway guard rails!',
-                                                 county=self.shiraz)
+                                                 county=self.shiraz,
+                                                 location=Location(1, 2))
 
     def test_assign_moderator(self):
         self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)

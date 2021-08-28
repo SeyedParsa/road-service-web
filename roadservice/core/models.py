@@ -292,8 +292,9 @@ class Citizen(Role):
     def get_concrete(self):
         return self
 
-    def submit_issue(self, title, description, county):
-        issue = Issue.objects.create(title=title, description=description, reporter=self, county=county)
+    def submit_issue(self, title, description, county, location):
+        issue = Issue.objects.create(title=title, description=description, reporter=self, county=county,
+                                     location=location)
         issue.notify_expert()
         return issue
 
@@ -477,11 +478,11 @@ class Mission(models.Model):
 
 
 class CountyExpert(Role):
+    county = models.OneToOneField(County, on_delete=models.PROTECT, related_name='expert')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.COUNTY_EXPERT
-
-    county = models.OneToOneField(County, on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.user)
@@ -497,6 +498,9 @@ class CountyExpert(Role):
         if issue.county != self.county:
             return None
             # raise Exception('The county expert can only accept the issues in its county')
+
+        if issue.state != Issue.State.REPORTED:
+            return None
 
         for speciality, amount in speciality_requirements:
             SpecialityRequirement.objects.create(issue=issue, speciality=speciality, amount=amount)
