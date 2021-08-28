@@ -462,12 +462,12 @@ class CountyModerator(Moderator):
 
     def remove_machinery(self, machine_type):
         machine = Machinery.objects.get(type=machine_type)
-        if machine.exists() and machine.total_count > 0:
+        if machine.exists() and machine.total_count >= 2:
             machine.total_count -= 1
             machine.save()
             machine.refresh_from_db()
             return True
-        elif machine.exists and machine.total_count <= 0:
+        elif machine.exists and machine.total_count <= 1:
             machine.objects.delete()
             return True
         else:
