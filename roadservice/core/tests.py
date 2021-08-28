@@ -1,7 +1,7 @@
 from django.test import TestCase
 from accounts.models import User
 from core.models import Country, Province, County, CountryModerator, ProvinceModerator, Citizen, Serviceman, \
-    ServiceTeam, Speciality, CountyExpert, Issue, MachineryType, Machinery, MissionType, Location
+    ServiceTeam, Speciality, CountyExpert, Issue, MachineryType, Machinery, MissionType, Location, Region
 
 
 class BaseTestCase(TestCase):
@@ -282,7 +282,7 @@ class CountyExpertTestCase(TestCase):
         pass
     
     def test_accept_issue(self):
-        pass
+        pass # check the commented code at the end of file
 
     def test_reject_issue(self):
         pass
@@ -351,6 +351,36 @@ class ModeratorTestCase(TestCase):
 
     def test_view_issue(self):
         pass
+
+
+class RegionTestCase(BaseTestCase):
+    def test_has_moderator(self):
+        self.assertTrue(self.shiraz.has_moderator())
+        self.shiraz_moderator.delete()
+        self.shiraz.refresh_from_db()
+        self.assertFalse(self.shiraz.has_moderator())
+
+    def test_get_concrete(self):
+        self.assertEqual(self.iran.region_ptr.get_concrete(), self.iran)
+        self.assertEqual(self.tehran_province.region_ptr.get_concrete(), self.tehran_province)
+        self.assertEqual(self.tehran.region_ptr.get_concrete(), self.tehran)
+
+    def test_get_including_regions(self):
+        including_regions = self.iran.region_ptr.get_including_regions()
+        self.assertEqual(list(including_regions), [self.iran.region_ptr])
+        including_regions = self.tehran_province.region_ptr.get_including_regions()
+        self.assertEqual(list(including_regions), [self.iran.region_ptr, self.tehran_province.region_ptr])
+        including_regions = self.tehran.region_ptr.get_including_regions()
+        self.assertEqual(list(including_regions), [self.iran.region_ptr, self.tehran_province.region_ptr, self.tehran.region_ptr])
+
+    def test_get_counties(self):
+        counties = self.mashhad.get_counties()
+        self.assertEqual(list(counties), [self.mashhad])
+        counties = self.khorasan.get_counties()
+        self.assertEqual(set(counties), set([self.neyshabur, self.mashhad]))
+        counties = self.iran.get_counties()
+        self.assertEqual(set(counties), set([self.tehran, self.damavand, self.shahrerey, self.isfahan, self.khansar,
+                                             self.shiraz, self.marvdasht, self.neyshabur, self.mashhad]))
 
 
 # class AcceptIssueTestCase(TestCase):

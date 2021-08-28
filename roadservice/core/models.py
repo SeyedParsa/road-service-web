@@ -68,16 +68,17 @@ class Region(models.Model):
         elif self.type == Region.Type.COUNTY:
             return self.county
 
-    def get_ancestors(self):
-        """returns a queryset consisting of ancestor regions including itself"""
-        res = Region.objects.get(pk=self.pk)
+    def get_including_regions(self):
+        """returns a queryset consisting of regions that include this region"""
+        res = Region.objects.filter(pk=self.pk)
         if self.type != Region.Type.COUNTRY:
-            return res | self.super_region.get_ancestors()
+            res |= self.super_region.get_including_regions()
+        return res
 
     def get_counties(self):
         concrete = self.get_concrete()
         if concrete.type == Region.Type.COUNTY:
-            return County.objects.get(pk=self.pk)
+            return County.objects.filter(pk=self.pk)
         res = County.objects.none()
         for region in self.sub_regions.all():
             res |= region.get_counties()
@@ -166,7 +167,7 @@ class Moderator(Role):
             return self.countymoderator
 
     def can_moderate(self, region):
-        return self.region in region.get_ancestors()
+        return self.region in region.get_including_regions()
 
     def can_view_issue(self, issue):
         return self.can_moderate(issue.county.region_ptr)
