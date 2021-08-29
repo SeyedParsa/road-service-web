@@ -8,24 +8,24 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/js/jquery-editable-poshytip.min.js"></script>
 
     <div class="ui stackable grid" id="resources">
-    <div class="ui row">
+        <div class="ui row">
 
-                 <form class="ui form" method="post">
-                    {% csrf_token %}
-                    <div class="fields">
-                        <div class="field" style="width: 400px">
-                           {{ filter_form.regions }}
-                        </div>
-
-                        <div class="field">
-                            <input type="submit" class="ui button" value="فیلتر"></input>
-                        </div>
+            <form class="ui form" method="post">
+                {% csrf_token %}
+                <div class="fields">
+                    <div class="field" style="width: 400px">
+                        {{ filter_form.regions }}
                     </div>
 
+                    <div class="field">
+                        <input type="submit" class="ui button" value="فیلتر">
+                    </div>
+                </div>
 
-                </form>
 
-    </div>
+            </form>
+
+        </div>
         <div class="ui six wide column">
             <div class="ui segments" id="teams" style="opacity: 0.9">
                 <div class="ui center aligned segment"
@@ -52,7 +52,7 @@
 
                                 </div>
                                 <div class="ui four wide column">
-                                    <a style="color: black" href="">
+                                    <a style="color: black" href="#">
                                         <i class="times icon"></i></a>
                                     <i class="edit icon"></i>
                                 </div>
@@ -77,7 +77,7 @@
 
                                 </div>
                                 <div class="ui four wide column">
-                                    <a style="color: black" href="">
+                                    <a style="color: black" href="#">
                                         <i class="times icon"></i> </a>
                                     <i class="edit icon"></i>
                                 </div>
@@ -99,31 +99,25 @@
                 </div>
                 <div class="ui basic segment" style="margin-top: 5px">
                     <div class="ui segments">
-                        <div class="ui segment">
-                            <div class="ui grid">
-                                <div class="ui nine wide column">
-                                    جرثقیل
-                                </div>
-                                <div class="ui seven wide column machinery">
-                                    <a href="" style="color: black"><i class="right floated plus icon"></i></a>
-                                    18
-                                    <a href="" style="color: black"><i class="left floated minus icon"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ui segment">
-                            <div class="ui grid">
-                                <div class="ui nine wide column">
-                                    لودر
-                                </div>
-                                <div class="ui seven wide column">
-                                    <a href="" style="color: black"><i class="right floated plus icon"></i></a>
-                                    20
-                                    <a href="" style="color: black"><i class="left floated minus icon"></i></a>
-                                </div>
-                            </div>
-                        </div>
 
+                        {% for machinery in machineries %}
+                            <div class="ui segment">
+                                <div class="ui grid">
+                                    <div class="ui nine wide column">
+                                        {{ machinery.type.name }}
+                                        {#                                    جرثقیل#}
+                                    </div>
+                                    <div class="ui seven wide column machinery">
+                                        <a href="/resources/addmachinery/{{ machinery.id }}/" style="color: black"><i
+                                                class="right floated plus icon"></i></a>
+                                        {#                                    18#}
+                                        {{ machinery.total_count }}
+                                        <a href="/resources/removemachinery/{{ machinery.id }}/" style="color: black"><i
+                                                class="left floated minus icon"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -138,26 +132,20 @@
                 <div class="ui basic segment" id="list"
                      style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
                     <div class="ui segments content">
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            گاردریل
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
+
+                        {% for mission_type in mission_types %}
+                            <div class="ui segment"
+                                 style="display: flex; justify-content: space-between; align-items: center">
+                                {{ mission_type.name }}
+                                <div>
+                                    <a style="color: black" href="/resources/removemissiontype/{{ mission_type.id }}">
+                                        <i class="left floated times icon"></i></a>
+                                    <a style="color: black" href="#">
+                                        <i class="left floated edit icon" id="{{ mission_type.id }}"></i></a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            گاردریل
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
-                            </div>
-                        </div>
+
+                        {% endfor %}
 
                     </div>
                 </div>
@@ -174,28 +162,18 @@
                 <div class="ui basic segment" id="list"
                      style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
                     <div class="ui segments content">
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            آهنگر
-
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
+                        {% for speciality in specialities %}
+                            <div class="ui segment"
+                                 style="display: flex; justify-content: space-between; align-items: center">
+                                {{ speciality.name }}
+                                <div>
+                                    <a style="color: black" href="/resources/removespeciality/{{ speciality.id }}">
+                                        <i class="left floated times icon"></i></a>
+                                    <a style="color: black" href="#" >
+                                        <i class="left floated edit icon" id="{{ speciality.id }}"></i></a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            متخصص گاو
-
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
 
                 </div>
@@ -210,42 +188,54 @@
 
     <script>
         $('#speciality .plus').on('click', function (event) {
-            $('#speciality').find('.content').append(' <div class="ui segment"\n' +
-                '                             style="display: flex; justify-content: space-between; align-items: center">\n' +
-                '                            <form class="ui form">\n' +
-                '                                <input type="text" placeholder="نام تخصص">\n' +
-                '                            </form>\n' +
-                '                        </div>');
 
-            var element = document.getElementById("speciality-save-icon");
-            //If it isn't "undefined" and it isn't "null", then it exists.
-            if (typeof (element) != 'undefined' && element != null) {
-                console.log('save-icon already exists!!')
-            } else {
-                $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;color: black">\n' +
-                    '                        <i class="save icon"></i>\n' +
-                    '                    </div>');
-            }
+            var id = $(this).attr('id');
+            var path = "/resources/addspeciality/";
+            {#$("#1-content").load(path);#}
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+
+            {#$('#speciality').find('.content').append(' <div class="ui segment"\n' +#}
+            {#    '                             style="display: flex; justify-content: space-between; align-items: center">\n' +#}
+            {#    '                            <form class="ui form">\n' +#}
+            {#    '                                <input type="text" placeholder="نام تخصص">\n' +#}
+            {#    '                            </form>\n' +#}
+            {#    '                        </div>');#}
+            {##}
+            {#var element = document.getElementById("speciality-save-icon");#}
+            {#//If it isn't "undefined" and it isn't "null", then it exists.#}
+            {#if (typeof (element) != 'undefined' && element != null) {#}
+            {#    console.log('save-icon already exists!!')#}
+            {# } else {#}
+            {#    $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;color: black">\n' +#}
+            {#        '                        <i class="save icon"></i>\n' +#}
+            {#        '                    </div>');#}
+            {# }#}
 
         });
 
         $('#mission .plus').on('click', function (event) {
-            $('#mission').find('.content').append(' <div class="ui segment"\n' +
-                '                             style="display: flex; justify-content: space-between; align-items: center">\n' +
-                '                            <form class="ui form">\n' +
-                '                                <input type="text" placeholder="نام ماموریت">\n' +
-                '                            </form>\n' +
-                '                        </div>');
+            var id = $(this).attr('id');
+            var path = "/resources/addmissiontype/";
+            {#$("#1-content").load(path);#}
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+            {#$('#mission').find('.content').append(' <div class="ui segment"\n' +#}
+            {#    '                             style="display: flex; justify-content: space-between; align-items: center">\n' +#}
+            {#    '                            <form class="ui form">\n' +#}
+            {#    '                                <input type="text" placeholder="نام ماموریت">\n' +#}
+            {#    '                            </form>\n' +#}
+            {#    '                        </div>');#}
 
-            var element = document.getElementById("mission-save-icon");
-            //If it isn't "undefined" and it isn't "null", then it exists.
-            if (typeof (element) != 'undefined' && element != null) {
-                console.log('save-icon already exists!!')
-            } else {
-                $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;color: black">\n' +
-                    '                        <i class="save icon"></i>\n' +
-                    '                    </div>');
-            }
+            {#var element = document.getElementById("mission-save-icon");#}
+            {#//If it isn't "undefined" and it isn't "null", then it exists.#}
+            {#if (typeof (element) != 'undefined' && element != null) {#}
+            {#    console.log('save-icon already exists!!')#}
+            {# } else {#}
+            {#    $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;color: black">\n' +#}
+            {#        '                        <i class="save icon"></i>\n' +#}
+            {#        '                    </div>');#}
+            {# }#}
 
         });
 
@@ -273,7 +263,8 @@
 
             });
 
-            $('#teams .edit.icon').click(function () {
+            $('#teams .edit.icon').click(function (e) {
+                e.preventDefault();
                 var id = $(this).parent().parent().attr('id');
                 var path = "/resources/changeteam/" + id;
                 {#$("#1-content").load(path);#}
@@ -283,9 +274,10 @@
             });
 
 
-            $('#mission .edit.icon').click(function () {
+            $('#mission .edit.icon').click(function (e) {
+                e.preventDefault();
                 var id = $(this).attr('id');
-                var path = "/resources/changemission/" + id;
+                var path = "/resources/changemissiontype/" + id;
                 {#$("#1-content").load(path);#}
                 $("#secretbox").load(path);
                 $("#secretbox").modal('show');
@@ -332,7 +324,6 @@
             $('#resources').find('.edit.icon').mouseout(function () {
                 $(this).css('color', 'black');
             });
-
 
 
             $('#resources').find('.save.icon').mouseover(function () {

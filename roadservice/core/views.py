@@ -1,11 +1,13 @@
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from khayyam import *
 
 from accounts.models import User
-from core.forms import AssignModeratorForm, RegionMultipleFilterForm
-from core.models import Region, CountryModerator, ProvinceModerator, Issue
+from core.forms import AssignModeratorForm, RegionMultipleFilterForm, SingleStringForm
+from core.models import Region, CountryModerator, ProvinceModerator, Issue, \
+    Machinery, MissionType, Speciality, MachineryType
 
 
 class Home(View):
@@ -64,32 +66,80 @@ class ChangeTeam(View):
                       template_name='core/changeteam.html', context=context)
 
 
-class ChangeMission(View):
+class AddSpeciality(View):
     def get(self, request, *args, **kwargs):
-        mission_id = kwargs['mission_id']
-        context = {'mission': mission_id}
+        form = SingleStringForm()
+        context = {'form': form}
         return render(request=request,
-                      template_name='core/changemission.html', context=context)
+                      template_name='core/addspeciality.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        mission_id = kwargs['mission_id']
-        context = {'mission': mission_id}
+        form = SingleStringForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            print('New Speciality Name:', name)
+            # TODO: Create new Speciality
+        context = {'form': form}
+        messages.add_message(request, messages.INFO, 'نوع تخصص جدید اضافه شد!')
+        return HttpResponseRedirect('/resources/')
+
+
+class AddMissionType(View):
+    def get(self, request, *args, **kwargs):
+        form = SingleStringForm()
+        context = {'form': form}
         return render(request=request,
-                      template_name='core/changemission.html', context=context)
+                      template_name='core/addmissiontype.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        form = SingleStringForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            print('New MissionType Name:', name)
+            # TODO: Create new missionType
+        context = {'form': form}
+        messages.add_message(request, messages.INFO, 'نوع ماموریت جدید اضافه شد!')
+        return HttpResponseRedirect('/resources/')
+
+
+class ChangeMissionType(View):
+    def get(self, request, *args, **kwargs):
+        missiontype_id = kwargs['missiontype_id']
+        form = SingleStringForm()
+        missiontype = MissionType.objects.get(id=missiontype_id)
+        context = {'form': form, 'missiontype': missiontype}
+        return render(request=request,
+                      template_name='core/changemissiontype.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        missiontype_id = kwargs['missiontype_id']
+        form = SingleStringForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            print('Modified Name:', name)
+            # TODO: Modify speciality name
+        messages.add_message(request, messages.INFO, 'نوع ماموریت بروز شد!')
+        return HttpResponseRedirect('/resources/')
 
 
 class ChangeSpeciality(View):
     def get(self, request, *args, **kwargs):
         speciality_id = kwargs['speciality_id']
-        context = {'speciality': speciality_id}
+        form = SingleStringForm()
+        speciality = Speciality.objects.get(id=speciality_id)
+        context = {'form': form, 'speciality': speciality}
         return render(request=request,
                       template_name='core/changespeciality.html', context=context)
 
     def post(self, request, *args, **kwargs):
         speciality_id = kwargs['speciality_id']
-        context = {'speciality': speciality_id}
-        return render(request=request,
-                      template_name='core/changespeciality.html', context=context)
+        form = SingleStringForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            print('Modified Name:', name)
+            # TODO: Modify speciality name
+        messages.add_message(request, messages.INFO, 'نوع تخصص بروز شد!')
+        return HttpResponseRedirect('/resources/')
 
 
 class AssignModerator(View):
@@ -122,8 +172,11 @@ class AssignModerator(View):
 
 class Resources(View):
     def get(self, request, *args, **kwargs):
-        form = RegionMultipleFilterForm()
-        context = {'filter_form': form}
+        context = {'filter_form': RegionMultipleFilterForm()}
+        context['machineries'] = Machinery.objects.all()
+        context['mission_types'] = MissionType.objects.all()
+        context['specialities'] = Speciality.objects.all()
+        # TODO: filter objects from above lines by user accessible objects @Kiarash
         return render(request=request,
                       template_name='core/resources.html',
                       context=context)
@@ -131,13 +184,55 @@ class Resources(View):
     def post(self, request, *args, **kwargs):
         form = RegionMultipleFilterForm(request.POST)
         context = {'filter_form': form}
+        context['machineries'] = Machinery.objects.all()
+        context['mission_types'] = MissionType.objects.all()
+        context['specialities'] = Speciality.objects.all()
+        # TODO: filter objects from above lines by user accessible objects @Kiarash
         if form.is_valid():
             messages.add_message(request, messages.INFO, 'جدول بروز شد!')
             regions = form.cleaned_data.get('regions')
             print(regions)
-            # TODO: lab lab lab @KIARASH!
+            # TODO: Do the filtering! @Kiarash
         else:
             messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
         return render(request=request,
                       template_name='core/resources.html',
                       context=context)
+
+
+class AddMachinery(View):
+    def get(self, request, *args, **kwargs):
+        machinery_id = kwargs['machinery_id']
+        machinery = MachineryType.objects.get(id=machinery_id)
+        context = {'machinery': machinery_id}
+        # TODO: Add a new machinery!
+        messages.add_message(request, messages.INFO, str('یک ' + machinery.name + ' اضافه شد!'))
+        return HttpResponseRedirect('/resources/')
+
+
+class RemoveMachinery(View):
+    def get(self, request, *args, **kwargs):
+        machinery_id = kwargs['machinery_id']
+        machinery = MachineryType.objects.get(id=machinery_id)
+        context = {'machinery': machinery_id}
+        # TODO: remove a single machinery!
+        messages.add_message(request, messages.INFO, str('یک ' + machinery.name + ' حذف شد!'))
+        return HttpResponseRedirect('/resources/')
+
+
+class RemoveMissionType(View):
+    def get(self, request, *args, **kwargs):
+        missiontype_id = kwargs['missiontype_id']
+        context = {'missiontype_id': missiontype_id}
+        # TODO: remove missiontype!
+        messages.add_message(request, messages.INFO, 'نوع ماموریت حذف شد!')
+        return HttpResponseRedirect('/resources/')
+
+
+class RemoveSpeciality(View):
+    def get(self, request, *args, **kwargs):
+        speciality_id = kwargs['speciality_id']
+        context = {'speciality_id': speciality_id}
+        # TODO: remove speciality!
+        messages.add_message(request, messages.INFO, 'نوع تخصص حذف شد!')
+        return HttpResponseRedirect('/resources/')

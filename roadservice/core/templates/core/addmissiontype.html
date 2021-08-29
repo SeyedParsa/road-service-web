@@ -1,23 +1,23 @@
 {% load static %}
 
-<form class="ui mini modal" style="display: block !important;" method="post" action="/resources/changespeciality/{{ speciality.id }}/">
+<form class="ui mini modal" style="display: block !important;" method="post" action="/resources/addmissiontype/">
     {% csrf_token %}
     {#<div class="ui segment" style="display: block !important;">#}
     <div class="header" style="text-align: right">
-        ویرایش نوع تخصص
+        اضافه کردن نوع ماموریت جدید
     </div>
     <div class="content">
         <div class="ui left icon input">
-            <i class="wrench icon"> </i>
-            <input type="text" name="name" required="" id="id_name" value="{{ speciality.name }}">
+            <i class="truck icon"> </i>
+            <input type="text" name="name" required="" id="id_name" placeholder="نام نوع ماموریت جدید">
         </div>
 
 
     </div>
     <div class="left aligned actions" style="overflow: hidden;">
         <button class="ui positive right labeled icon button" type="submit" style="float: left;" value="ذخیره">
-            <i class="checkmark icon"></i>
             ذخیره
+            <i class="checkmark icon"></i>
         </button>
         <div class="ui black deny button" style="float: left;">
             انصراف

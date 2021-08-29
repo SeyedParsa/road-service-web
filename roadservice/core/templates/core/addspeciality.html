@@ -1,15 +1,15 @@
 {% load static %}
 
-<form class="ui mini modal" style="display: block !important;" method="post" action="/resources/changespeciality/{{ speciality.id }}/">
+<form class="ui mini modal" style="display: block !important;" method="post" action="/resources/addspeciality/">
     {% csrf_token %}
     {#<div class="ui segment" style="display: block !important;">#}
     <div class="header" style="text-align: right">
-        ویرایش نوع تخصص
+        اضافه کردن نوع تخصص جدید
     </div>
     <div class="content">
         <div class="ui left icon input">
             <i class="wrench icon"> </i>
-            <input type="text" name="name" required="" id="id_name" value="{{ speciality.name }}">
+            <input type="text" name="name" required="" id="id_name" placeholder="نام تخصص جدید">
         </div>
 
 

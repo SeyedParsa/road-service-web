@@ -31,3 +31,7 @@ class RegionMultipleFilterForm(forms.Form):
                               + list((region.id, "شهرستان " + region.name) for region in counties)
         self.fields['regions'].choices = region_choices
         self.fields['regions'].widget.attrs['class'] = 'ui fluid right aligned search dropdown'
+
+
+class SingleStringForm(forms.Form):
+    name = forms.CharField(label='نام')
