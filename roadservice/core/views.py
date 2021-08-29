@@ -7,7 +7,7 @@ from khayyam import *
 from accounts.models import User
 from core.forms import AssignModeratorForm, RegionMultipleFilterForm, SingleStringForm
 from core.models import Region, CountryModerator, ProvinceModerator, Issue, \
-    Machinery, MissionType, Speciality, MachineryType
+    MissionType, Speciality, MachineryType, Machinery
 
 
 class Home(View):
@@ -109,6 +109,26 @@ class ChangeMissionType(View):
         missiontype = MissionType.objects.get(id=missiontype_id)
         context = {'form': form, 'missiontype': missiontype}
         return render(request=request,
+                      template_name='core/addmissiontype.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        form = SingleStringForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            print('New MissionType Name:', name)
+            # TODO: Create new missionType
+        context = {'form': form}
+        messages.add_message(request, messages.INFO, 'نوع ماموریت جدید اضافه شد!')
+        return HttpResponseRedirect('/resources/')
+
+
+class ChangeMissionType(View):
+    def get(self, request, *args, **kwargs):
+        missiontype_id = kwargs['missiontype_id']
+        form = SingleStringForm()
+        missiontype = MissionType.objects.get(id=missiontype_id)
+        context = {'form': form, 'missiontype': missiontype}
+        return render(request=request,
                       template_name='core/changemissiontype.html', context=context)
 
     def post(self, request, *args, **kwargs):
@@ -177,8 +197,6 @@ class Resources(View):
                    'mission_types': MissionType.objects.all(),
                    'specialities': Speciality.objects.all()}
         # TODO: filter objects from above lines by user accessible objects @Kiarash
-        form = RegionMultipleFilterForm()
-        context = {'filter_form': form}
         return render(request=request,
                       template_name='core/resources.html',
                       context=context)
