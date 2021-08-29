@@ -5,7 +5,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
 from django.views import View
-
 from accounts.forms import SignUpForm, LoginForm, PasswordResetForm, NewPasswordForm
 
 
@@ -49,14 +48,20 @@ class Signup(View):
 
 class Login(View):
     def get(self, request):
+<<<<<<< 9b69768459a0b83e5bf1fcbc89fc56b2cc0dbb08
         if request.user.is_authenticated:
             return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
         form = LoginForm()
+=======
+        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
+        form = AuthenticationForm()
+>>>>>>> do basis of authentication logic
         context = {'form': form}
         return render(request=request,
                       template_name='accounts/login.html', context=context)
 
     def post(self, request):
+<<<<<<< 9b69768459a0b83e5bf1fcbc89fc56b2cc0dbb08
         form = LoginForm(request.POST)
         if form.is_valid():
             phone_number = form.cleaned_data['phone_number']
@@ -69,6 +74,18 @@ class Login(View):
         messages.error(request, "فرم متعبر نیست!")
         return render(request=request,
                       template_name='accounts/login.html', context={'form': form})
+=======
+        form = AuthenticationForm(request.POST)
+        if form.is_valid():
+            messages.success(request, "شما با موافقیت وارد شدید!")
+            # TODO: Log in!
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        else:
+            messages.error(request, "فرم متعبر نیست!")
+            return render(request=request,
+                          template_name='accounts/login.html', context={'form': form})
+
+>>>>>>> do basis of authentication logic
 
 
 class PasswordReset(View):
