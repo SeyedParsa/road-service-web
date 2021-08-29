@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
+from django.contrib.auth.forms import SetPasswordForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 
@@ -8,7 +9,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from accounts.forms import SignUpForm, AuthenticationForm
+from accounts.forms import SignUpForm, AuthenticationForm, LoginForm, PasswordResetForm, NewPasswordForm
 
 
 class PasswordResetComplete(View):
@@ -51,13 +52,13 @@ class Signup(View):
 class Login(View):
     def get(self, request):
         # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
-        form = AuthenticationForm()
+        form = LoginForm()
         context = {'form': form}
         return render(request=request,
                       template_name='accounts/login.html', context=context)
 
     def post(self, request):
-        form = AuthenticationForm(request.POST)
+        form = LoginForm(request.POST)
         if form.is_valid():
             messages.success(request, "شما با موافقیت وارد شدید!")
             # TODO: Log in!
@@ -68,23 +69,39 @@ class Login(View):
                           template_name='accounts/login.html', context={'form': form})
 
 
-
 class PasswordReset(View):
     def get(self, request):
+        form = PasswordResetForm()
         return render(request=request,
-                      template_name='accounts/resetpassword.html')
+                      template_name='accounts/resetpassword.html', context={'form': form})
 
     def post(self, request):
-        messages.success(request, "لینک بازیابی گذرواژه برای شما پیامک شد!")
-        return render(request=request,
-                      template_name='accounts/resetpassword.html')
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            messages.success(request, "لینک بازیابی گذرواژه برای شما پیامک شد!")
+            # TODO: Send the SMS!
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        else:
+            messages.error(request, "فرم متعبر نیست!")
+            return render(request=request,
+                          template_name='accounts/resetpassword.html', context={'form': form})
 
 
 class PasswordSet(View):
     def get(self, request):
+        # TODO: Check validity of the url
+        form = NewPasswordForm()
         return render(request=request,
-                      template_name='accounts/setnewpassword.html')
+                      template_name='accounts/setnewpassword.html', context={'form': form})
 
     def post(self, request):
-        messages.success(request, "گذرواژه جدید شما با موفقیت ذخیره شد!")
-        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        # TODO: Check validity of the url
+        form = NewPasswordForm(request.POST)
+        if form.is_valid():
+            messages.success(request, "گذرواژه جدید شما با موفقیت ذخیره شد!")
+            # TODO: Reset The Password!
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        else:
+            messages.error(request, "فرم متعبر نیست!")
+            return render(request=request,
+                          template_name='accounts/setnewpassword.html', context={'form': form})
