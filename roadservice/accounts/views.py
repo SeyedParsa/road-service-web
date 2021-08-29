@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from accounts.forms import SignUpForm
+from accounts.forms import SignUpForm, AuthenticationForm
 
 
 class PasswordResetComplete(View):
@@ -26,24 +26,47 @@ class Logout(View):
 
 class Signup(View):
     def get(self, request):
+        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
         form = SignUpForm()
         return render(request=request,
                       template_name='accounts/signup.html',
                       context={'form': form})
 
     def post(self, request):
-        messages.success(request, "کاربر جدید با موافقیت اضافه شد!")
-        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            print('VALID FORMMMM!!', form)
+            # TODO: Add a new user
+            messages.success(request, "کاربر جدید با موافقیت اضافه شد!")
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        else:
+            # TODO: show specific error
+            messages.error(request, "فرم معتبر نیست!")
+            return render(request=request,
+                          template_name='accounts/signup.html',
+                          context={'form': form})
 
 
 class Login(View):
     def get(self, request):
+        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
+        form = AuthenticationForm()
+        context = {'form': form}
         return render(request=request,
-                      template_name='accounts/login.html')
+                      template_name='accounts/login.html', context=context)
 
     def post(self, request):
-        messages.success(request, "شما با موافقیت وارد شدید!")
-        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        form = AuthenticationForm(request.POST)
+        if form.is_valid():
+            messages.success(request, "شما با موافقیت وارد شدید!")
+            # TODO: Log in!
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        else:
+            messages.error(request, "فرم متعبر نیست!")
+            return render(request=request,
+                          template_name='accounts/login.html', context={'form': form})
+
 
 
 class PasswordReset(View):
