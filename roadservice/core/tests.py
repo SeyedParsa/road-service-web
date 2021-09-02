@@ -320,10 +320,26 @@ class ModeratorTestCase(BaseTestCase):
         self.majid = User.objects.create(username='majid', phone_number='2')
         self.mahdi = User.objects.create(username='mahdi', phone_number='3')
 
+        self.osama = User.objects.create(username='osama', phone_number='021')
+        self.osama.refresh_from_db()
+        self.vladimir = User.objects.create(username='vladimir', phone_number='051')
+        self.vladimir.refresh_from_db()
+        self.james = User.objects.create(username='james', phone_number='007')
+        self.james.refresh_from_db()
+        self.mohammadali = User.objects.create(username='mohammadali', phone_number='44')
+        self.asghar = User.objects.create(username='asghar', phone_number='55')
+        self.akbar = User.objects.create(username='akbar', phone_number='66')
+        self.abubakr = User.objects.create(username='abubakr', phone_number='77')
+
+
     def setUpModerators(self):
         self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
+        self.parsa.refresh_from_db()
+        self.iran.refresh_from_db()
+        self.iran_moderator.refresh_from_db()
         self.tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
         self.tehran_moderator = self.tehran_province_moderator.assign_moderator(self.majid, self.tehran.region_ptr)
+        self.shahrerey_moderator = self.tehran_province_moderator.assign_moderator(self.mohammadali, self.shahrerey.region_ptr)
 
     def setUpIssues(self):
         self.issue0 = self.citizen0.submit_issue(title='The cow on the road',
@@ -369,11 +385,16 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.tehran_moderator.moderator_ptr.role_ptr.get_concrete(), self.tehran_moderator)
 
     def test_manipulating_speciality(self):
-        self.assertEqual(self.mohammadali.add_speciality('barricade removal').name, 'barricade removal')
-        self.assertEqual(self.mohammadali.rename_speciality('barricade removal', 'sade mabar').name, 'sade mabar')
-        self.mohammadali.delete_speciality('sade mabar')
+        self.setUpModerators()
+        shahrerey_moderator = self.shahrerey.moderator.get_concrete()
+        speciality = self.shahrerey_moderator.add_speciality('barricade removal')
+        self.assertEqual(speciality.name, 'barricade removal')
+        self.shahrerey_moderator.rename_speciality(speciality, 'sade mabar')
+        speciality.refresh_from_db()
+        self.assertEqual(speciality.name, 'sade mabar')
+        self.shahrerey_moderator.delete_speciality(speciality)
         # makes sure that sade mabar has been deleted
-        self.assertEqual(self.mohammadali.add_speciality('barricade removal').name, 'barricade removal')
+        self.assertEqual(self.shahrerey_moderator.add_speciality('barricade removal').name, 'barricade removal')
 
     def test_can_moderate(self):
         self.setUpModerators()
@@ -418,40 +439,51 @@ class ModeratorTestCase(BaseTestCase):
         pass
 
     def test_expert_assignment(self):
+        self.setUpModerators()
         self.damavand_expert = CountyExpert.objects.create(user=self.asghar, county=self.damavand)
         self.assertEqual(self.damavand.expert.user, self.asghar)
-        self.rey.moderator.get_concrete().assign_expert(self.akbar)
-        self.assertEqual(self.rey.expert.user, self.akbar)
-        self.assertEqual(self.rey.has_expert(), True)
+        self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
+        self.assertEqual(self.shahrerey.expert.user, self.akbar)
+        self.assertEqual(self.shahrerey.has_expert(), True)
 
     def test_user_creation(self):
-        self.jfk = self.rey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555')
+        self.setUpModerators()
+        self.jfk = self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555', 'John', 'Kennedy')
         self.assertEqual(self.jfk.username, 'JohnFKennedy')
         with self.assertRaisesMessage(Exception, 'Already exists'):
-            self.rey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+98 21')
+            self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+98 21', 'John', 'Kennedy')
 
     def test_team_manipulation(self):
-        self.my_speciality = self.rey.moderator.add_speciality('snow plow')
-        self.team17 = self.rey.moderator.add_service_team(self.my_speciality, self.osama, self.vladimir)
-        self.team17.refresh_from_db()
+        self.setUpModerators()
+        shahrerey_moderator = self.shahrerey.moderator.get_concrete()
+        self.my_speciality = self.shahrerey_moderator.add_speciality('snow plow')
+        self.team17 = self.shahrerey_moderator.add_service_team(self.my_speciality, [self.osama, self.vladimir])
         self.assertEqual(self.vladimir.role.get_concrete().team, self.team17)
-        # self.assertEqual(self.rey.moderator.get_teams_list(self.rey)[-1], self.team17)
-        # self.edited_team = self.rey.moderator.edit_service_team(self.team17, self.my_speciality, self.osama, self.vladimir, self.abubakr)
-        # self.assertEqual(self.edited_team, self.abubakr.team)
-        # self.assertEqual(self.rey.moderator.delete_service_team(self.team17), True)
+        self.assertTrue(self.shahrerey_moderator.edit_service_team(self.team17, self.my_speciality, [self.osama, self.abubakr]))
+        self.abubakr.refresh_from_db()
+        self.assertEqual(self.abubakr.role.get_concrete().team, self.team17)
+        self.vladimir.refresh_from_db()
+        self.assertFalse(self.vladimir.has_role())
+        self.shahrerey_moderator.delete_service_team(self.team17)
+        self.osama.refresh_from_db()
+        self.assertFalse(self.osama.has_role())
 
     def test_machinery_manipulation(self):
-        self.tractor = Machinery.objects.create(type='tractor', total_count=1, available_count=1, county=self.rey)
-        self.rey.moderator.add_machinery('tractor')
+        self.setUpModerators()
+        self.tractor_type = MachineryType.objects.create(name='Tractor')
+        self.snow_plow_type = MachineryType.objects.create(name='Snow Plow')
+        self.tractor = Machinery.objects.create(type=self.tractor_type, total_count=1, available_count=1, county=self.shahrerey)
+        self.shahrerey.moderator.get_concrete().increase_machinery(self.tractor_type)
         self.tractor.refresh_from_db()
         self.assertEqual(self.tractor.total_count, 2)
         self.tractor.refresh_from_db()
-        self.rey.moderator.remove_machinery('tractor')
+        self.shahrerey.moderator.get_concrete().decrease_machinery(self.tractor_type)
         self.tractor.refresh_from_db()
         self.assertEqual(self.tractor.total_count, 1)
-        self.snow_plow = self.rey.moderator.add_machinery('snow plow')
+        self.snow_plow = self.shahrerey.moderator.get_concrete().increase_machinery(self.snow_plow_type)
         self.snow_plow.refresh_from_db()
         self.assertEqual(self.snow_plow.total_count, 1)
+
 
 class RegionTestCase(BaseTestCase):
     def test_has_moderator(self):
