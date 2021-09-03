@@ -326,10 +326,17 @@ class ModeratorTestCase(BaseTestCase):
         self.james = User.objects.create(username='james', phone_number='007')
         self.james.refresh_from_db()
         self.mohammadali = User.objects.create(username='mohammadali', phone_number='44')
+        self.mohammadali.refresh_from_db()
         self.asghar = User.objects.create(username='asghar', phone_number='55')
-        self.akbar = User.objects.create(username='akbar', phone_number='66')
+        self.asghar.refresh_from_db()
+        self.ebrahim = User.objects.create(username='ebrahim', phone_number='66')
+        self.ebrahim.refresh_from_db()
         self.abubakr = User.objects.create(username='abubakr', phone_number='77')
-
+        self.abubakr.refresh_from_db()
+        self.gholamali = User.objects.create(username='gholamali', phone_number='88')
+        self.gholamali.refresh_from_db()
+        self.nagamuto = User.objects.create(username='nagamuto', phone_number='89')
+        self.nagamuto.refresh_from_db()
 
     def setUpModerators(self):
         self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
@@ -444,6 +451,8 @@ class ModeratorTestCase(BaseTestCase):
         self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
         self.assertEqual(self.shahrerey.expert.user, self.akbar)
         self.assertEqual(self.shahrerey.has_expert(), True)
+        with self.assertRaisesMessage(OccupiedUserError, ''):
+            self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
 
     def test_user_creation(self):
         self.setUpModerators()
@@ -463,6 +472,10 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.abubakr.role.get_concrete().team, self.team17)
         self.vladimir.refresh_from_db()
         self.assertFalse(self.vladimir.has_role())
+        with self.assertRaisesMessage(OccupiedUserError, ''):
+            self.shahrerey.moderator.add_service_team(self.my_speciality, [self.nagamuto, self.vladimir])
+        with self.assertRaisesMessage(OccupiedUserError, ''):
+            self.shahrerey.moderator.edit_service_team(self.team17, self.my_speciality, [self.osama, self.vladimir, self.kiarash])
         self.shahrerey_moderator.delete_service_team(self.team17)
         self.osama.refresh_from_db()
         self.assertFalse(self.osama.has_role())
@@ -471,6 +484,8 @@ class ModeratorTestCase(BaseTestCase):
         self.setUpModerators()
         self.tractor_type = MachineryType.objects.create(name='Tractor')
         self.snow_plow_type = MachineryType.objects.create(name='Snow Plow')
+        self.bulldozer_type = MachineryType.objects.create(name='Bulldozer')
+        self.grader_type = MachineryType.objects.create(name='Grader')
         self.tractor = Machinery.objects.create(type=self.tractor_type, total_count=1, available_count=1, county=self.shahrerey)
         self.shahrerey.moderator.get_concrete().increase_machinery(self.tractor_type)
         self.tractor.refresh_from_db()
@@ -482,6 +497,15 @@ class ModeratorTestCase(BaseTestCase):
         self.snow_plow = self.shahrerey.moderator.get_concrete().increase_machinery(self.snow_plow_type)
         self.snow_plow.refresh_from_db()
         self.assertEqual(self.snow_plow.total_count, 1)
+        self.bulldozer = self.shahrerey.moderator.get_concrete().increase_machinery(self.bulldozer_type)
+        self.bulldozer.refresh_from_db()
+        self.assertEqual(self.bulldozer.total_count, 1)
+        self.assertEqual(self.bulldozer.available_count, 1)
+        self.assertEqual(self.bulldozer.county.get_concrete(), self.shahrerey)
+        self.shahrerey.moderator.get_concrete().decrease_machinery(self, bulldozer_type)
+        with self.assertRaisesMessage(ResourceNotFoundError, ''):
+            self.shahrerey.moderator.decrease_machinery(self.bulldozer_type)
+
 
 
 class RegionTestCase(BaseTestCase):
