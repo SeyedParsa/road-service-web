@@ -332,6 +332,7 @@ class CountyModerator(Moderator):
         for serviceman in team.members.all():
             serviceman.delete()
         team.deleted_at = timezone.now()
+        team.save()
 
     def add_speciality(self, name):
         if not Speciality.objects.filter(name=name).exists():
