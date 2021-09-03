@@ -36,56 +36,40 @@
 
                 <div class="ui basic segment">
                     <div class="ui styled fluid accordion" id="accordion" style="line-height: 2; margin-top: 5px">
-                        <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                            <div class="ui  grid" id="1">
-                                <div class="ui four wide column">
-                                    <i class="ui angle left icon"></i>
-                                    آهنگر
-                                </div>
-                                <div class="ui three wide column">
-                                    ۵ نفر
-                                </div>
 
-                                <div class="ui five wide column">
-                                    فارس، شیراز
+                        {% for team in teams %}
+                            <div class="title" style="color: rgba(0, 0, 0, 0.87)">
+                                <div class="ui  grid" id="1">
+                                    <div class="ui five wide column">
+                                        <i class="ui angle left icon"></i>
+                                        {#                                        آهنگر#}
+                                        {{ team.speciality.name }}
+                                    </div>
+                                    <div class="ui three wide column">
+                                        {#                                        ۵ نفر#}
+                                        {{ team.members.all | length }} نفر
+                                    </div>
 
-                                </div>
-                                <div class="ui four wide column">
-                                    <a style="color: black" href="#">
-                                        <i class="times icon"></i></a>
-                                    <i class="edit icon"></i>
+                                    <div class="ui four wide column">
+                                        {#                                        فارس، شیراز#}
+
+                                        {{ team.county.super_region }}
+                                        ،
+                                        {{ team.county }}
+
+                                    </div>
+                                    <div class="ui four wide column">
+                                        <a style="color: black" href="#">
+                                            <i class="times icon"></i></a>
+                                        <i class="edit icon"></i>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="content" id="1-content">
-                            {% include 'core/teamdetails.html' %}
-                        </div>
-
-                        <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                            <div class="ui  grid" id="2">
-                                <div class="ui four wide column">
-                                    <i class="ui angle left icon"></i>
-                                    آهنگر
-                                </div>
-                                <div class="ui three wide column">
-                                    ۵ نفر
-                                </div>
-
-                                <div class="ui five wide column">
-                                    فارس، شیراز
-
-                                </div>
-                                <div class="ui four wide column">
-                                    <a style="color: black" href="#">
-                                        <i class="times icon"></i> </a>
-                                    <i class="edit icon"></i>
-                                </div>
+                            <div class="content" id="1-content">
+                                {% include 'core/teamdetails.html' with team=team %}
                             </div>
-                        </div>
-                        <div class="content">
-                            {% include 'core/teamdetails.html' %}
-                        </div>
-
+                        {% endfor %}
+                    
                     </div>
                 </div>
             </div>
@@ -168,7 +152,7 @@
                                 <div>
                                     <a style="color: black" href="/resources/removespeciality/{{ speciality.id }}">
                                         <i class="left floated times icon"></i></a>
-                                    <a style="color: black" href="#" >
+                                    <a style="color: black" href="#">
                                         <i class="left floated edit icon" id="{{ speciality.id }}"></i></a>
                                 </div>
                             </div>

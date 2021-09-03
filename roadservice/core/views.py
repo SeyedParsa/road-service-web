@@ -12,6 +12,7 @@ from core.models import Region, CountryModerator, ProvinceModerator, Issue, \
 
 class Home(View):
     def get(self, request, *args, **kwargs):
+        # TODO: if not logged in, redirect to login page
         issues = Issue.objects.all()
         # TODO: filter issues by user @Kiarash
         context = {'issues': issues}
