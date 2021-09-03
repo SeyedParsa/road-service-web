@@ -235,11 +235,11 @@ class Moderator(Role):
                 res |= region.get_machineries()
         return res
 
-    def create_new_user(self, username, password, phone_number, firstname, surname):
+    def create_new_user(self, username, password, phone_number, first_name, last_name):
         # TODO: Check whether the username and the password are valid
         if User.objects.filter(username=username).exists():
             raise Exception('Already exists')
-        return User.objects.create(username=username, password=password, phone_number=phone_number, first_name=firstname, last_name=surname)
+        return User.objects.create(username=username, password=password, phone_number=phone_number, first_name=first_name, last_name=last_name)
 
 
 class CountryModerator(Moderator):
@@ -300,40 +300,38 @@ class CountyModerator(Moderator):
     def get_concrete(self):
         return self
 
-    def add_service_team(self, speciality, team_members_users):
-        for team_member in team_members_users:
-            if team_member.has_role():
+    def add_service_team(self, speciality, members_users):
+        for user in members_users:
+            if user.has_role():
                 return None
         new_team = ServiceTeam.objects.create(county=self.county, speciality=speciality)
-        for team_member in team_members_users:
-            Serviceman.objects.create(team=new_team, user=team_member)
+        for user in members_users:
+            Serviceman.objects.create(team=new_team, user=user)
         return new_team
 
-    def edit_service_team(self, team, speciality, team_members_users):
-        ex_members_users = []
-        for member in team.members.all():
-            ex_members_users.append(member.user)
-        for user in team_members_users:
+    def edit_service_team(self, team, speciality, members_users):
+        ex_members_users = [serviceman.user for serviceman in team.members.all()]
+        for user in members_users:
             if user.has_role() and user not in ex_members_users:
                 return False
-        for user in team_members_users:
-            if user.has_role() and user in ex_members_users:
-                continue
-            Serviceman.objects.create(user=user, team=team)
-        for member in team.members.all():
-            if member.user not in team_members_users:
-                member.delete()
+        for user in members_users:
+            if not user.has_role():
+                Serviceman.objects.create(user=user, team=team)
+        for serviceman in team.members.all():
+            if serviceman.user not in members_users:
+                serviceman.delete()
         team.speciality = speciality
+        team.save()
         return True
 
     def delete_service_team(self, team):
-        for member in team.members.all():
-            member.delete()
+        for serviceman in team.members.all():
+            serviceman.delete()
         team.delete()
 
     def add_speciality(self, name):
         if not Speciality.objects.filter(name=name).exists():
-            Speciality.objects.create(name=name)
+            return Speciality.objects.create(name=name)
         return Speciality.objects.get(name=name)
 
     def rename_speciality(self, speciality, new_name):
@@ -358,10 +356,9 @@ class CountyModerator(Moderator):
 
     def increase_machinery(self, machine_type):
         if not Machinery.objects.filter(type=machine_type).exists():
-            Machinery.objects.create(type=machine_type, total_count=0, available_count=0, county=self.county)
+            return Machinery.objects.create(type=machine_type, total_count=1, available_count=1, county=self.county)
         machine = Machinery.objects.get(type=machine_type)
-        machine.total_count += 1
-        machine.available_count += 1
+        machine.increase()
         machine.save()
         return machine
 
@@ -370,8 +367,7 @@ class CountyModerator(Moderator):
             return False
         machine = Machinery.objects.get(type=machine_type)
         if machine.available_count >= 1:
-            machine.available_count -= 1
-            machine.total_count -= 1
+            machine.decrease()
             if machine.total_count == 0:
                 machine.delete()
             else:
@@ -448,10 +444,10 @@ class Citizen(Role):
             return False
 
     @classmethod
-    def sign_up(cls, username, password, phone_number, firstname, surname):
+    def sign_up(cls, username, password, phone_number, first_name, last_name):
         if User.objects.filter(username=username).exists():
             raise Exception('Already exists')
-        user = User.objects.create(username=username, password=password, phone_number=phone_number, first_name=firstname, last_name=surname)
+        user = User.objects.create(username=username, password=password, phone_number=phone_number, first_name=first_name, last_name=last_name)
         return cls.objects.create(user=user)
 
 
@@ -470,6 +466,14 @@ class Machinery(models.Model):
 
     def __str__(self):
         return '%s - %s: %d/%d' % (self.type, self.county, self.available_count, self.total_count)
+
+    def increase(self):
+        self.total_count += 1
+        self.available_count += 1
+
+    def decrease(self):
+        self.total_count -= 1
+        self.available_count -= 1
 
 
 class Issue(GeoModel):
