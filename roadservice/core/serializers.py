@@ -38,8 +38,8 @@ class MachineryRequirementSerializer(serializers.ModelSerializer):
 class IssueAcceptanceSerializer(serializers.Serializer):
     issue = serializers.PrimaryKeyRelatedField(queryset=Issue.objects.all())
     mission_type = serializers.PrimaryKeyRelatedField(queryset=MissionType.objects.all())
-    speciality_requirements = serializers.ListField(child=SpecialityRequirementSerializer(), required=False)
-    machinery_requirements = serializers.ListField(child=MachineryRequirementSerializer(), required=False)
+    speciality_requirements = serializers.ListField(child=SpecialityRequirementSerializer())
+    machinery_requirements = serializers.ListField(child=MachineryRequirementSerializer())
 
 
 class IssueRejectionSerializer(serializers.Serializer):
@@ -50,6 +50,10 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Serviceman
         fields = ['lat', 'long']
+        extra_kwargs = {
+            'lat': {'required': True},
+            'long': {'required': True},
+        }
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -82,16 +86,12 @@ class CountySerializer(serializers.ModelSerializer):
 
 class IssueSerializer(serializers.ModelSerializer):
     mission = serializers.PrimaryKeyRelatedField(queryset=Mission.objects.all(), allow_null=True)
-    county = serializers.SerializerMethodField()
     reporter = serializers.SerializerMethodField()
 
     class Meta:
         model = Issue
         fields = ['id', 'lat', 'long', 'state', 'title', 'description', 'reporter', 'county',
                   'created_at', 'mission']
-
-    def get_county(self, obj):
-        return CountySerializer(obj.county).data
 
     def get_reporter(self, obj):
         return UserSerializer(obj.reporter.user).data
@@ -132,10 +132,14 @@ class IssueReporingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = ['lat', 'long', 'title', 'description', 'county']
+        extra_kwargs = {
+            'lat': {'required': True},
+            'long': {'required': True},
+        }
 
 
 class IssueRatingSerializer(serializers.Serializer):
-    rating = serializers.IntegerField(max_value=5, min_value=1)
+    rating = serializers.IntegerField(max_value=5, min_value=1, allow_null=True)
 
 
 class ServicemanSerializer(serializers.ModelSerializer):
@@ -151,8 +155,6 @@ class ServicemanSerializer(serializers.ModelSerializer):
 
 
 class ServiceTeamSerializer(serializers.ModelSerializer):
-    county = serializers.SerializerMethodField()
-    speciality = serializers.SerializerMethodField()
     members = serializers.SerializerMethodField()
 
     class Meta:
@@ -162,17 +164,10 @@ class ServiceTeamSerializer(serializers.ModelSerializer):
     def get_members(self, obj):
         return ServicemanSerializer(obj.members.all(), many=True).data
 
-    def get_county(self, obj):
-        return CountySerializer(obj.county).data
-
-    def get_speciality(self, obj):
-        return SpecialitySerializer(obj.speciality).data
-
 
 class MissionSerializer(serializers.ModelSerializer):
     issue = serializers.SerializerMethodField()
     service_teams = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
     machinery_requirements = serializers.SerializerMethodField()
 
     class Meta:
@@ -185,9 +180,6 @@ class MissionSerializer(serializers.ModelSerializer):
     def get_service_teams(self, obj):
         return ServiceTeamSerializer(obj.service_teams.all(), many=True).data
 
-    def get_type(self, obj):
-        return MissionTypeSerializer(obj.type).data
-
     def get_machinery_requirements(self, obj):
         return MachineryRequirementSerializer(obj.issue.machineryrequirement_set.all(), many=True).data
 
@@ -196,3 +188,4 @@ class MissionReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mission
         fields = ['report']
+        extra_kwargs = {'report': {'required': True}}

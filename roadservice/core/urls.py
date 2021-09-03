@@ -6,6 +6,9 @@ from core import views, api_views
 app_name = 'core'
 urlpatterns = [
     path('api/regions/', api_views.RegionsListView.as_view()),
+    path('api/specialities/', api_views.SpecialitiesView.as_view()),
+    path('api/machinery-types/', api_views.MachineryTypesView.as_view()),
+    path('api/mission-types/', api_views.MissionTypesView.as_view()),
     path('api/citizen/issue/', api_views.CurrentIssueView.as_view()),
     path('api/citizen/report-issue/', api_views.ReportIssueView.as_view()),
     path('api/citizen/rate-issue/', api_views.RateIssueView.as_view()),
@@ -15,8 +18,6 @@ urlpatterns = [
     path('api/serviceman/update-location/', api_views.UpdateLocationView.as_view()),
     path('api/serviceman/finish-mission/', api_views.FinishMissionView.as_view()),
     path('api/expert/issues/', api_views.ReportedIssuesView.as_view()),
-    path('api/expert/specialities/', api_views.SpecialitiesView.as_view()),
-    path('api/expert/machinery-types/', api_views.MachineryTypesView.as_view()),
     path('api/expert/accept-issue/', api_views.AcceptIssueView.as_view()),
     path('api/expert/reject-issue/', api_views.RejectIssueView.as_view()),
 
