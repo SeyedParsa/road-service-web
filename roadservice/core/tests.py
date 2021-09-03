@@ -3,6 +3,8 @@ from django.test import TestCase
 from accounts.models import User
 from core.models import Country, Province, County, CountryModerator, Citizen, Serviceman, \
     ServiceTeam, CountyExpert, Issue, MachineryType, Machinery, MissionType, Speciality, Location
+from core.exceptions import AccessDeniedError, OccupiedUserError, DuplicatedInfoError, BusyResourceError, \
+    ResourceNotFoundError, IllegalOperationInStateError, InvalidArgumentError
 
 
 class BaseTestCase(TestCase):
@@ -231,16 +233,12 @@ class CitizenTestCase(BaseTestCase):
         self.assertEqual(self.issue0.state, Issue.State.REPORTED)
         self.assertEqual(self.issue1.state, Issue.State.REPORTED)
 
-    def test_view_issue(self):
-        self.assertTrue(self.citizen0.can_view_issue(self.issue0))
-        self.assertFalse(self.citizen0.can_view_issue(self.issue1))
-
     def test_rate_issue(self):
         self.mission = self.tehran_expert.accept_issue(self.issue0, self.animal_type, [(self.wind_speciality, 1)], [(self.crane_type, 1), (self.truck_type, 1)])
         self.tehran_wind_team.refresh_from_db()
         self.tehran_wind_team_servicemen[0].end_mission('The cow is caught alive')
         self.issue0.refresh_from_db()
-        self.assertTrue(self.citizen0.rate_issue(self.issue0, 3))
+        self.citizen0.rate_issue(self.issue0, 3)
         self.mission.refresh_from_db()
         self.assertEqual(self.mission.score, 3)
         self.assertEqual(self.issue0.state, Issue.State.SCORED)
@@ -364,11 +362,11 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.tehran_province.moderator.user, self.kiarash)
         tehran_province_moderator.assign_moderator(self.majid, self.damavand.region_ptr)
         self.assertEqual(self.damavand.moderator.user, self.majid)
-        with self.assertRaisesMessage(Exception, 'The region is not in the moderator\'s subregions'):
+        with self.assertRaisesMessage(AccessDeniedError, ''):
             tehran_province_moderator.assign_moderator(self.mahdi, self.shiraz_province.region_ptr)
-        with self.assertRaisesMessage(Exception, 'The user is already the moderator of the region'):
+        with self.assertRaisesMessage(OccupiedUserError, ''):
             self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
-        with self.assertRaisesMessage(Exception, 'The user has a role'):
+        with self.assertRaisesMessage(OccupiedUserError, ''):
             self.iran_moderator.assign_moderator(self.majid, self.shiraz_province.region_ptr)
 
         self.iran_moderator.assign_moderator(self.mahdi, self.tehran_province.region_ptr)
@@ -451,7 +449,7 @@ class ModeratorTestCase(BaseTestCase):
         self.setUpModerators()
         self.jfk = self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555', 'John', 'Kennedy')
         self.assertEqual(self.jfk.username, 'JohnFKennedy')
-        with self.assertRaisesMessage(Exception, 'Already exists'):
+        with self.assertRaisesMessage(DuplicatedInfoError, ''):
             self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+98 21', 'John', 'Kennedy')
 
     def test_team_manipulation(self):
@@ -460,7 +458,7 @@ class ModeratorTestCase(BaseTestCase):
         self.my_speciality = self.shahrerey_moderator.add_speciality('snow plow')
         self.team17 = self.shahrerey_moderator.add_service_team(self.my_speciality, [self.osama, self.vladimir])
         self.assertEqual(self.vladimir.role.get_concrete().team, self.team17)
-        self.assertTrue(self.shahrerey_moderator.edit_service_team(self.team17, self.my_speciality, [self.osama, self.abubakr]))
+        self.shahrerey_moderator.edit_service_team(self.team17, self.my_speciality, [self.osama, self.abubakr])
         self.abubakr.refresh_from_db()
         self.assertEqual(self.abubakr.role.get_concrete().team, self.team17)
         self.vladimir.refresh_from_db()
