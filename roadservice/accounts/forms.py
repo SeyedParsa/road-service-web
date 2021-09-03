@@ -1,12 +1,5 @@
 import django.contrib.auth.forms
 from django import forms
-<<<<<<< dd7c9035965096487399d2f5e5f1c2a25a3c3fec
-<<<<<<< 9b69768459a0b83e5bf1fcbc89fc56b2cc0dbb08
-=======
-from django.contrib.auth import get_user_model, authenticate
->>>>>>> do basis of authentication logic
-=======
->>>>>>> merge, migrate and complete the accounts views
 from django.utils.text import capfirst
 
 from accounts.models import User

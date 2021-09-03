@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
 from django.shortcuts import render
 from django.views import View
 from accounts.forms import SignUpForm, LoginForm, PasswordResetForm, NewPasswordForm
