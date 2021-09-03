@@ -1,10 +1,19 @@
+import django.contrib.auth.forms
 from django import forms
-from django.contrib.auth import password_validation
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.password_validation import password_validators_help_texts
-from django.utils.html import format_html
 
 from accounts.models import User
+
+
+class UserCreationForm(django.contrib.auth.forms.UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'phone_number')
+
+
+class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'phone_number')
 
 
 class SignUpForm(UserCreationForm):
