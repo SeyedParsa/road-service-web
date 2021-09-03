@@ -4,6 +4,7 @@ from geopy.distance import geodesic
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from accounts.models import User, Role
+from django.utils import timezone
 
 
 class Location:
@@ -141,7 +142,7 @@ class County(Region):
         return County.objects.filter(pk=self.pk)
 
     def get_teams(self):
-        return self.serviceteam_set.all()
+        return self.serviceteam_set.filter(deleted_at__isnull=True)
 
     def get_machineries(self):
         return self.machinery_set.all()
@@ -304,10 +305,11 @@ class CountyModerator(Moderator):
         for user in members_users:
             if user.has_role():
                 return None
-        new_team = ServiceTeam.objects.create(county=self.county, speciality=speciality)
+        team = ServiceTeam.objects.create(county=self.county, speciality=speciality)
         for user in members_users:
-            Serviceman.objects.create(team=new_team, user=user)
-        return new_team
+            Serviceman.objects.create(team=team, user=user)
+            user.refresh_from_db()
+        return team
 
     def edit_service_team(self, team, speciality, members_users):
         ex_members_users = [serviceman.user for serviceman in team.members.all()]
@@ -317,6 +319,7 @@ class CountyModerator(Moderator):
         for user in members_users:
             if not user.has_role():
                 Serviceman.objects.create(user=user, team=team)
+                user.refresh_from_db()
         for serviceman in team.members.all():
             if serviceman.user not in members_users:
                 serviceman.delete()
@@ -325,9 +328,10 @@ class CountyModerator(Moderator):
         return True
 
     def delete_service_team(self, team):
+        # TODO: What if the team has an active mission?
         for serviceman in team.members.all():
             serviceman.delete()
-        team.delete()
+        team.deleted_at = timezone.now()
 
     def add_speciality(self, name):
         if not Speciality.objects.filter(name=name).exists():
@@ -352,14 +356,15 @@ class CountyModerator(Moderator):
 
     def assign_expert(self, user):
         self.pre_assign_expert(user)
-        return CountyExpert.objects.create(user=user, county=self.county)
+        expert = CountyExpert.objects.create(user=user, county=self.county)
+        user.refresh_from_db()
+        return expert
 
     def increase_machinery(self, machine_type):
         if not Machinery.objects.filter(type=machine_type).exists():
             return Machinery.objects.create(type=machine_type, total_count=1, available_count=1, county=self.county)
         machine = Machinery.objects.get(type=machine_type)
         machine.increase()
-        machine.save()
         return machine
 
     def decrease_machinery(self, machine_type):
@@ -368,10 +373,6 @@ class CountyModerator(Moderator):
         machine = Machinery.objects.get(type=machine_type)
         if machine.available_count >= 1:
             machine.decrease()
-            if machine.total_count == 0:
-                machine.delete()
-            else:
-                machine.save()
             return True
         else:
             return False
@@ -448,7 +449,9 @@ class Citizen(Role):
         if User.objects.filter(username=username).exists():
             raise Exception('Already exists')
         user = User.objects.create(username=username, password=password, phone_number=phone_number, first_name=first_name, last_name=last_name)
-        return cls.objects.create(user=user)
+        citizen = cls.objects.create(user=user)
+        user.refresh_from_db()
+        return citizen
 
 
 class MachineryType(models.Model):
@@ -470,10 +473,15 @@ class Machinery(models.Model):
     def increase(self):
         self.total_count += 1
         self.available_count += 1
+        self.save()
 
     def decrease(self):
         self.total_count -= 1
         self.available_count -= 1
+        if self.total_count == 0:
+            self.delete()
+        else:
+            self.save()
 
 
 class Issue(GeoModel):
