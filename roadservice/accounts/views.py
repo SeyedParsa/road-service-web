@@ -1,15 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.contrib.auth.forms import SetPasswordForm
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
-
-# Create your views here.
 from django.urls import reverse
+from django.shortcuts import render
 from django.views import View
 
-from accounts.forms import SignUpForm, AuthenticationForm, LoginForm, PasswordResetForm, NewPasswordForm
+from accounts.forms import SignUpForm, LoginForm, PasswordResetForm, NewPasswordForm
 
 
 class PasswordResetComplete(View):

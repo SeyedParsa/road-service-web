@@ -7,7 +7,8 @@ from khayyam import *
 from accounts.models import User
 from core.forms import AssignModeratorForm, RegionMultipleFilterForm, SingleStringForm
 from core.models import Region, CountryModerator, ProvinceModerator, Issue, \
-    MissionType, Speciality, MachineryType, Machinery
+    MissionType, Speciality, MachineryType, Machinery, ServiceTeam
+from core.serializers import ServiceTeamSerializer
 
 
 class Home(View):
@@ -184,8 +185,8 @@ class AssignModerator(View):
                 ProvinceModerator.assign_county_moderator(user, region)
             messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
         else:
+            messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
             print('invalid form!')
-        messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
         return render(request=request,
                       template_name='core/assignmoderator.html',
                       context=context)
@@ -196,7 +197,8 @@ class Resources(View):
         context = {'filter_form': RegionMultipleFilterForm(),
                    'machineries': Machinery.objects.all(),
                    'mission_types': MissionType.objects.all(),
-                   'specialities': Speciality.objects.all()}
+                   'specialities': Speciality.objects.all(),
+                   'teams': ServiceTeam.objects.all()}
         # TODO: filter objects from above lines by user accessible objects @Kiarash
         return render(request=request,
                       template_name='core/resources.html',
@@ -204,10 +206,11 @@ class Resources(View):
 
     def post(self, request, *args, **kwargs):
         form = RegionMultipleFilterForm(request.POST)
-        context = {'filter_form': form,
+        context = {'filter_form': RegionMultipleFilterForm(),
                    'machineries': Machinery.objects.all(),
                    'mission_types': MissionType.objects.all(),
-                   'specialities': Speciality.objects.all()}
+                   'specialities': Speciality.objects.all(),
+                   'teams': ServiceTeam.objects.all()}
         # TODO: filter objects from above lines by user accessible objects @Kiarash
         if form.is_valid():
             messages.add_message(request, messages.INFO, 'جدول بروز شد!')
