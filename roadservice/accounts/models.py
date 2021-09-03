@@ -22,7 +22,7 @@ class Role(models.Model):
         COUNTY_MODERATOR = 'CM'
         COUNTY_EXPERT = 'CE'
 
-    user = models.OneToOneField(User, related_name='role', on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=Type.choices)
 
     def get_concrete(self):
