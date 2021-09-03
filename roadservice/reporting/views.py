@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views import View
 
 from reporting.forms import TimeReportForm, StatusReportForm
-from reporting.models import TimeReport, ReportGenerator
+from reporting.models import IntervalReport, ReportGenerator
 
 
 # class TestView(View):
