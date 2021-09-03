@@ -4,6 +4,7 @@ from geopy.distance import geodesic
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from accounts.models import User, Role
+from django.utils import timezone
 
 
 class Location:
@@ -60,6 +61,9 @@ class Region(models.Model):
     def has_moderator(self):
         return hasattr(self, 'moderator')
 
+    def is_concrete(self):
+        return self.__class__ != Region
+
     def get_concrete(self):
         if self.type == Region.Type.COUNTRY:
             return self.country
@@ -71,17 +75,40 @@ class Region(models.Model):
     def get_including_regions(self):
         """returns a queryset consisting of regions that include this region"""
         res = Region.objects.filter(pk=self.pk)
-        if self.type != Region.Type.COUNTRY:
+        if self.super_region is not None:
             res |= self.super_region.get_including_regions()
         return res
 
     def get_counties(self):
-        concrete = self.get_concrete()
-        if concrete.type == Region.Type.COUNTY:
-            return County.objects.filter(pk=self.pk)
+        if not self.is_concrete():
+            return self.get_concrete().get_counties()
         res = County.objects.none()
         for region in self.sub_regions.all():
-            res |= region.get_counties()
+            res |= region.get_concrete().get_counties()
+        return res
+
+    def get_teams(self):
+        if not self.is_concrete():
+            return self.get_concrete().get_teams()
+        res = ServiceTeam.objects.none()
+        for region in self.sub_regions.all():
+            res |= region.get_concrete().get_teams()
+        return res
+
+    def get_machineries(self):
+        if not self.is_concrete():
+            return self.get_concrete().get_machineries()
+        res = Machinery.objects.none()
+        for region in self.sub_regions.all():
+            res |= region.get_concrete().get_machineries()
+        return res
+
+    def get_issues(self):
+        if not self.is_concrete():
+            return self.get_concrete().get_issues()
+        res = Issue.objects.none()
+        for region in self.sub_regions.all():
+            res |= region.get_concrete().get_issues()
         return res
 
 
@@ -111,6 +138,18 @@ class County(Region):
     def get_concrete(self):
         return self
 
+    def get_counties(self):
+        return County.objects.filter(pk=self.pk)
+
+    def get_teams(self):
+        return self.serviceteam_set.filter(deleted_at__isnull=True)
+
+    def get_machineries(self):
+        return self.machinery_set.all()
+
+    def get_issues(self):
+        return self.issue_set.all()
+
     def get_required_teams(self, speciality, amount, location):
         special_teams = list(
             self.serviceteam_set.filter(
@@ -130,6 +169,9 @@ class County(Region):
         if not machinery_qs:
             return None
         return machinery_qs.get()
+
+    def has_expert(self):
+        return hasattr(self, 'expert')
 
     def notify_expert(self):
         pass # TODO
@@ -177,9 +219,28 @@ class Moderator(Role):
         res = Issue.objects.none()
         for region in regions:
             if self.can_moderate(region):
-                for county in region.get_counties():
-                    res |= county.issue_set.all()
+                res |= region.get_issues()
         return res
+
+    def get_teams(self, regions):
+        res = ServiceTeam.objects.none()
+        for region in regions:
+            if self.can_moderate(region):
+                res |= region.get_teams()
+        return res
+
+    def get_machineries(self, regions):
+        res = Machinery.objects.none()
+        for region in regions:
+            if self.can_moderate(region):
+                res |= region.get_machineries()
+        return res
+
+    def create_new_user(self, username, password, phone_number, first_name, last_name):
+        # TODO: Check whether the username and the password are valid
+        if User.objects.filter(username=username).exists():
+            raise Exception('Already exists')
+        return User.objects.create(username=username, password=password, phone_number=phone_number, first_name=first_name, last_name=last_name)
 
 
 class CountryModerator(Moderator):
@@ -233,12 +294,89 @@ class CountyModerator(Moderator):
         super().__init__(*args, **kwargs)
         self.type = Role.Type.COUNTY_MODERATOR
 
-    # TODO
-    def assign_county_expert(self):
-        pass
+    @property
+    def county(self):
+        return self.region.get_concrete()
 
     def get_concrete(self):
         return self
+
+    def add_service_team(self, speciality, members_users):
+        for user in members_users:
+            if user.has_role():
+                return None
+        team = ServiceTeam.objects.create(county=self.county, speciality=speciality)
+        for user in members_users:
+            Serviceman.objects.create(team=team, user=user)
+            user.refresh_from_db()
+        return team
+
+    def edit_service_team(self, team, speciality, members_users):
+        ex_members_users = [serviceman.user for serviceman in team.members.all()]
+        for user in members_users:
+            if user.has_role() and user not in ex_members_users:
+                return False
+        for user in members_users:
+            if not user.has_role():
+                Serviceman.objects.create(user=user, team=team)
+                user.refresh_from_db()
+        for serviceman in team.members.all():
+            if serviceman.user not in members_users:
+                serviceman.delete()
+        team.speciality = speciality
+        team.save()
+        return True
+
+    def delete_service_team(self, team):
+        # TODO: What if the team has an active mission?
+        for serviceman in team.members.all():
+            serviceman.delete()
+        team.deleted_at = timezone.now()
+        team.save()
+
+    def add_speciality(self, name):
+        if not Speciality.objects.filter(name=name).exists():
+            return Speciality.objects.create(name=name)
+        return Speciality.objects.get(name=name)
+
+    def rename_speciality(self, speciality, new_name):
+        speciality.name = new_name
+        speciality.save()
+
+    def delete_speciality(self, speciality):
+        speciality.delete()
+
+    def pre_assign_expert(self, user):
+        # Check whether the operation is valid and dismiss the previous expert
+        if self.county.has_expert() and self.county.expert.user == user:
+            raise Exception('The user is already the expert of the county')
+        elif user.has_role():
+            raise Exception('The user has a role')
+        elif self.county.has_expert():
+            self.county.expert.delete()
+
+    def assign_expert(self, user):
+        self.pre_assign_expert(user)
+        expert = CountyExpert.objects.create(user=user, county=self.county)
+        user.refresh_from_db()
+        return expert
+
+    def increase_machinery(self, machine_type):
+        if not Machinery.objects.filter(type=machine_type).exists():
+            return Machinery.objects.create(type=machine_type, total_count=1, available_count=1, county=self.county)
+        machine = Machinery.objects.get(type=machine_type)
+        machine.increase()
+        return machine
+
+    def decrease_machinery(self, machine_type):
+        if not Machinery.objects.filter(type=machine_type).exists():
+            return False
+        machine = Machinery.objects.get(type=machine_type)
+        if machine.available_count >= 1:
+            machine.decrease()
+            return True
+        else:
+            return False
 
 
 class Speciality(models.Model):
@@ -307,6 +445,15 @@ class Citizen(Role):
         else:
             return False
 
+    @classmethod
+    def sign_up(cls, username, password, phone_number, first_name, last_name):
+        if User.objects.filter(username=username).exists():
+            raise Exception('Already exists')
+        user = User.objects.create(username=username, password=password, phone_number=phone_number, first_name=first_name, last_name=last_name)
+        citizen = cls.objects.create(user=user)
+        user.refresh_from_db()
+        return citizen
+
 
 class MachineryType(models.Model):
     name = models.CharField(max_length=20)
@@ -323,6 +470,19 @@ class Machinery(models.Model):
 
     def __str__(self):
         return '%s - %s: %d/%d' % (self.type, self.county, self.available_count, self.total_count)
+
+    def increase(self):
+        self.total_count += 1
+        self.available_count += 1
+        self.save()
+
+    def decrease(self):
+        self.total_count -= 1
+        self.available_count -= 1
+        if self.total_count == 0:
+            self.delete()
+        else:
+            self.save()
 
 
 class Issue(GeoModel):
