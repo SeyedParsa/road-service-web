@@ -12,22 +12,6 @@ class User(AbstractUser):
     def has_role(self):
         return hasattr(self, 'role')
 
-    def login(self):
-        pass
-
-    def request_password_recovery(self):
-        pass
-
-    def request_phone_authentication(self):
-        pass
-
-    def change_password(self, old_password, new_password):
-        if self.password == old_password:
-            self.password = new_password
-            self.save()
-            return True
-        raise False
-
 
 class Role(models.Model):
     class Type(models.TextChoices):
