@@ -1,7 +1,8 @@
 from django.test import TestCase
+
 from accounts.models import User
-from core.models import Country, Province, County, CountryModerator, ProvinceModerator, Citizen, Serviceman, \
-    ServiceTeam, Speciality, CountyExpert, Issue, MachineryType, Machinery, MissionType, CountyModerator, Speciality, Location, Region
+from core.models import Country, Province, County, CountryModerator, Citizen, Serviceman, \
+    ServiceTeam, CountyExpert, Issue, MachineryType, Machinery, MissionType, Speciality, Location
 
 
 class BaseTestCase(TestCase):
@@ -283,7 +284,7 @@ class CountyExpertTestCase(TestCase):
 
     def test_view_issue(self):
         pass
-    
+
     def test_accept_issue(self):
         pass # check the commented code at the end of file
 
@@ -513,7 +514,6 @@ class RegionTestCase(BaseTestCase):
         counties = self.iran.get_counties()
         self.assertEqual(set(counties), set([self.tehran, self.damavand, self.shahrerey, self.isfahan, self.khansar,
                                              self.shiraz, self.marvdasht, self.neyshabur, self.mashhad]))
-
 
 # class AcceptIssueTestCase(TestCase):
 #     def setUp(self):

@@ -1,10 +1,12 @@
-from abc import abstractmethod
-
-from geopy.distance import geodesic
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
-from accounts.models import User, Role
+from django.db import models, IntegrityError
+from django.db.models import ProtectedError
 from django.utils import timezone
+from geopy.distance import geodesic
+
+from accounts.models import User, Role
+from core.exceptions import AccessDeniedError, OccupiedUserError, DuplicatedInfoError, BusyResourceError, \
+    ResourceNotFoundError, IllegalOperationInStateError, InvalidArgumentError
 
 
 class Location:
@@ -53,7 +55,8 @@ class Region(models.Model):
 
     type = models.CharField(max_length=2, choices=Type.choices)
     name = models.CharField(max_length=20)
-    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, blank=True, on_delete=models.PROTECT)
+    super_region = models.ForeignKey('self', related_name='sub_regions', null=True, blank=True,
+                                     on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -174,7 +177,7 @@ class County(Region):
         return hasattr(self, 'expert')
 
     def notify_expert(self):
-        pass # TODO
+        pass  # TODO
 
 
 class Moderator(Role):
@@ -191,13 +194,12 @@ class Moderator(Role):
         region -- the Region that becomes moderated
         """
         if region not in self.region.sub_regions.all():
-            raise Exception('The region is not in the moderator\'s subregions')
-        elif region.has_moderator() and region.moderator.user == user:
-            raise Exception('The user is already the moderator of the region')
+            raise AccessDeniedError('The region is not in the moderator\'s subregions')
         elif user.has_role():
-            raise Exception('The user has a role')
+            raise OccupiedUserError('The user has a role')
         elif region.has_moderator():
             region.moderator.delete()
+            region.moderator.user.refresh_from_db()
             region.refresh_from_db()
 
     def get_concrete(self):
@@ -238,9 +240,11 @@ class Moderator(Role):
 
     def create_new_user(self, username, password, phone_number, first_name, last_name):
         # TODO: Check whether the username and the password are valid
-        if User.objects.filter(username=username).exists():
-            raise Exception('Already exists')
-        return User.objects.create(username=username, password=password, phone_number=phone_number, first_name=first_name, last_name=last_name)
+        try:
+            return User.objects.create(username=username, password=password, phone_number=phone_number,
+                                       first_name=first_name, last_name=last_name)
+        except IntegrityError:
+            raise DuplicatedInfoError()
 
 
 class CountryModerator(Moderator):
@@ -304,7 +308,7 @@ class CountyModerator(Moderator):
     def add_service_team(self, speciality, members_users):
         for user in members_users:
             if user.has_role():
-                return None
+                raise OccupiedUserError()
         team = ServiceTeam.objects.create(county=self.county, speciality=speciality)
         for user in members_users:
             Serviceman.objects.create(team=team, user=user)
@@ -315,7 +319,7 @@ class CountyModerator(Moderator):
         ex_members_users = [serviceman.user for serviceman in team.members.all()]
         for user in members_users:
             if user.has_role() and user not in ex_members_users:
-                return False
+                raise OccupiedUserError()
         for user in members_users:
             if not user.has_role():
                 Serviceman.objects.create(user=user, team=team)
@@ -323,37 +327,44 @@ class CountyModerator(Moderator):
         for serviceman in team.members.all():
             if serviceman.user not in members_users:
                 serviceman.delete()
+                serviceman.user.refresh_from_db()
         team.speciality = speciality
         team.save()
-        return True
 
     def delete_service_team(self, team):
-        # TODO: What if the team has an active mission?
+        if team.active_mission is not None:
+            raise BusyResourceError()
         for serviceman in team.members.all():
             serviceman.delete()
+            serviceman.user.refresh_from_db()
         team.deleted_at = timezone.now()
         team.save()
 
     def add_speciality(self, name):
-        if not Speciality.objects.filter(name=name).exists():
-            return Speciality.objects.create(name=name)
-        return Speciality.objects.get(name=name)
+        if Speciality.objects.filter(name=name).exists():
+            raise DuplicatedInfoError()
+        return Speciality.objects.create(name=name)
 
     def rename_speciality(self, speciality, new_name):
+        if Speciality.objects.filter(name=new_name).exists():
+            raise DuplicatedInfoError()
         speciality.name = new_name
         speciality.save()
 
     def delete_speciality(self, speciality):
-        speciality.delete()
+        try:
+            speciality.delete()
+        except ProtectedError:
+            raise BusyResourceError()
 
     def pre_assign_expert(self, user):
         # Check whether the operation is valid and dismiss the previous expert
-        if self.county.has_expert() and self.county.expert.user == user:
-            raise Exception('The user is already the expert of the county')
-        elif user.has_role():
-            raise Exception('The user has a role')
+        if user.has_role():
+            raise OccupiedUserError('The user has a role')
         elif self.county.has_expert():
             self.county.expert.delete()
+            self.county.expert.user.refresh_from_db()
+            self.county.refresh_from_db()
 
     def assign_expert(self, user):
         self.pre_assign_expert(user)
@@ -361,26 +372,22 @@ class CountyModerator(Moderator):
         user.refresh_from_db()
         return expert
 
-    def increase_machinery(self, machine_type):
-        if not Machinery.objects.filter(type=machine_type).exists():
-            return Machinery.objects.create(type=machine_type, total_count=1, available_count=1, county=self.county)
-        machine = Machinery.objects.get(type=machine_type)
-        machine.increase()
-        return machine
+    def increase_machinery(self, machinery_type):
+        if not Machinery.objects.filter(type=machinery_type, county=self.county).exists():
+            return Machinery.objects.create(type=machinery_type, total_count=1, available_count=1, county=self.county)
+        machinery = Machinery.objects.get(type=machinery_type, county=self.county)
+        machinery.increase()
+        return machinery
 
-    def decrease_machinery(self, machine_type):
-        if not Machinery.objects.filter(type=machine_type).exists():
-            return False
-        machine = Machinery.objects.get(type=machine_type)
-        if machine.available_count >= 1:
-            machine.decrease()
-            return True
-        else:
-            return False
+    def decrease_machinery(self, machinery_type):
+        if not Machinery.objects.filter(type=machinery_type, county=self.county).exists():
+            raise ResourceNotFoundError()
+        machinery = Machinery.objects.get(type=machinery_type, county=self.county)
+        machinery.decrease()
 
 
 class Speciality(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.name
@@ -402,7 +409,7 @@ class ServiceTeam(models.Model):
 
 
 class Serviceman(Role, GeoModel):
-    team = models.ForeignKey(ServiceTeam, on_delete=models.SET_NULL, null=True, related_name='members')
+    team = models.ForeignKey(ServiceTeam, on_delete=models.PROTECT, null=True, related_name='members')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -416,10 +423,9 @@ class Serviceman(Role, GeoModel):
         self.save()
 
     def end_mission(self, report):
-        if self.team.active_mission is not None:
-            return self.team.active_mission.finish(report)
-        else:
-            return False
+        if self.team.active_mission is None:
+            raise IllegalOperationInStateError()
+        self.team.active_mission.finish(report)
 
 
 class Citizen(Role):
@@ -436,27 +442,25 @@ class Citizen(Role):
         issue.notify_expert()
         return issue
 
-    def can_view_issue(self, issue):
-        return issue.reporter == self
-
     def rate_issue(self, issue, rating):
-        if issue.reporter == self:
-            return issue.rate(rating)
-        else:
-            return False
+        if issue.reporter != self:
+            raise AccessDeniedError()
+        issue.rate(rating)
 
     @classmethod
     def sign_up(cls, username, password, phone_number, first_name, last_name):
-        if User.objects.filter(username=username).exists():
-            raise Exception('Already exists')
-        user = User.objects.create(username=username, password=password, phone_number=phone_number, first_name=first_name, last_name=last_name)
-        citizen = cls.objects.create(user=user)
-        user.refresh_from_db()
-        return citizen
+        try:
+            user = User.objects.create(username=username, password=password, phone_number=phone_number,
+                                       first_name=first_name, last_name=last_name)
+            citizen = cls.objects.create(user=user)
+            user.refresh_from_db()
+            return citizen
+        except IntegrityError:
+            raise DuplicatedInfoError()
 
 
 class MachineryType(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.name
@@ -477,6 +481,8 @@ class Machinery(models.Model):
         self.save()
 
     def decrease(self):
+        if self.available_count == 0:
+            raise BusyResourceError()
         self.total_count -= 1
         self.available_count -= 1
         if self.total_count == 0:
@@ -501,16 +507,17 @@ class Issue(GeoModel):
     county = models.ForeignKey(County, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     state = models.CharField(max_length=2, choices=State.choices, default=State.REPORTED)
+
     # image = models.ImageField() TODO
 
     def __str__(self):
         return '%s: %s (%s)' % (self.county, self.title, self.State(self.state).label)
 
     def assign_resources(self, mission_type):
-        # TODO: requires lock
+        # TODO: lock is required when manipulating resources (in this & other methods)
         if self.state != Issue.State.ACCEPTED:
-            return None
-            # raise Exception('The issues must be an accepted issue for resource assignment')
+            raise IllegalOperationInStateError()
+
         required_teams = []
         for speciality_requirement in self.specialityrequirement_set.all():
             special_teams = self.county.get_required_teams(
@@ -549,6 +556,8 @@ class Issue(GeoModel):
 
     def postpone_assignment(self, mission_type):
         # Right now we won't implement the queue, so the mission will just fail
+        if self.state != Issue.State.ACCEPTED:
+            raise IllegalOperationInStateError()
         self.state = Issue.State.FAILED
         self.save()
 
@@ -556,16 +565,16 @@ class Issue(GeoModel):
         self.county.notify_expert()
 
     def rate(self, rating):
-        if self.state == Issue.State.DONE:
-            self.mission.score = rating
-            self.mission.save()
-            self.state = Issue.State.SCORED
-            self.save()
-            return True
-        else:
-            return False
+        if self.state != Issue.State.DONE:
+            raise IllegalOperationInStateError()
+        self.mission.score = rating
+        self.mission.save()
+        self.state = Issue.State.SCORED
+        self.save()
 
     def return_machineries(self):
+        if self.state != Issue.State.DONE:
+            raise IllegalOperationInStateError()
         for machinery_requirement in self.machineryrequirement_set.all():
             machinery = self.county.machinery_set.get(type=machinery_requirement.machinery_type)
             machinery.available_count += machinery_requirement.amount
@@ -623,18 +632,16 @@ class Mission(models.Model):
         self.issue.return_machineries()
 
     def finish(self, report):
-        if self.issue.state == Issue.State.ASSIGNED:
-            self.report = report
-            self.save()
-            self.issue.state = Issue.State.DONE
-            self.issue.save()
-            for team in self.service_teams.all():
-                team.active_mission = None
-                team.save()
-            self.return_machineries()
-            return True
-        else:
-            return False
+        if self.issue.state != Issue.State.ASSIGNED:
+            raise IllegalOperationInStateError()
+        self.report = report
+        self.save()
+        self.issue.state = Issue.State.DONE
+        self.issue.save()
+        for team in self.service_teams.all():
+            team.active_mission = None
+            team.save()
+        self.return_machineries()
 
 
 class CountyExpert(Role):
@@ -656,28 +663,33 @@ class CountyExpert(Role):
                 specialities are distinct. The same goes for machinery_requirements.
         """
         if issue.county != self.county:
-            return None
-            # raise Exception('The county expert can only accept the issues in its county')
+            raise AccessDeniedError()
 
         if issue.state != Issue.State.REPORTED:
-            return None
+            raise IllegalOperationInStateError()
 
+        requires_speciality = False
         for speciality, amount in speciality_requirements:
-            SpecialityRequirement.objects.create(issue=issue, speciality=speciality, amount=amount)
+            if amount > 0:
+                SpecialityRequirement.objects.create(issue=issue, speciality=speciality, amount=amount)
+                requires_speciality = True
+
+        if not requires_speciality:
+            raise InvalidArgumentError()
 
         for machinery_type, amount in machinery_requirements:
-            MachineryRequirement.objects.create(issue=issue, machinery_type=machinery_type, amount=amount)
+            if amount > 0:
+                MachineryRequirement.objects.create(issue=issue, machinery_type=machinery_type, amount=amount)
 
         issue.state = Issue.State.ACCEPTED
         issue.save()
         return issue.assign_resources(mission_type)
 
     def reject_issue(self, issue):
-        if self.county == issue.county:
-            issue.state = Issue.State.REJECTED
-            issue.save()
-            return True
-        return False
+        if self.county != issue.county:
+            raise IllegalOperationInStateError()
+        issue.state = Issue.State.REJECTED
+        issue.save()
 
     def get_issues(self):
         return self.county.issue_set.all()
@@ -689,14 +701,18 @@ class CountyExpert(Role):
         return MissionType.objects.all()
 
     def add_mission_type(self, name):
-        MissionType.objects.create(name=name)
+        if MissionType.objects.filter(name=name).exists():
+            raise DuplicatedInfoError()
+        return MissionType.objects.create(name=name)
 
-    def rename_mission_type(self, mission_type, name):
-        mission_type.name = name
+    def rename_mission_type(self, mission_type, new_name):
+        if MissionType.objects.filter(name=new_name).exists():
+            raise DuplicatedInfoError()
+        mission_type.name = new_name
         mission_type.save()
 
     def delete_mission_type(self, mission_type):
-        mission_type.delete()
-
-    def can_view_issue(self, issue):
-        return self.county == issue.county
+        try:
+            mission_type.delete()
+        except ProtectedError:
+            raise BusyResourceError()
