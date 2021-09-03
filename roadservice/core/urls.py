@@ -35,6 +35,7 @@ urlpatterns = [
     path('resources/addmissiontype/', views.AddMissionType.as_view()),
     path('resources/removemachinery/<int:machinery_id>/', views.RemoveMachinery.as_view()),
     path('resources/addmachinery/<int:machinery_id>/', views.AddMachinery.as_view()),
+    path('resources/removeteam/<int:team_id>/', views.RemoveTeam.as_view()),
     path('resources/', views.Resources.as_view()),
     path('', RedirectView.as_view(url='/dashboard/', permanent=False), name='dashboard'),
 ]

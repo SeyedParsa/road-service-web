@@ -258,3 +258,12 @@ class RemoveSpeciality(View):
         # TODO: remove speciality!
         messages.add_message(request, messages.INFO, 'نوع تخصص حذف شد!')
         return HttpResponseRedirect('/resources/')
+
+
+class RemoveTeam(View):
+    def get(self, request, *args, **kwargs):
+        team_id = kwargs['team_id']
+        context = {'team_id': team_id}
+        # TODO: remove team!
+        messages.add_message(request, messages.INFO, 'تیم  حذف شد!')
+        return HttpResponseRedirect('/resources/')
