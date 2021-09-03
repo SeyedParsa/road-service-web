@@ -91,27 +91,27 @@ class Region(models.Model):
         return res
 
     def get_teams(self):
-        if not self.is_concrete():
-            return self.get_concrete().get_teams()
         res = ServiceTeam.objects.none()
-        for region in self.sub_regions.all():
-            res |= region.get_concrete().get_teams()
+        for county in self.get_counties():
+            res |= county.get_teams()
         return res
 
     def get_machineries(self):
-        if not self.is_concrete():
-            return self.get_concrete().get_machineries()
         res = Machinery.objects.none()
-        for region in self.sub_regions.all():
-            res |= region.get_concrete().get_machineries()
+        for county in self.get_counties():
+            res |= county.get_machineries()
         return res
 
     def get_issues(self):
-        if not self.is_concrete():
-            return self.get_concrete().get_issues()
         res = Issue.objects.none()
-        for region in self.sub_regions.all():
-            res |= region.get_concrete().get_issues()
+        for county in self.get_counties():
+            res |= county.get_issues()
+        return res
+
+    def get_missions(self):
+        res = Mission.objects.none()
+        for county in self.get_counties():
+            res |= county.get_missions()
         return res
 
 
@@ -153,12 +153,16 @@ class County(Region):
     def get_issues(self):
         return self.issue_set.all()
 
+    def get_missions(self):
+        return Mission.objects.filter(issue__county=self)
+
     def get_required_teams(self, speciality, amount, location):
         special_teams = list(
             self.serviceteam_set.filter(
                 speciality=speciality,
                 active_mission__isnull=True,
-                deleted_at__isnull=True
+                deleted_at__isnull=True,
+                members__isnull=False
             )
         )
         special_teams.sort(key=lambda t: t.farthest_member_distance(location))
