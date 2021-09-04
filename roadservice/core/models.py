@@ -208,9 +208,9 @@ class Moderator(Role):
         region -- the Region that becomes moderated
         """
         if region not in self.region.sub_regions.all():
-            raise AccessDeniedError('The region is not in the moderator\'s subregions')
+            raise AccessDeniedError()
         elif user.has_role():
-            raise OccupiedUserError('The user has a role')
+            raise OccupiedUserError()
         elif region.has_moderator():
             region.moderator.delete()
             region.moderator.user.refresh_from_db()
@@ -379,7 +379,7 @@ class CountyModerator(Moderator):
     def pre_assign_expert(self, user):
         # Check whether the operation is valid and dismiss the previous expert
         if user.has_role():
-            raise OccupiedUserError('The user has a role')
+            raise OccupiedUserError()
         elif self.county.has_expert():
             self.county.expert.delete()
             self.county.expert.user.refresh_from_db()

@@ -58,12 +58,16 @@ class BaseTestCase(TestCase):
         self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
         self.iran.refresh_from_db()
 
-        self.tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
+        self.tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash,
+                                                                              self.tehran_province.region_ptr)
         self.tehran_moderator = self.tehran_province_moderator.assign_moderator(self.pooyan, self.tehran.region_ptr)
-        self.damavand_moderator = self.tehran_province_moderator.assign_moderator(self.amirkasra, self.damavand.region_ptr)
-        self.shahrerey_moderator = self.tehran_province_moderator.assign_moderator(self.majid, self.shahrerey.region_ptr)
+        self.damavand_moderator = self.tehran_province_moderator.assign_moderator(self.amirkasra,
+                                                                                  self.damavand.region_ptr)
+        self.shahrerey_moderator = self.tehran_province_moderator.assign_moderator(self.majid,
+                                                                                   self.shahrerey.region_ptr)
 
-        self.shiraz_province_moderator = self.iran_moderator.assign_moderator(self.mahdi, self.shiraz_province.region_ptr)
+        self.shiraz_province_moderator = self.iran_moderator.assign_moderator(self.mahdi,
+                                                                              self.shiraz_province.region_ptr)
         self.shiraz_moderator = self.shiraz_province_moderator.assign_moderator(self.amin, self.shiraz.region_ptr)
         self.marvdasht_moderator = self.shiraz_province_moderator.assign_moderator(self.ali, self.marvdasht.region_ptr)
 
@@ -71,7 +75,8 @@ class BaseTestCase(TestCase):
         self.mashhad_moderator = self.khorasan_moderator.assign_moderator(self.gorji, self.mashhad.region_ptr)
         self.neyshabur_moderator = self.khorasan_moderator.assign_moderator(self.alireza, self.neyshabur.region_ptr)
 
-        self.isfahan_province_moderator = self.iran_moderator.assign_moderator(self.sina, self.isfahan_province.region_ptr)
+        self.isfahan_province_moderator = self.iran_moderator.assign_moderator(self.sina,
+                                                                               self.isfahan_province.region_ptr)
         self.isfahan_moderator = self.isfahan_province_moderator.assign_moderator(self.erfan, self.isfahan.region_ptr)
         self.khansar_moderator = self.isfahan_province_moderator.assign_moderator(self.amoo, self.khansar.region_ptr)
 
@@ -163,21 +168,24 @@ class BaseTestCase(TestCase):
         self.u1 = User.objects.create(username='u1', phone_number='31')
         self.u2 = User.objects.create(username='u2', phone_number='32')
         self.tehran_water_team0 = ServiceTeam.objects.create(county=self.tehran, speciality=self.water_speciality)
-        self.tehran_water_team0_servicemen = [Serviceman.objects.create(user=self.u0, team=self.tehran_water_team0, lat=1, long=1),
-        Serviceman.objects.create(user=self.u1, team=self.tehran_water_team0, lat=1.1, long=1),
-        Serviceman.objects.create(user=self.u2, team=self.tehran_water_team0, lat=1, long=1.1)]
+        self.tehran_water_team0_servicemen = [
+            Serviceman.objects.create(user=self.u0, team=self.tehran_water_team0, lat=1, long=1),
+            Serviceman.objects.create(user=self.u1, team=self.tehran_water_team0, lat=1.1, long=1),
+            Serviceman.objects.create(user=self.u2, team=self.tehran_water_team0, lat=1, long=1.1)]
 
         self.u3 = User.objects.create(username='u3', phone_number='33')
         self.u4 = User.objects.create(username='u4', phone_number='34')
         self.tehran_water_team1 = ServiceTeam.objects.create(county=self.tehran, speciality=self.water_speciality)
-        self.tehran_water_team1_servicemen = [Serviceman.objects.create(user=self.u3, team=self.tehran_water_team1, lat=1, long=1),
-        Serviceman.objects.create(user=self.u4, team=self.tehran_water_team1, lat=1.5, long=1)]
+        self.tehran_water_team1_servicemen = [
+            Serviceman.objects.create(user=self.u3, team=self.tehran_water_team1, lat=1, long=1),
+            Serviceman.objects.create(user=self.u4, team=self.tehran_water_team1, lat=1.5, long=1)]
 
         self.u5 = User.objects.create(username='u5', phone_number='35')
         self.u6 = User.objects.create(username='u6', phone_number='36')
         self.tehran_wind_team = ServiceTeam.objects.create(county=self.tehran, speciality=self.wind_speciality)
-        self.tehran_wind_team_servicemen = [Serviceman.objects.create(user=self.u5, team=self.tehran_wind_team, lat=1.1, long=1.2),
-        Serviceman.objects.create(user=self.u6, team=self.tehran_wind_team, lat=1.5, long=1.3)]
+        self.tehran_wind_team_servicemen = [
+            Serviceman.objects.create(user=self.u5, team=self.tehran_wind_team, lat=1.1, long=1.2),
+            Serviceman.objects.create(user=self.u6, team=self.tehran_wind_team, lat=1.5, long=1.3)]
 
         self.tehran_moon_team0 = ServiceTeam.objects.create(county=self.tehran, speciality=self.moon_speciality)
         self.tehran_moon_team1 = ServiceTeam.objects.create(county=self.tehran, speciality=self.moon_speciality)
@@ -234,7 +242,8 @@ class CitizenTestCase(BaseTestCase):
         self.assertEqual(self.issue1.state, Issue.State.REPORTED)
 
     def test_rate_issue(self):
-        self.mission = self.tehran_expert.accept_issue(self.issue0, self.animal_type, [(self.wind_speciality, 1)], [(self.crane_type, 1), (self.truck_type, 1)])
+        self.mission = self.tehran_expert.accept_issue(self.issue0, self.animal_type, [(self.wind_speciality, 1)],
+                                                       [(self.crane_type, 1), (self.truck_type, 1)])
         self.tehran_wind_team.refresh_from_db()
         self.tehran_wind_team_servicemen[0].end_mission('The cow is caught alive')
         self.issue0.refresh_from_db()
@@ -266,8 +275,10 @@ class ServicemanTestCase(BaseTestCase):
         self.assertEqual(self.issue0.state, Issue.State.DONE)
         self.tehran_wind_team.refresh_from_db()
         self.assertIsNone(self.tehran_wind_team.active_mission)
-        self.assertEqual(available_cranes + crane_need, self.tehran.machinery_set.get(type=self.crane_type).available_count)
-        self.assertEqual(available_trucks + truck_need, self.tehran.machinery_set.get(type=self.truck_type).available_count)
+        self.assertEqual(available_cranes + crane_need,
+                         self.tehran.machinery_set.get(type=self.crane_type).available_count)
+        self.assertEqual(available_trucks + truck_need,
+                         self.tehran.machinery_set.get(type=self.truck_type).available_count)
 
 
 class CountyExpertTestCase(TestCase):
@@ -284,7 +295,7 @@ class CountyExpertTestCase(TestCase):
         pass
 
     def test_accept_issue(self):
-        pass # check the commented code at the end of file
+        pass  # check the commented code at the end of file
 
     def test_reject_issue(self):
         pass
@@ -326,19 +337,28 @@ class ModeratorTestCase(BaseTestCase):
         self.james = User.objects.create(username='james', phone_number='007')
         self.james.refresh_from_db()
         self.mohammadali = User.objects.create(username='mohammadali', phone_number='44')
+        self.mohammadali.refresh_from_db()
         self.asghar = User.objects.create(username='asghar', phone_number='55')
-        self.akbar = User.objects.create(username='akbar', phone_number='66')
+        self.asghar.refresh_from_db()
+        self.ebrahim = User.objects.create(username='ebrahim', phone_number='66')
+        self.ebrahim.refresh_from_db()
         self.abubakr = User.objects.create(username='abubakr', phone_number='77')
-
+        self.abubakr.refresh_from_db()
+        self.gholamali = User.objects.create(username='gholamali', phone_number='88')
+        self.gholamali.refresh_from_db()
+        self.nagamuto = User.objects.create(username='nagamuto', phone_number='89')
+        self.nagamuto.refresh_from_db()
 
     def setUpModerators(self):
         self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
         self.parsa.refresh_from_db()
         self.iran.refresh_from_db()
         self.iran_moderator.refresh_from_db()
-        self.tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
+        self.tehran_province_moderator = self.iran_moderator.assign_moderator(self.kiarash,
+                                                                              self.tehran_province.region_ptr)
         self.tehran_moderator = self.tehran_province_moderator.assign_moderator(self.majid, self.tehran.region_ptr)
-        self.shahrerey_moderator = self.tehran_province_moderator.assign_moderator(self.mohammadali, self.shahrerey.region_ptr)
+        self.shahrerey_moderator = self.tehran_province_moderator.assign_moderator(self.mohammadali,
+                                                                                   self.shahrerey.region_ptr)
 
     def setUpIssues(self):
         self.issue0 = self.citizen0.submit_issue(title='The cow on the road',
@@ -363,12 +383,15 @@ class ModeratorTestCase(BaseTestCase):
         tehran_province_moderator.assign_moderator(self.majid, self.damavand.region_ptr)
         self.assertEqual(self.damavand.moderator.user, self.majid)
         with self.assertRaisesMessage(AccessDeniedError, ''):
+            tehran_province_moderator.assign_moderator(self.mahdi, self.iran.region_ptr)
+        with self.assertRaisesMessage(AccessDeniedError, ''):
             tehran_province_moderator.assign_moderator(self.mahdi, self.shiraz_province.region_ptr)
+        with self.assertRaisesMessage(AccessDeniedError, ''):
+            tehran_province_moderator.assign_moderator(self.mahdi, self.marvdasht.region_ptr)
         with self.assertRaisesMessage(OccupiedUserError, ''):
             self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
         with self.assertRaisesMessage(OccupiedUserError, ''):
             self.iran_moderator.assign_moderator(self.majid, self.shiraz_province.region_ptr)
-
         self.iran_moderator.assign_moderator(self.mahdi, self.tehran_province.region_ptr)
         self.kiarash.refresh_from_db()
         self.tehran_province.refresh_from_db()
@@ -387,11 +410,17 @@ class ModeratorTestCase(BaseTestCase):
         self.setUpModerators()
         shahrerey_moderator = self.shahrerey.moderator.get_concrete()
         speciality = self.shahrerey_moderator.add_speciality('barricade removal')
+        speciality2 = self.shahrerey_moderator.add_speciality('sade mabar2')
         self.assertEqual(speciality.name, 'barricade removal')
         self.shahrerey_moderator.rename_speciality(speciality, 'sade mabar')
         speciality.refresh_from_db()
         self.assertEqual(speciality.name, 'sade mabar')
+        with self.assertRaisesMessage(DuplicatedInfoError, ''):
+            self.shahrerey_moderator.add_speciality('sade mabar')
+        with self.assertRaisesMessage(AccessDeniedError, ''):
+            self.shahrerey_moderator.rename_speciality(speciality2, 'sade mabar')
         self.shahrerey_moderator.delete_speciality(speciality)
+        self.shahrerey_moderator.delete_speciality(speciality2)
         # makes sure that sade mabar has been deleted
         self.assertEqual(self.shahrerey_moderator.add_speciality('barricade removal').name, 'barricade removal')
 
@@ -413,10 +442,10 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(list(self.tehran_moderator.get_issues([self.tehran])), [self.issue0])
         self.assertEqual(set(self.tehran_province_moderator.get_issues(
             [self.tehran.region_ptr, self.damavand.region_ptr, self.shahrerey.region_ptr])),
-                         set([self.issue0, self.issue1]))
+            set([self.issue0, self.issue1]))
         self.assertEqual(set(self.iran_moderator.get_issues(
             [self.tehran_province.region_ptr, self.shiraz.region_ptr, self.khorasan.region_ptr])),
-                         set([self.issue0, self.issue1, self.issue2]))
+            set([self.issue0, self.issue1, self.issue2]))
         self.assertEqual(set(self.iran_moderator.get_issues(
             [self.shiraz.region_ptr, self.khorasan.region_ptr])), set([self.issue2]))
         self.assertEqual(set(self.iran_moderator.get_issues([self.khorasan.region_ptr])), set([]))
@@ -444,10 +473,13 @@ class ModeratorTestCase(BaseTestCase):
         self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
         self.assertEqual(self.shahrerey.expert.user, self.akbar)
         self.assertEqual(self.shahrerey.has_expert(), True)
+        with self.assertRaisesMessage(OccupiedUserError, ''):
+            self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
 
     def test_user_creation(self):
         self.setUpModerators()
-        self.jfk = self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555', 'John', 'Kennedy')
+        self.jfk = self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555', 'John',
+                                                            'Kennedy')
         self.assertEqual(self.jfk.username, 'JohnFKennedy')
         with self.assertRaisesMessage(DuplicatedInfoError, ''):
             self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+98 21', 'John', 'Kennedy')
@@ -463,6 +495,12 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.abubakr.role.get_concrete().team, self.team17)
         self.vladimir.refresh_from_db()
         self.assertFalse(self.vladimir.has_role())
+        with self.assertRaisesMessage(OccupiedUserError, ''):
+            self.shahrerey.moderator.add_service_team(self.my_speciality, [self.nagamuto, self.vladimir])
+        with self.assertRaisesMessage(OccupiedUserError, ''):
+            self.shahrerey.moderator.edit_service_team(self.team17, self.my_speciality,
+                                                       [self.osama, self.vladimir, self.kiarash])
+        #TODO: Mark team17 as busy on a mission and see that we can't delete it due to BusyResourceError
         self.shahrerey_moderator.delete_service_team(self.team17)
         self.osama.refresh_from_db()
         self.assertFalse(self.osama.has_role())
@@ -471,7 +509,10 @@ class ModeratorTestCase(BaseTestCase):
         self.setUpModerators()
         self.tractor_type = MachineryType.objects.create(name='Tractor')
         self.snow_plow_type = MachineryType.objects.create(name='Snow Plow')
-        self.tractor = Machinery.objects.create(type=self.tractor_type, total_count=1, available_count=1, county=self.shahrerey)
+        self.bulldozer_type = MachineryType.objects.create(name='Bulldozer')
+        self.grader_type = MachineryType.objects.create(name='Grader')
+        self.tractor = Machinery.objects.create(type=self.tractor_type, total_count=1, available_count=1,
+                                                county=self.shahrerey)
         self.shahrerey.moderator.get_concrete().increase_machinery(self.tractor_type)
         self.tractor.refresh_from_db()
         self.assertEqual(self.tractor.total_count, 2)
@@ -482,6 +523,14 @@ class ModeratorTestCase(BaseTestCase):
         self.snow_plow = self.shahrerey.moderator.get_concrete().increase_machinery(self.snow_plow_type)
         self.snow_plow.refresh_from_db()
         self.assertEqual(self.snow_plow.total_count, 1)
+        self.bulldozer = self.shahrerey.moderator.get_concrete().increase_machinery(self.bulldozer_type)
+        self.bulldozer.refresh_from_db()
+        self.assertEqual(self.bulldozer.total_count, 1)
+        self.assertEqual(self.bulldozer.available_count, 1)
+        self.assertEqual(self.bulldozer.county.get_concrete(), self.shahrerey)
+        self.shahrerey.moderator.get_concrete().decrease_machinery(self, self.bulldozer_type)
+        with self.assertRaisesMessage(ResourceNotFoundError, ''):
+            self.shahrerey.moderator.decrease_machinery(self.bulldozer_type)
 
 
 class RegionTestCase(BaseTestCase):
@@ -502,7 +551,8 @@ class RegionTestCase(BaseTestCase):
         including_regions = self.tehran_province.region_ptr.get_including_regions()
         self.assertEqual(list(including_regions), [self.iran.region_ptr, self.tehran_province.region_ptr])
         including_regions = self.tehran.region_ptr.get_including_regions()
-        self.assertEqual(list(including_regions), [self.iran.region_ptr, self.tehran_province.region_ptr, self.tehran.region_ptr])
+        self.assertEqual(list(including_regions),
+                         [self.iran.region_ptr, self.tehran_province.region_ptr, self.tehran.region_ptr])
 
     def test_get_counties(self):
         counties = self.mashhad.get_counties()
@@ -512,6 +562,7 @@ class RegionTestCase(BaseTestCase):
         counties = self.iran.get_counties()
         self.assertEqual(set(counties), set([self.tehran, self.damavand, self.shahrerey, self.isfahan, self.khansar,
                                              self.shiraz, self.marvdasht, self.neyshabur, self.mashhad]))
+
 
 # class AcceptIssueTestCase(TestCase):
 #     def setUp(self):
@@ -547,3 +598,26 @@ class RegionTestCase(BaseTestCase):
 #         self.assertEqual(self.issue.state, Issue.State.ASSIGNED)
 #         self.assertEqual(self.serviceman.team.active_mission, self.issue.mission)
 #         self.assertEqual(self.crane.available_count, 7)
+
+
+class ScenarioTestCase1(BaseTestCase):
+    def test_damavand(self):
+        self.setUpModerators()
+        self.varamin = County.objects.create(name='Varamin', super_region=self.tehran_province.region_ptr)
+        self.varamin.refresh_from_db()
+        self.bouazar = User.objects.create(username='bouazar', phone_number='91')
+        self.kareem = User.objects.create(username='kareem', phone_number='91')
+        self.bouazar.refresh_from_db()
+        self.varamin_moderator = self.tehran_province_moderator.assign_moderator(self.bouazar,
+                                                                                  self.varamin.region_ptr)
+        self.varamin_moderator.refresh_from_db()
+        self.varamin_expert = self.varamin_moderator.get_concrete().assign_expert(self.kareem)
+        self.roadroller_type = MachineryType.objects.create(name='Road Roller')
+        self.roadroller = Machinery.objects.create(type=self.roadroller_type, total_count=1, available_count=1,
+                                                county=self.varamin)
+        self.varamin_expert.get_concrete().increase_machinery(self.roadroller_type)
+        self.varamin_expert.get_concrete().increase_machinery(self.roadroller_type)
+        self.varamin_expert.get_concrete().decrease_machinery(self.roadroller_type)
+        self.assertEqual(self.roadroller.total_count, 2)
+        # TODO: Insert some issue manipulation here and at its midst, manipulate teams and machinery
+        # TODO: and make sure that everything's okay
