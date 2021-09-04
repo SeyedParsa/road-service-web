@@ -224,6 +224,9 @@ class BaseTestCase(TestCase):
 
 
 class CitizenTestCase(BaseTestCase):
+    def test_sign_up(self):
+        pass
+
     def test_submit_issue(self):
         self.assertTrue(self.issue0 in self.issue0.county.issue_set.all())
         self.assertFalse(self.issue0 in self.issue1.county.issue_set.all())
@@ -301,12 +304,24 @@ class CountyExpertTestCase(TestCase):
     def test_delete_mission_type(self):
         pass
 
+    def test_notify(self):
+        pass
+
 
 class IssueTestCase(TestCase):
     def setUp(self):
         pass
 
     def test_assign_resources(self):
+        pass
+
+    def test_postpone_assignment(self):
+        pass
+
+    def test_rate(self):
+        pass
+
+    def test_return_machineries(self):
         pass
 
 
