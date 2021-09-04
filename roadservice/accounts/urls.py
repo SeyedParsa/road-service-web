@@ -5,7 +5,7 @@ from accounts import views, api_views
 app_name = 'accounts'
 urlpatterns = [
     path('api/user/', api_views.UserView.as_view()),
-    path('api/signup/', api_views.SignUpView.as_view()),
+    path('api/change-password/', api_views.ChangePasswordView.as_view()),
 
     path('logout/', views.Logout.as_view()),
     path('signup/', views.Signup.as_view()),

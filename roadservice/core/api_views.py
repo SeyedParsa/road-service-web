@@ -3,12 +3,29 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.exceptions import AccessDeniedError, IllegalOperationInStateError, InvalidArgumentError
-from core.models import Location, Issue, Country, Speciality, MachineryType, MissionType
+from accounts.exceptions import WeakPasswordError
+from core.exceptions import AccessDeniedError, IllegalOperationInStateError, InvalidArgumentError, DuplicatedInfoError
+from core.models import Location, Issue, Country, Speciality, MachineryType, MissionType, Citizen
 from core.permissions import IsCitizen, IsServiceman, IsCountyExpert
 from core.serializers import IssueAcceptanceSerializer, LocationSerializer, IssueSerializer, NestedCountrySerializer, \
     IssueReportingSerializer, IssueRatingSerializer, ServiceTeamSerializer, MissionSerializer, MissionReportSerializer, \
-    SpecialitySerializer, MachineryTypeSerializer, IssueRejectionSerializer, MissionTypeSerializer
+    SpecialitySerializer, MachineryTypeSerializer, IssueRejectionSerializer, MissionTypeSerializer, SignUpSerializer
+
+
+class SignUpView(APIView):
+    def post(self, request):
+        serializer = SignUpSerializer(data=request.data)
+        if serializer.is_valid():
+            first_name = serializer.validated_data['first_name']
+            last_name = serializer.validated_data['last_name']
+            phone_number = serializer.validated_data['phone_number']
+            password = serializer.validated_data['password']
+            try:
+                Citizen.sign_up(phone_number, password, phone_number, first_name, last_name)
+                return Response({'status': True})
+            except (WeakPasswordError, DuplicatedInfoError) as e:
+                return Response({'status': False})
+        return Response(serializer.errors)
 
 
 class RegionsListView(APIView):

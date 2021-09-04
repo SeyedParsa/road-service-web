@@ -2,7 +2,8 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.serializers import UserSerializer, SignUpSerializer
+from accounts.exceptions import WeakPasswordError
+from accounts.serializers import UserSerializer, PasswordSerializer
 
 
 class UserView(APIView):
@@ -12,10 +13,16 @@ class UserView(APIView):
         return Response(UserSerializer(request.user).data)
 
 
-class SignUpView(APIView):
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
-        serializer = SignUpSerializer(data=request.data)
+        serializer = PasswordSerializer(data=request.data)
         if serializer.is_valid():
-            pass  # TODO
-            return Response({'error': 'PHONE_DUPLICATE'})
-        return Response({'status': False})
+            password = serializer.validated_data['password']
+            try:
+                request.user.change_password(password)
+                return Response({'status': True})
+            except WeakPasswordError as e:
+                return Response({'status': False})
+        return Response(serializer.errors)

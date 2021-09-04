@@ -1,5 +1,9 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.db import models
+
+from accounts.exceptions import WeakPasswordError
 
 
 class User(AbstractUser):
@@ -11,6 +15,14 @@ class User(AbstractUser):
 
     def has_role(self):
         return hasattr(self, 'role')
+
+    def change_password(self, password):
+        try:
+            validate_password(password)
+            self.set_password(password)
+            self.save()
+        except ValidationError:
+            raise WeakPasswordError()
 
 
 class Role(models.Model):
