@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from accounts.models import User
 from accounts.serializers import UserSerializer
 from core.models import Speciality, SpecialityRequirement, Issue, MachineryRequirement, MachineryType, MissionType, \
     Serviceman, Mission, County, Province, Country, ServiceTeam
@@ -197,3 +198,14 @@ class MissionReportSerializer(serializers.ModelSerializer):
         model = Mission
         fields = ['report']
         extra_kwargs = {'report': {'required': True}}
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone_number', 'password']
+        extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'phone_number': {'validators': []},
+        }

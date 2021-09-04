@@ -2,6 +2,7 @@ import base64
 from uuid import uuid4
 
 from django.conf import settings
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
@@ -11,6 +12,7 @@ from django.db.models import ProtectedError
 from django.utils import timezone
 from geopy.distance import geodesic
 
+from accounts.exceptions import WeakPasswordError
 from accounts.models import User, Role
 from core.exceptions import AccessDeniedError, OccupiedUserError, DuplicatedInfoError, BusyResourceError, \
     ResourceNotFoundError, IllegalOperationInStateError, InvalidArgumentError
@@ -251,12 +253,17 @@ class Moderator(Role):
         return res
 
     def create_new_user(self, username, password, phone_number, first_name, last_name):
-        # TODO: Check whether the username and the password are valid
         try:
-            return User.objects.create(username=username, password=password, phone_number=phone_number,
+            validate_password(password)
+            user = User.objects.create(username=username, phone_number=phone_number,
                                        first_name=first_name, last_name=last_name)
+            user.set_password(password)
+            user.save()
+            return user
         except IntegrityError:
             raise DuplicatedInfoError()
+        except ValidationError:
+            raise WeakPasswordError()
 
 
 class CountryModerator(Moderator):
@@ -467,13 +474,18 @@ class Citizen(Role):
     @classmethod
     def sign_up(cls, username, password, phone_number, first_name, last_name):
         try:
-            user = User.objects.create(username=username, password=password, phone_number=phone_number,
+            validate_password(password)
+            user = User.objects.create(username=username, phone_number=phone_number,
                                        first_name=first_name, last_name=last_name)
+            user.set_password(password)
+            user.save()
             citizen = cls.objects.create(user=user)
             user.refresh_from_db()
             return citizen
         except IntegrityError:
             raise DuplicatedInfoError()
+        except ValidationError:
+            raise WeakPasswordError()
 
 
 class MachineryType(models.Model):

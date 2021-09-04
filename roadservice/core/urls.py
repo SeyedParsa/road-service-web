@@ -5,6 +5,7 @@ from core import views, api_views
 
 app_name = 'core'
 urlpatterns = [
+    path('api/signup/', api_views.SignUpView.as_view()),
     path('api/regions/', api_views.RegionsListView.as_view()),
     path('api/specialities/', api_views.SpecialitiesView.as_view()),
     path('api/machinery-types/', api_views.MachineryTypesView.as_view()),
