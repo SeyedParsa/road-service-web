@@ -154,6 +154,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'www', 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+ISSUE_IMAGE_LIMIT_MB = 5
+
 # Local settings
 try:
     from .local_settings import *

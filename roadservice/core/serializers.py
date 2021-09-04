@@ -87,14 +87,20 @@ class CountySerializer(serializers.ModelSerializer):
 class IssueSerializer(serializers.ModelSerializer):
     mission = serializers.PrimaryKeyRelatedField(queryset=Mission.objects.all(), allow_null=True)
     reporter = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Issue
         fields = ['id', 'lat', 'long', 'state', 'title', 'description', 'reporter', 'county',
-                  'created_at', 'mission']
+                  'created_at', 'mission', 'image_url']
 
     def get_reporter(self, obj):
         return UserSerializer(obj.reporter.user).data
+
+    def get_image_url(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
 
 class NestedCountySerializer(serializers.ModelSerializer):
@@ -128,10 +134,12 @@ class NestedCountrySerializer(serializers.ModelSerializer):
         return [NestedProvinceSerializer(region.province).data for region in obj.sub_regions.all()]
 
 
-class IssueReporingSerializer(serializers.ModelSerializer):
+class IssueReportingSerializer(serializers.ModelSerializer):
+    base64_image = serializers.CharField(required=False)
+
     class Meta:
         model = Issue
-        fields = ['lat', 'long', 'title', 'description', 'county']
+        fields = ['lat', 'long', 'title', 'description', 'county', 'base64_image']
         extra_kwargs = {
             'lat': {'required': True},
             'long': {'required': True},

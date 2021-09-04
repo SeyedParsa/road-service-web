@@ -1,3 +1,10 @@
+import base64
+from uuid import uuid4
+
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
+from django.core.files.images import get_image_dimensions
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, IntegrityError
 from django.db.models import ProtectedError
@@ -441,9 +448,14 @@ class Citizen(Role):
     def get_concrete(self):
         return self
 
-    def submit_issue(self, title, description, county, location):
+    def submit_issue(self, title, description, county, location, base64_image):
+        if base64_image:
+            file_name, image_file = Issue.get_image_from_base64(base64_image)
+            Issue.validate_image(image_file)
         issue = Issue.objects.create(title=title, description=description, reporter=self, county=county,
                                      location=location)
+        if base64_image:
+            issue.image.save(file_name, image_file)
         county.notify_expert()
         return issue
 
@@ -506,17 +518,33 @@ class Issue(GeoModel):
         DONE = 'DO'
         SCORED = 'SC'
 
+    @staticmethod
+    def validate_image(image):
+        if image.size > settings.ISSUE_IMAGE_LIMIT_MB * 1024 * 1024:
+            raise ValidationError("Images have size limit of %d megabytes" % settings.ISSUE_IMAGE_LIMIT_MB)
+        width, height = get_image_dimensions(image)
+        ratio = width / height
+        if ratio < 0.5 or ratio > 1.75:
+            raise ValidationError("Ratio of the images should be between 1 and 1.75")
+
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=280)
     reporter = models.ForeignKey(Citizen, on_delete=models.SET_NULL, null=True)
     county = models.ForeignKey(County, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     state = models.CharField(max_length=2, choices=State.choices, default=State.REPORTED)
-
-    # image = models.ImageField() TODO
+    image = models.ImageField(upload_to='issue-images/', validators=[validate_image.__func__], null=True, blank=True)
 
     def __str__(self):
         return '%s: %s (%s)' % (self.county, self.title, self.State(self.state).label)
+
+    @staticmethod
+    def get_image_from_base64(base64_image):
+        format, imgstr = base64_image.split(';base64,')
+        ext = format.split('/')[-1]
+        image_file = ContentFile(base64.b64decode(imgstr))
+        file_name = '%s.%s' % (uuid4().hex, ext)
+        return file_name, image_file
 
     def assign_resources(self, mission_type):
         # TODO: lock is required when manipulating resources (in this & other methods)
@@ -689,6 +717,8 @@ class CountyExpert(Role):
 
     def reject_issue(self, issue):
         if self.county != issue.county:
+            raise IllegalOperationInStateError()
+        if issue.state != Issue.State.REPORTED:
             raise IllegalOperationInStateError()
         issue.state = Issue.State.REJECTED
         issue.save()
