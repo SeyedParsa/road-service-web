@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from django.shortcuts import render
 from django.views import View
-from accounts.forms import SignUpForm, LoginForm, PasswordResetForm, NewPasswordForm
+from accounts.forms import LoginForm, PasswordResetForm, NewPasswordForm
 
 
 class PasswordResetComplete(View):
@@ -20,31 +20,6 @@ class Logout(View):
         logout(request)
         messages.success(request, "شما با موفقیت از اکانت خود خارج شدید!")
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
-
-
-# TODO: should be moved to core
-class Signup(View):
-    def get(self, request):
-        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
-        form = SignUpForm()
-        return render(request=request,
-                      template_name='accounts/signup.html',
-                      context={'form': form})
-
-    def post(self, request):
-        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            print('VALID FORMMMM!!', form)
-            # TODO: Add a new user
-            messages.success(request, "کاربر جدید با موافقیت اضافه شد!")
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
-        else:
-            # TODO: show specific error
-            messages.error(request, "فرم معتبر نیست!")
-            return render(request=request,
-                          template_name='accounts/signup.html',
-                          context={'form': form})
 
 
 class Login(View):

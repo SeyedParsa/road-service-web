@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/expert/accept-issue/', api_views.AcceptIssueView.as_view()),
     path('api/expert/reject-issue/', api_views.RejectIssueView.as_view()),
 
+    path('signup/', views.Signup.as_view()),
     path('assignmoderator/', views.AssignModerator.as_view()),
     path('dashboard/<int:issue_id>/', views.IssueCard.as_view()),
     path('dashboard/', views.Home.as_view()),

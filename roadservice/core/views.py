@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.forms import ModelForm
@@ -7,6 +8,7 @@ from django.urls import reverse
 from django.views import View
 from khayyam import *
 
+from accounts.forms import SignUpForm
 from accounts.models import User, Role
 from core.exceptions import DuplicatedInfoError, BusyResourceError
 from core.forms import AssignModeratorForm, RegionMultipleFilterForm, SingleStringForm
@@ -333,3 +335,26 @@ class RemoveSpeciality(LoginRequiredMixin, UserPassesTestMixin, View):
             messages.add_message(request, messages.ERROR, 'تیم‌هایی با این تخصص وجود دارد!')
         return HttpResponseRedirect(reverse('core:resources'))
 
+
+class Signup(View):
+    def get(self, request):
+        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
+        form = SignUpForm()
+        return render(request=request,
+                      template_name='core/signup.html',
+                      context={'form': form})
+
+    def post(self, request):
+        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            print('VALID FORMMMM!!', form)
+            # TODO: Add a new user
+            messages.success(request, "کاربر جدید با موافقیت اضافه شد!")
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        else:
+            # TODO: show specific error
+            messages.error(request, "فرم معتبر نیست!")
+            return render(request=request,
+                          template_name='core/signup.html',
+                          context={'form': form})
