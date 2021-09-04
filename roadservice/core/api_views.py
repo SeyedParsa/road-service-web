@@ -6,7 +6,7 @@ from core.exceptions import AccessDeniedError, IllegalOperationInStateError, Inv
 from core.models import Location, Issue, Country, Speciality, MachineryType, MissionType
 from core.permissions import IsCitizen, IsServiceman, IsCountyExpert
 from core.serializers import IssueAcceptanceSerializer, LocationSerializer, IssueSerializer, NestedCountrySerializer, \
-    IssueReporingSerializer, IssueRatingSerializer, ServiceTeamSerializer, MissionSerializer, MissionReportSerializer, \
+    IssueReportingSerializer, IssueRatingSerializer, ServiceTeamSerializer, MissionSerializer, MissionReportSerializer, \
     SpecialitySerializer, MachineryTypeSerializer, IssueRejectionSerializer, MissionTypeSerializer
 
 
@@ -49,16 +49,17 @@ class ReportIssueView(APIView):
     permission_classes = [IsAuthenticated, IsCitizen]
 
     def post(self, request):
-        serializer = IssueReporingSerializer(data=request.data)
+        serializer = IssueReportingSerializer(data=request.data)
         if serializer.is_valid():
             lat = serializer.validated_data['lat']
             long = serializer.validated_data['long']
             title = serializer.validated_data['title']
             description = serializer.validated_data['description']
             county = serializer.validated_data['county']
+            base64_image = serializer.validated_data.get('base64_image', None)
             citizen = request.user.role.citizen
             issue = citizen.submit_issue(title=title, description=description, county=county,
-                                         location=Location(lat, long))
+                                         location=Location(lat, long), base64_image=base64_image)
             return Response(IssueSerializer(issue).data)
         return Response(serializer.errors)
 
