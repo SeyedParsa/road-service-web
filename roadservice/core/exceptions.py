@@ -24,7 +24,3 @@ class IllegalOperationInStateError(Exception):
 
 class InvalidArgumentError(Exception):
     pass
-
-
-class SingletonInitError(Exception):
-    pass
