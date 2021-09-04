@@ -69,47 +69,51 @@
 
 
             {% if user.is_authenticated %}
-
-                <div class="ui dropdown link item" id="reports_dropdown">
-                    <i class="newspaper icon" style="margin: 10px"></i>
-                    <span class="text">گزارش‌ها</span>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        <a href="/timereport">
-                            <div class="item">گزارش‌های زمانی</div>
-                        </a>
-                        <a href="/statusreport">
-                            <div class="item">گزارش وضعیت بخش</div>
-                        </a>
-                        <a href="/regionreport">
-                            <div class="item">گزارش زیربخش‌ها</div>
-                        </a>
+                {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                    <div class="ui dropdown link item" id="reports_dropdown">
+                        <i class="newspaper icon" style="margin: 10px"></i>
+                        <span class="text">گزارش‌ها</span>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a href="/timereport">
+                                <div class="item">گزارش‌های زمانی</div>
+                            </a>
+                            <a href="/statusreport">
+                                <div class="item">گزارش وضعیت بخش</div>
+                            </a>
+                            <a href="/regionreport">
+                                <div class="item">گزارش زیربخش‌ها</div>
+                            </a>
+                        </div>
                     </div>
-                </div>
 
+                {% endif %}
 
                 <div class="ui dropdown link item" id="users_dropdown">
                     <i class="user icon" style="margin: 10px"></i>
                     <span class="text">مدیریت کاربرها</span>
                     <i class="dropdown icon"></i>
                     <div class="menu">
-                        <a href="/assignmoderator">
-                            <div class="item">تعیین کارشناس</div>
-                        </a>
-                        <a href="/assignmoderator">
-                            <div class="item">تعیین مدیر زیربخش</div>
-                        </a>
-                        <a href="/signup">
-                            <div class="item">ثبت‌نام کاربر جدید</div>
-                        </a>
+                        {% if user.role.type == 'CM' %}
+                            <a href="/assignmoderator">
+                                <div class="item">تعیین کارشناس</div>
+                            </a>
+                        {% endif %}
+                        {% if user.role.type == 'PR' or user.role.type == 'PM' %}
+                            <a href="/assignmoderator">
+                                <div class="item">تعیین مدیر زیربخش</div>
+                            </a>
+                        {% endif %}
+                        {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                            <a href="/signup">
+                                <div class="item">ثبت‌نام کاربر جدید</div>
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
 
 
                 <a href="/resources" class="item"><i class="bullseye icon" style="margin: 5px;"></i> مدیریت منابع </a>
-
-
-
 
                 <div class="right menu"></div>
 
@@ -155,46 +159,55 @@
                 <a href="/login" class="item"><i class="user icon" style="margin: 10px;"></i> ورود </a>
             {% endif %}
         </div>
-        <div class="tablet mobile only row" style="display: flex;justify-content: space-between;align-items: stretch;flex-wrap: nowrap;">
+        <div class="tablet mobile only row"
+             style="display: flex;justify-content: space-between;align-items: stretch;flex-wrap: nowrap;">
             <div class="ui dropdown link item" id="reports_dropdown">
                 <i class="big bars icon" style="margin: 10px"></i>
                 <div class="menu">
-                    <div class="item">
-                        <i class="newspaper icon" style="margin: 10px"></i>
-                        <span class="text">گزارش‌ها</span>
+                    {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+
+                        <div class="item">
+                            <i class="newspaper icon" style="margin: 10px"></i>
+                            <span class="text">گزارش‌ها</span>
                             <i class="caret right icon"></i>
-                        <div class="right menu">
-                            <a href="/timereport">
-                                <div class="item">گزارش‌های زمانی</div>
-                            </a>
-                            <a href="/statusreport">
-                                <div class="item">گزارش وضعیت بخش</div>
-                            </a>
-                            <a href="/regionreport">
-                                <div class="item">گزارش زیربخش‌ها</div>
-                            </a>
+                            <div class="right menu">
+                                <a href="/timereport">
+                                    <div class="item">گزارش‌های زمانی</div>
+                                </a>
+                                <a href="/statusreport">
+                                    <div class="item">گزارش وضعیت بخش</div>
+                                </a>
+                                <a href="/regionreport">
+                                    <div class="item">گزارش زیربخش‌ها</div>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                     <div class="item">
                         <i class="user icon" style="margin: 10px"></i>
                         <span class="text">مدیریت کاربرها</span>
-                            <i class="caret right icon"></i>
+                        <i class="caret right icon"></i>
                         <div class="right menu">
-                            <a href="/assignmoderator">
-                                <div class="item">تعیین کارشناس</div>
-                            </a>
-
-                            <a href="/assignmoderator">
-                                <div class="item">تعیین مدیر زیربخش</div>
-                            </a>
-                            <a href="/signup">
-                                <div class="item">ثبت‌نام کاربر جدید</div>
-                            </a>
+                            {% if user.role.type == 'CM' %}
+                                <a href="/assignmoderator">
+                                    <div class="item">تعیین کارشناس</div>
+                                </a>
+                            {% endif %}
+                            {% if user.role.type == 'PR' or user.role.type == 'PM' %}
+                                <a href="/assignmoderator">
+                                    <div class="item">تعیین مدیر زیربخش</div>
+                                </a>
+                            {% endif %}
+                            {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                                <a href="/signup">
+                                    <div class="item">ثبت‌نام کاربر جدید</div>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
 
-                        <a href="/resources" class="item"><i class="bullseye icon"></i> مدیریت
-                            منابع </a>
+                    <a href="/resources" class="item"><i class="bullseye icon"></i> مدیریت
+                        منابع </a>
                 </div>
             </div>
 

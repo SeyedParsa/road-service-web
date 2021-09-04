@@ -42,7 +42,6 @@ class Home(LoginRequiredMixin, UserPassesTestMixin, View):
             messages.add_message(request, messages.INFO, 'جدول بروز شد!')
             region_ids = form.cleaned_data.get('regions')
             regions = [Region.objects.get(id=region_id) for region_id in region_ids]
-            print(regions[0])
             issues = request.user.role.get_concrete().get_issues(regions)
         else:
             messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')

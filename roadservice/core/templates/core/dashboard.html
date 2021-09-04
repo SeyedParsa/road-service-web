@@ -4,6 +4,8 @@
 {% block content %}
 
     <div class="ui stackable grid">
+        {% if user.role.type != 'CE' and user.role.type != 'CM' %}
+
 <div class="ui row">
             <form class="ui form" method="post">
                 {% csrf_token %}
@@ -21,6 +23,7 @@
             </form>
 
         </div>
+    {% endif %}
         {% for issue in issues %}
 
             <div class="four wide column swing-in-top-fwd">
