@@ -254,13 +254,13 @@
     <script>
         $(document).ready(function () {
 
-            $('.issuecard').click(function () {
-                var id = $(this).attr('id');
-                var path = "/resources/teamdetails/" + id;
-                $("#secretbox").load(path);
-                $("#secretbox").modal('show');
-
-            });
+            {#$('.issuecard').click(function () {#}
+            {#    var id = $(this).attr('id');#}
+            {#    var path = "/resources/teamdetails/" + id;#}
+            {#    $("#secretbox").load(path);#}
+            {#    $("#secretbox").modal('show');#}
+            {##}
+            {#});#}
 
             $('#add-team-icon').click(function () {
                 var path = "/resources/addteam/";

@@ -222,7 +222,11 @@
             <div class="ui six wide left floated column" style="text-align: right">
                 <div class="ui fluid right aligned card" style="background-color: #486071;color: white">
                     <div class="image" style="margin: 10px">
-                        <img src="/static/images/cow-guardrail.jpg">
+                        {% if issue.image %}
+                            <img src="{{ issue.image.url }}">
+                        {% else %}
+                            <img src="/static/images/cow-guardrail.jpg">
+                        {% endif %}
                     </div>
                     <div class="content">
                         <p>
