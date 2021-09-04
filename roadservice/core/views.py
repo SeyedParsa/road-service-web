@@ -153,9 +153,6 @@ class Resources(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.process(request, form, regions)
 
 
-# TODO: add team
-
-
 class ChangeTeam(View):
     # TODO
     def get(self, request, *args, **kwargs):
@@ -165,9 +162,20 @@ class ChangeTeam(View):
                       template_name='core/changeteam.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        print(request)
         messages.add_message(request, messages.INFO, 'تیم  بروز شد!')
         team_id = kwargs['team_id']
+        return HttpResponseRedirect('/resources/')
+
+
+class AddTeam(View):
+    # TODO
+    def get(self, request, *args, **kwargs):
+        context = {'specialities': Speciality.objects.all()}
+        return render(request=request,
+                      template_name='core/changeteam.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        messages.add_message(request, messages.INFO, 'تیم  اضافه  شد!')
         return HttpResponseRedirect('/resources/')
 
 
@@ -178,6 +186,7 @@ class RemoveTeam(View):
         # TODO: remove team!
         messages.add_message(request, messages.INFO, 'تیم  حذف شد!')
         return HttpResponseRedirect('/resources/')
+
 
 
 class AddMachinery(View):

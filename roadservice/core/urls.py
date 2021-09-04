@@ -33,6 +33,7 @@ urlpatterns = [
     path('resources/removespeciality/<int:speciality_id>/', views.RemoveSpeciality.as_view()),
     path('resources/addspeciality/', views.AddSpeciality.as_view()),
     path('resources/addmissiontype/', views.AddMissionType.as_view()),
+    path('resources/addteam/', views.AddTeam.as_view()),
     path('resources/removemachinery/<int:machinery_id>/', views.RemoveMachinery.as_view()),
     path('resources/addmachinery/<int:machinery_id>/', views.AddMachinery.as_view()),
     path('resources/removeteam/<int:team_id>/', views.RemoveTeam.as_view()),

@@ -6,7 +6,7 @@
     ویرایش تیم
 </div>
 <div class="content">
-    <form class="ui form" id="form1" method="post" action="/resources/changeteam/{{ team.id }}/">
+    <form class="ui form" id="form1" method="post" action="/resources/{% if team %}changeteam/{{ team.id }}{% else %}addteam{% endif %}/">
         {% csrf_token %}
 
         <div class="field" style="">
@@ -82,6 +82,8 @@
 
         let num = 5;
         num = parseInt($('tbody').children().last().attr('id'))+1;
+        if(!$.isNumeric( num))
+            num = 1;
         console.log(`New ID is: ${num}`);
 
         $('.content').find('.table').append('<tr id="'+num+'">\n' +
