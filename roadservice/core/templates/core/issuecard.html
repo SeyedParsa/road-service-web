@@ -10,6 +10,12 @@
                     <h2>
                         <i class="close icon right floated" style="margin: 10px; color: black;"></i>
                         {#                        گاردریل | گیر کردن گاو روی گاردریل اتوبان شیراز-اصفهان#}
+                        {% if issue.state == 'AS' or issue.state == 'DO' or issue.state == 'SC' or issue.state == 'AC' %}
+                            {{ issue.mission.type.name }}
+                        {% else %}
+                            نوع ماموریت نامشخص
+                        {% endif %}
+                        |
                         {{ issue.title }}
                     </h2>
                 </div>
@@ -180,34 +186,34 @@
                                     <tr>
                                         <td>
                                             <h4 class="ui header">
-                                            {{ machineryrequirement.machinery_type.name }}
-    {#                                            بیل مکانیکی#}
+                                                {{ machineryrequirement.machinery_type.name }}
+                                                {#                                            بیل مکانیکی#}
                                             </h4></td>
                                         <td>
                                             {{ machineryrequirement.amount }}
-    {#                                        22#}
+                                            {#                                        22#}
                                         </td>
                                     </tr>
                                 {% endfor %}
 
-{#                                <tr>#}
-{#                                    <td>#}
-{#                                        <h4 class="ui header">#}
-{#                                            باب&zwnj;کت#}
-{#                                        </h4></td>#}
-{#                                    <td>#}
-{#                                        12#}
-{#                                    </td>#}
-{#                                </tr>#}
-{#                                <tr>#}
-{#                                    <td>#}
-{#                                        <h4 class="ui header">#}
-{#                                            جرثقیل#}
-{#                                        </h4></td>#}
-{#                                    <td>#}
-{#                                        56#}
-{#                                    </td>#}
-{#                                </tr>#}
+                                {#                                <tr>#}
+                                {#                                    <td>#}
+                                {#                                        <h4 class="ui header">#}
+                                {#                                            باب&zwnj;کت#}
+                                {#                                        </h4></td>#}
+                                {#                                    <td>#}
+                                {#                                        12#}
+                                {#                                    </td>#}
+                                {#                                </tr>#}
+                                {#                                <tr>#}
+                                {#                                    <td>#}
+                                {#                                        <h4 class="ui header">#}
+                                {#                                            جرثقیل#}
+                                {#                                        </h4></td>#}
+                                {#                                    <td>#}
+                                {#                                        56#}
+                                {#                                    </td>#}
+                                {#                                </tr>#}
                                 </tbody>
                             </table>
                         </div>
@@ -223,7 +229,7 @@
                         <p>
                             <i class="calendar alternate icon" style="margin-right: 10px"></i>
                             {#                            ۹ تیر ۱۴۰۰، ساعت ۱۲:۱۷#}
-{#                            {{ issue.created_at }}#}
+                            {#                            {{ issue.created_at }}#}
                             {{ persian_datetime }}
                         </p>
 
@@ -237,13 +243,13 @@
                         <p></p>
 
 
-{#                        <p style="margin-top:20px">#}
-{#                            <i class="map marker icon" style="margin-right: 10px"></i>#}
-{#                            آدرس کامل:#}
-{#                            <br>#}
-{#                            {{ issue.address }}#}
-                            {#                            کیلومتر ۱۷ جاده شیراز به اصفهان، نرسیده به خروجی باتلاق گاو خونی#}
-{#                        </p>#}
+                        {#                        <p style="margin-top:20px">#}
+                        {#                            <i class="map marker icon" style="margin-right: 10px"></i>#}
+                        {#                            آدرس کامل:#}
+                        {#                            <br>#}
+                        {#                            {{ issue.address }}#}
+                        {#                            کیلومتر ۱۷ جاده شیراز به اصفهان، نرسیده به خروجی باتلاق گاو خونی#}
+                        {#                        </p>#}
                     </div>
                 </div>
             </div>

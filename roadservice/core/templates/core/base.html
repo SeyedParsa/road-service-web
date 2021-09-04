@@ -96,6 +96,9 @@
                         <a href="/assignmoderator">
                             <div class="item">تعیین کارشناس</div>
                         </a>
+                        <a href="/assignmoderator">
+                            <div class="item">تعیین مدیر زیربخش</div>
+                        </a>
                         <a href="/signup">
                             <div class="item">ثبت‌نام کاربر جدید</div>
                         </a>
@@ -151,8 +154,6 @@
                 <div class="right menu"></div>
                 <a href="/login" class="item"><i class="user icon" style="margin: 10px;"></i> ورود </a>
             {% endif %}
-
-
         </div>
         <div class="tablet mobile only row" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="ui dropdown link item" id="reports_dropdown">
@@ -180,6 +181,10 @@
                             <a href="/assignmoderator">
                                 <div class="item">تعیین کارشناس</div>
                             </a>
+
+                            <a href="/assignmoderator">
+                                <div class="item">تعیین مدیر زیربخش</div>
+                            </a>
                             <a href="/signup">
                                 <div class="item">ثبت‌نام کاربر جدید</div>
                             </a>
@@ -200,7 +205,6 @@
 
             {% if user.is_authenticated %}
 
-
                 <div class="ui dropdown item" id="profile_dropdown">
                     {% if user.profile_picture %}
                         <img class="item" style="width:auto;height:60px;border:0;padding:0;"
@@ -217,7 +221,6 @@
                         <div class="divider hide-in-mobile"></div>
                         <a class="item" href="/password/set" style="text-align: right">
                             <i class="key icon"></i>
-
                             تغییر گذرواژه
                         </a>
 

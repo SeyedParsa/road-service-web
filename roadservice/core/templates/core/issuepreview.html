@@ -6,14 +6,18 @@
             <div class="content">
                 <div class="header"
                      style="display: flex; justify-content: space-between; align-items: center;">
-                    گاردریل
 
+                    {% if issue.state == 'AS' or issue.state == 'DO' or issue.state == 'SC' or issue.state == 'AC' %}
+                        {{ issue.mission.type.name }}
+                    {% else %}
+                        نوع ماموریت نامشخص
+                    {% endif %}
 
                     <span class="left floated item">
-                                        {% if issue.state == 'DO' or issue.state == 'SC' %}
-                                            <i class="green check circle icon" style="color:green"
-                                               data-content="ماموریت انجام شده"></i>
-                                        {% endif %}
+                                {% if issue.state == 'DO' or issue.state == 'SC' %}
+                                    <i class="green check circle icon" style="color:green"
+                                       data-content="ماموریت انجام شده"></i>
+                                {% endif %}
 
                         {% if issue.state == 'AS' %}
                             <i class="truck circle icon" data-content="ماموریت در حال انجام است"></i>
@@ -83,9 +87,12 @@
                     در انتظار تخصیص تیم و ماشین‌آلات
                 {% endif %}
 
+                {% if issue.state == 'DO' %}
+                    در انتظار امتیازدهی کاربر
+                {% endif %}
             </div>
         </div>
     </div>
 {% else %}
-        چنین ماموریت/مشکلی ثبت نشده!!!!!!۱
+    چنین ماموریت/مشکلی ثبت نشده!!!!!!۱
 {% endif %}
