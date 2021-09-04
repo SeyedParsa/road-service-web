@@ -212,11 +212,11 @@ class BaseTestCase(TestCase):
         self.issue0 = self.citizen0.submit_issue(title='The cow on the road',
                                                  description='There is a cow trapped in the Chamran Highway guard rails!',
                                                  county=self.tehran,
-                                                 location=Location(1.5, 2))
+                                                 location=Location(1.5, 2), base64_image=None)
         self.issue1 = self.citizen1.submit_issue(title='Slippery road',
                                                  description='The road is slippery',
                                                  county=self.shahrerey,
-                                                 location=Location(1.5, 1))
+                                                 location=Location(1.5, 1), base64_image=None)
 
     def setUp(self):
         self.setUpRegions()
@@ -379,15 +379,15 @@ class ModeratorTestCase(BaseTestCase):
         self.issue0 = self.citizen0.submit_issue(title='The cow on the road',
                                                  description='There is a cow trapped in the Chamran Highway guard rails!',
                                                  county=self.tehran,
-                                                 location=Location(1.5, 2))
+                                                 location=Location(1.5, 2), base64_image=None)
         self.issue1 = self.citizen1.submit_issue(title='The horse on the road',
                                                  description='There is a horse trapped in the Chamran Highway guard rails!',
                                                  county=self.damavand,
-                                                 location=Location(1.1, 1.1))
+                                                 location=Location(1.1, 1.1), base64_image=None)
         self.issue2 = self.citizen2.submit_issue(title='The fox on the road',
                                                  description='There is a fox trapped in the Chamran Highway guard rails!',
                                                  county=self.shiraz,
-                                                 location=Location(1, 2))
+                                                 location=Location(1, 2), base64_image=None)
 
     def test_assign_moderator(self):
         self.iran_moderator = CountryModerator.objects.create(user=self.parsa, region=self.iran.region_ptr)
@@ -432,7 +432,7 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(speciality.name, 'sade mabar')
         with self.assertRaisesMessage(DuplicatedInfoError, ''):
             self.shahrerey_moderator.add_speciality('sade mabar')
-        with self.assertRaisesMessage(AccessDeniedError, ''):
+        with self.assertRaisesMessage(DuplicatedInfoError, ''):
             self.shahrerey_moderator.rename_speciality(speciality2, 'sade mabar')
         self.shahrerey_moderator.delete_speciality(speciality)
         self.shahrerey_moderator.delete_speciality(speciality2)
@@ -453,6 +453,7 @@ class ModeratorTestCase(BaseTestCase):
 
     def test_get_issues(self):
         self.setUpModerators()
+        self.setUpExperts()
         self.setUpIssues()
         self.assertEqual(list(self.tehran_moderator.get_issues([self.tehran])), [self.issue0])
         self.assertEqual(set(self.tehran_province_moderator.get_issues(
@@ -467,6 +468,7 @@ class ModeratorTestCase(BaseTestCase):
 
     def test_view_issue(self):
         self.setUpModerators()
+        self.setUpExperts()
         self.setUpIssues()
         self.assertTrue(self.iran_moderator.can_view_issue(self.issue0))
         self.assertTrue(self.iran_moderator.can_view_issue(self.issue1))
@@ -484,6 +486,7 @@ class ModeratorTestCase(BaseTestCase):
     def test_expert_assignment(self):
         self.setUpModerators()
         self.damavand_expert = CountyExpert.objects.create(user=self.asghar, county=self.damavand)
+        self.akbar = User.objects.create(username='akbar', phone_number='4')
         self.assertEqual(self.damavand.expert.user, self.asghar)
         self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
         self.assertEqual(self.shahrerey.expert.user, self.akbar)
@@ -511,9 +514,9 @@ class ModeratorTestCase(BaseTestCase):
         self.vladimir.refresh_from_db()
         self.assertFalse(self.vladimir.has_role())
         with self.assertRaisesMessage(OccupiedUserError, ''):
-            self.shahrerey.moderator.add_service_team(self.my_speciality, [self.nagamuto, self.vladimir])
+            self.shahrerey.moderator.get_concrete().add_service_team(self.my_speciality, [self.nagamuto, self.osama])
         with self.assertRaisesMessage(OccupiedUserError, ''):
-            self.shahrerey.moderator.edit_service_team(self.team17, self.my_speciality,
+            self.shahrerey.moderator.get_concrete().edit_service_team(self.team17, self.my_speciality,
                                                        [self.osama, self.vladimir, self.kiarash])
         #TODO: Mark team17 as busy on a mission and see that we can't delete it due to BusyResourceError
         self.shahrerey_moderator.delete_service_team(self.team17)
@@ -543,9 +546,9 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.bulldozer.total_count, 1)
         self.assertEqual(self.bulldozer.available_count, 1)
         self.assertEqual(self.bulldozer.county.get_concrete(), self.shahrerey)
-        self.shahrerey.moderator.get_concrete().decrease_machinery(self, self.bulldozer_type)
+        self.shahrerey.moderator.get_concrete().decrease_machinery(self.bulldozer_type)
         with self.assertRaisesMessage(ResourceNotFoundError, ''):
-            self.shahrerey.moderator.decrease_machinery(self.bulldozer_type)
+            self.shahrerey.moderator.get_concrete().decrease_machinery(self.bulldozer_type)
 
 
 class RegionTestCase(BaseTestCase):
@@ -617,11 +620,10 @@ class RegionTestCase(BaseTestCase):
 
 class ScenarioTestCase1(BaseTestCase):
     def test_damavand(self):
-        self.setUpModerators()
         self.varamin = County.objects.create(name='Varamin', super_region=self.tehran_province.region_ptr)
         self.varamin.refresh_from_db()
         self.bouazar = User.objects.create(username='bouazar', phone_number='91')
-        self.kareem = User.objects.create(username='kareem', phone_number='91')
+        self.kareem = User.objects.create(username='kareem', phone_number='92')
         self.bouazar.refresh_from_db()
         self.varamin_moderator = self.tehran_province_moderator.assign_moderator(self.bouazar,
                                                                                   self.varamin.region_ptr)
@@ -630,9 +632,10 @@ class ScenarioTestCase1(BaseTestCase):
         self.roadroller_type = MachineryType.objects.create(name='Road Roller')
         self.roadroller = Machinery.objects.create(type=self.roadroller_type, total_count=1, available_count=1,
                                                 county=self.varamin)
-        self.varamin_expert.get_concrete().increase_machinery(self.roadroller_type)
-        self.varamin_expert.get_concrete().increase_machinery(self.roadroller_type)
-        self.varamin_expert.get_concrete().decrease_machinery(self.roadroller_type)
+        self.varamin_moderator.get_concrete().increase_machinery(self.roadroller_type)
+        self.varamin_moderator.get_concrete().increase_machinery(self.roadroller_type)
+        self.varamin_moderator.get_concrete().decrease_machinery(self.roadroller_type)
+        self.roadroller.refresh_from_db()
         self.assertEqual(self.roadroller.total_count, 2)
         # TODO: Insert some issue manipulation here and at its midst, manipulate teams and machinery
         # TODO: and make sure that everything's okay
