@@ -1,10 +1,8 @@
-from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, IntegrityError
 from django.db.models import ProtectedError
 from django.utils import timezone
 from geopy.distance import geodesic
-from kavenegar import KavenegarAPI
 
 from accounts.models import User, Role
 from core.exceptions import AccessDeniedError, OccupiedUserError, DuplicatedInfoError, BusyResourceError, \
