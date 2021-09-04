@@ -13,7 +13,7 @@
             <label>تخصص</label>
             <select class="ui fluid right aligned search dropdown" name="spaciality">
                 {% for speciality in specialities %}
-                    <option value="">{{ speciality.name }}</option>
+                    <option id="{{ speciality.id }}">{{ speciality.name }}</option>
                 {% endfor %}
             </select>
         </div>
