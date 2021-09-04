@@ -90,24 +90,24 @@
                 <div class="ui basic segment" style="margin-top: 5px">
                     <div class="ui segments">
 
-                        {% for machinery in machineries %}
+                        {% for key, value in machinery_count.items %}
                             <div class="ui segment">
                                 <div class="ui grid">
                                     <div class="ui six wide column">
-                                        {{ machinery.type.name }}
+                                        {{ key.name }}
                                         {#                                    جرثقیل#}
                                     </div>
                                     <div class="ui ten wide column machinery" style="white-space: nowrap">
                                         {% if user.role.type == 'CM' %}
 
-                                            <a href="/resources/addmachinery/{{ machinery.id }}/"
+                                            <a href="/resources/addmachinery/{{ key.id }}/"
                                                style="color: black"><i
                                                     class="right floated plus icon"></i></a>
                                         {% endif %}
                                         {#                                    18#}
-                                        {{ machinery.total_count }} (۳ مشغول)
+                                        {{ value.total }} ({{ value.available }} مشغول)
                                         {% if user.role.type == 'CM' %}
-                                            <a href="/resources/removemachinery/{{ machinery.id }}/"
+                                            <a href="/resources/removemachinery/{{ key.id }}/"
                                                style="color: black"><i
                                                     class="left floated minus icon"></i></a>
                                         {% endif %}

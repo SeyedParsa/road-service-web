@@ -129,7 +129,7 @@ class Resources(LoginRequiredMixin, UserPassesTestMixin, View):
         specialities = Speciality.objects.all()
         context = {'filter_form': form,
                    'teams': teams,
-                   # TODO @Mahdi: User machinery_count instead of machineries
+                   'machinery_count': machinery_count,
                    'machineries': Machinery.objects.all(),
                    'mission_types': mission_types,
                    'specialities': specialities}
