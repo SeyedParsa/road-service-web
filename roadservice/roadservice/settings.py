@@ -38,6 +38,8 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 KAVENEGAR_API_KEY = env('KAVENEGAR_API_KEY')
 
+DOMAIN = env('DOMAIN')
+
 # Application definition
 
 INSTALLED_APPS = [
