@@ -7,6 +7,7 @@ from geopy.distance import geodesic
 from accounts.models import User, Role
 from core.exceptions import AccessDeniedError, OccupiedUserError, DuplicatedInfoError, BusyResourceError, \
     ResourceNotFoundError, IllegalOperationInStateError, InvalidArgumentError
+from sms.models import SmsSender
 
 
 class Location:
@@ -181,7 +182,7 @@ class County(Region):
         return hasattr(self, 'expert')
 
     def notify_expert(self):
-        pass  # TODO
+        self.expert.notify()
 
 
 class Moderator(Role):
@@ -443,7 +444,7 @@ class Citizen(Role):
     def submit_issue(self, title, description, county, location):
         issue = Issue.objects.create(title=title, description=description, reporter=self, county=county,
                                      location=location)
-        issue.notify_expert()
+        county.notify_expert()
         return issue
 
     def rate_issue(self, issue, rating):
@@ -564,9 +565,6 @@ class Issue(GeoModel):
             raise IllegalOperationInStateError()
         self.state = Issue.State.FAILED
         self.save()
-
-    def notify_expert(self):
-        self.county.notify_expert()
 
     def rate(self, rating):
         if self.state != Issue.State.DONE:
@@ -695,6 +693,11 @@ class CountyExpert(Role):
         issue.state = Issue.State.REJECTED
         issue.save()
 
+    def notify(self):
+        sms_sender = SmsSender.get_instance()
+        message = 'مشکل تازه‌ای در شهرستان %s گزارش شده است. لطفا آن را بررسی فرمایید.' % self.county
+        sms_sender.send_to_number(self.user.phone_number, message)
+
     def get_issues(self):
         return self.county.issue_set.all()
 
@@ -720,3 +723,4 @@ class CountyExpert(Role):
             mission_type.delete()
         except ProtectedError:
             raise BusyResourceError()
+

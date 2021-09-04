@@ -36,6 +36,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
+KAVENEGAR_API_KEY = env('KAVENEGAR_API_KEY')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
     'reporting',
     'accounts',
     'core',
+    'sms',
 ]
 
 MIDDLEWARE = [
