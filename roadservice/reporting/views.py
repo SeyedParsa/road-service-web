@@ -12,6 +12,7 @@ class StatusReport(View):
     def get(self, request, *args, **kwargs):
         status_report_form = StatusReportForm()
         # print(time_report_form.region.choices)
+        ReportGenerator.get_instance()
         return render(request=request,
                       template_name='reporting/statusreport.html',
                       context={'form': status_report_form })

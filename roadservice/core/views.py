@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.forms import ModelForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
@@ -10,7 +11,7 @@ from accounts.models import User, Role
 from core.exceptions import DuplicatedInfoError, BusyResourceError
 from core.forms import AssignModeratorForm, RegionMultipleFilterForm, SingleStringForm
 from core.models import Region, CountryModerator, ProvinceModerator, Issue, MissionType, Speciality, MachineryType, \
-    Machinery
+    Machinery, ServiceTeam
 
 
 class Home(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -159,15 +160,15 @@ class ChangeTeam(View):
     # TODO
     def get(self, request, *args, **kwargs):
         team_id = kwargs['team_id']
-        context = {'team': team_id}
+        context = {'team': ServiceTeam.objects.get(id=team_id), 'specialities': Speciality.objects.all()}
         return render(request=request,
                       template_name='core/changeteam.html', context=context)
 
     def post(self, request, *args, **kwargs):
+        print(request)
+        messages.add_message(request, messages.INFO, 'تیم  بروز شد!')
         team_id = kwargs['team_id']
-        context = {'team': team_id}
-        return render(request=request,
-                      template_name='core/changeteam.html', context=context)
+        return HttpResponseRedirect('/resources/')
 
 
 class RemoveTeam(View):
