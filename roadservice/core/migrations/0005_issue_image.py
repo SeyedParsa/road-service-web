@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='issue',
             name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='issue-images/', validators=[core.models.Issue.image_validator]),
+            field=models.ImageField(blank=True, null=True, upload_to='issue-images/', validators=[core.models.Issue.validate_image]),
         ),
     ]

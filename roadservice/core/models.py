@@ -451,7 +451,7 @@ class Citizen(Role):
     def submit_issue(self, title, description, county, location, base64_image):
         if base64_image:
             file_name, image_file = Issue.get_image_from_base64(base64_image)
-            Issue.image_validator(image_file)
+            Issue.validate_image(image_file)
         issue = Issue.objects.create(title=title, description=description, reporter=self, county=county,
                                      location=location)
         if base64_image:
@@ -519,7 +519,7 @@ class Issue(GeoModel):
         SCORED = 'SC'
 
     @staticmethod
-    def image_validator(image):
+    def validate_image(image):
         if image.size > settings.ISSUE_IMAGE_LIMIT_MB * 1024 * 1024:
             raise ValidationError("Images have size limit of %d megabytes" % settings.ISSUE_IMAGE_LIMIT_MB)
         width, height = get_image_dimensions(image)
@@ -533,7 +533,7 @@ class Issue(GeoModel):
     county = models.ForeignKey(County, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     state = models.CharField(max_length=2, choices=State.choices, default=State.REPORTED)
-    image = models.ImageField(upload_to='issue-images/', validators=[image_validator.__func__], null=True, blank=True)
+    image = models.ImageField(upload_to='issue-images/', validators=[validate_image.__func__], null=True, blank=True)
 
     def __str__(self):
         return '%s: %s (%s)' % (self.county, self.title, self.State(self.state).label)
