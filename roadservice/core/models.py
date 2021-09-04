@@ -449,12 +449,14 @@ class Citizen(Role):
         return self
 
     def submit_issue(self, title, description, county, location, base64_image):
+        if base64_image:
+            file_name, image_file = Issue.get_image_from_base64(base64_image)
+            Issue.image_validator(image_file)
         issue = Issue.objects.create(title=title, description=description, reporter=self, county=county,
                                      location=location)
-        county.notify_expert()
         if base64_image:
-            issue.save_base64_image(base64_image)
-        issue.notify_expert()
+            issue.image.save(file_name, image_file)
+        county.notify_expert()
         return issue
 
     def rate_issue(self, issue, rating):
@@ -522,7 +524,7 @@ class Issue(GeoModel):
             raise ValidationError("Images have size limit of %d megabytes" % settings.ISSUE_IMAGE_LIMIT_MB)
         width, height = get_image_dimensions(image)
         ratio = width / height
-        if ratio < 1 or ratio > 1.75:
+        if ratio < 0.5 or ratio > 1.75:
             raise ValidationError("Ratio of the images should be between 1 and 1.75")
 
     title = models.CharField(max_length=50)
@@ -536,13 +538,13 @@ class Issue(GeoModel):
     def __str__(self):
         return '%s: %s (%s)' % (self.county, self.title, self.State(self.state).label)
 
-    def save_base64_image(self, base64_image):
+    @staticmethod
+    def get_image_from_base64(base64_image):
         format, imgstr = base64_image.split(';base64,')
         ext = format.split('/')[-1]
         image_file = ContentFile(base64.b64decode(imgstr))
         file_name = '%s.%s' % (uuid4().hex, ext)
-        print(file_name, format, ext)
-        self.image.save(file_name, image_file, save=True)
+        return file_name, image_file
 
     def assign_resources(self, mission_type):
         # TODO: lock is required when manipulating resources (in this & other methods)
@@ -715,6 +717,8 @@ class CountyExpert(Role):
 
     def reject_issue(self, issue):
         if self.county != issue.county:
+            raise IllegalOperationInStateError()
+        if issue.state != Issue.State.REPORTED:
             raise IllegalOperationInStateError()
         issue.state = Issue.State.REJECTED
         issue.save()
