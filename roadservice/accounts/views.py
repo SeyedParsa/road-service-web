@@ -52,7 +52,6 @@ class Login(View):
         if request.user.is_authenticated:
             return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
         form = LoginForm()
-        form = LoginForm()
         context = {'form': form}
         return render(request=request,
                       template_name='accounts/login.html', context=context)
@@ -70,6 +69,7 @@ class Login(View):
         messages.error(request, "فرم متعبر نیست!")
         return render(request=request,
                       template_name='accounts/login.html', context={'form': form})
+
 
 class PasswordReset(View):
     def get(self, request):
