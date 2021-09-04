@@ -36,6 +36,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
+SMS_API_KEY = env('SMS_API_KEY')
+
 # Application definition
 
 INSTALLED_APPS = [

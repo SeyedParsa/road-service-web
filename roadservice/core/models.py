@@ -1,12 +1,14 @@
+from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, IntegrityError
 from django.db.models import ProtectedError
 from django.utils import timezone
 from geopy.distance import geodesic
+from kavenegar import KavenegarAPI
 
 from accounts.models import User, Role
 from core.exceptions import AccessDeniedError, OccupiedUserError, DuplicatedInfoError, BusyResourceError, \
-    ResourceNotFoundError, IllegalOperationInStateError, InvalidArgumentError
+    ResourceNotFoundError, IllegalOperationInStateError, InvalidArgumentError, SingletonInitError
 
 
 class Location:
@@ -181,7 +183,10 @@ class County(Region):
         return hasattr(self, 'expert')
 
     def notify_expert(self):
-        pass  # TODO
+        sms_sender = SMSSender.get_instance()
+        message = 'مشکل تازه‌ای در شهرستان %s گزارش شده است. لطفا آن را بررسی فرمایید.' % self
+        print(message)
+        sms_sender.sms_send_to_user(self.expert.user, message)
 
 
 class Moderator(Role):
@@ -720,3 +725,26 @@ class CountyExpert(Role):
             mission_type.delete()
         except ProtectedError:
             raise BusyResourceError()
+
+
+class SMSSender(KavenegarAPI):
+    __instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls.__instance is None:
+            cls()
+        return cls.__instance
+
+    def __init__(self):
+        if SMSSender.__instance is not None:
+            raise SingletonInitError()
+        super().__init__(settings.SMS_API_KEY)
+        SMSSender.__instance = self
+
+    def sms_send_to_user(self, user, message):
+        params = {
+            'receptor': user.phone_number,
+            'message': message,
+        }
+        self.sms_send(params)
