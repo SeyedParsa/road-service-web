@@ -1,0 +1,27 @@
+{% load static %}
+
+{#<div class="ui segment" style="display: block !important;">#}
+<div class="header" style="text-align: right">
+    {{ header }}
+</div>
+<div class="content">
+
+    <form id="form1" style="display: block !important;" method="post" action="{{ action }}">
+        {% csrf_token %}
+        <div class="ui left icon input">
+            <i class="{{ icon }} icon"> </i>
+            <input type="text" name="name" required="" id="id_name" placeholder="{{ placeholder }}" value="{{ value }}">
+        </div>
+
+    </form>
+</div>
+<div class="left aligned actions" style="overflow: hidden;">
+    <button class="ui positive right labeled icon button" type="submit" style="float: left;" form="form1" value="ذخیره">
+        <i class="checkmark icon"></i>
+        ذخیره
+    </button>
+    <div class="ui black deny button" style="float: left;">
+        انصراف
+    </div>
+</div>
+

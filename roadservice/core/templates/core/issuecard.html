@@ -1,7 +1,6 @@
 {% load static %}
 
 {% if issue %}
-
     <div id="thecard" class="ui container" style="height:100%;width:100%;">
         <div class="ui stackable right aligned grid" style="margin: 10px">
             <div class="ui row" style="height: 60px">
@@ -45,7 +44,7 @@
                             {#                            کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد. کتابهای زیادی در شصت و سه درصد گذشته،#}
                             {#                            حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای#}
                             {#                            طرا#}
-                            {{ issue.description }}
+                            {{ issue.description | safe }}
                         </p>
                     </div>
                 </div>
