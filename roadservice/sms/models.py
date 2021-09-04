@@ -1,11 +1,14 @@
+import logging
+
 from django.conf import settings
-from kavenegar import KavenegarAPI
+from kavenegar import KavenegarAPI, APIException, HTTPException
 
 from sms.exceptions import SingletonInitError
 
 
-class SmsSender(KavenegarAPI):
+class SmsSender:
     __instance = None
+    logger = logging.getLogger('SmsSenderLogger')
 
     @classmethod
     def get_instance(cls):
@@ -16,7 +19,8 @@ class SmsSender(KavenegarAPI):
     def __init__(self):
         if SmsSender.__instance is not None:
             raise SingletonInitError()
-        super().__init__(settings.KAVENEGAR_API_KEY)
+        api_key = settings.KAVENEGAR_API_KEY
+        self.kavenegar = KavenegarAPI(api_key) if api_key else None
         SmsSender.__instance = self
 
     def send_to_number(self, phone_number, message):
@@ -24,4 +28,10 @@ class SmsSender(KavenegarAPI):
             'receptor': phone_number,
             'message': message,
         }
-        self.sms_send(params)
+        if self.kavenegar:
+            try:
+                self.kavenegar.sms_send(params)
+            except (HTTPException, APIException):
+                self.logger.error('Could not send the message to %s.' % phone_number)
+        else:
+            self.logger.warning('The SMS API-Key is not setup correctly.')
