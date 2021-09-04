@@ -60,7 +60,7 @@ class Role(models.Model):
             return self.moderator.provincemoderator
         elif self.type == Role.Type.COUNTY_MODERATOR:
             return self.moderator.countymoderator
-        elif self.type == Role.Type.countyexpert:
+        elif self.type == Role.Type.COUNTY_EXPERT:
             return self.countyexpert
 
     def __str__(self):

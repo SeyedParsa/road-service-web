@@ -1,6 +1,7 @@
 from django import forms
 
-from core.models import Country, Province, County
+from accounts.models import Role
+from core.models import Country, Province, County, Region
 
 
 class AssignModeratorForm(forms.Form):
@@ -12,8 +13,8 @@ class AssignModeratorForm(forms.Form):
     def __init__(self, *args, **kwargs):
         provinces = Province.objects.all()
         counties = County.objects.all()
-        self.region_field = list((region.id-1, "استان " + region.name) for region in provinces)\
-                          + list((region.id-1 + len(provinces), "شهرستان " + region.name) for region in counties)
+        self.region_field = list((region.id - 1, "استان " + region.name) for region in provinces) \
+                            + list((region.id - 1 + len(provinces), "شهرستان " + region.name) for region in counties)
         self.region_instances = list(provinces) + list(counties)
         super().__init__(*args, **kwargs)
         self.fields['region'].choices = self.region_field
@@ -22,13 +23,16 @@ class AssignModeratorForm(forms.Form):
 class RegionMultipleFilterForm(forms.Form):
     regions = forms.MultipleChoiceField(label='بخش')
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-        # TODO: filter regions by user @Kiarash
-        provinces = Province.objects.all()
-        counties = County.objects.all()
-        region_choices = list((region.id, "استان " + region.name) for region in provinces) \
-                              + list((region.id, "شهرستان " + region.name) for region in counties)
+        if user.role.type == Role.Type.COUNTY_EXPERT:
+            regions = []
+        else:
+            regions = user.role.get_concrete().region.get_including_regions()
+        region_choices = [(region.id,
+                           ('استان %s' if region.type == Region.Type.PROVINCE else 'شهرستان %s') % region.name)
+                          for region in regions if region.type != Region.Type.COUNTRY]
         self.fields['regions'].choices = region_choices
         self.fields['regions'].widget.attrs['class'] = 'ui fluid right aligned search dropdown'
 

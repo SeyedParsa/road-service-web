@@ -27,8 +27,8 @@ urlpatterns = [
     path('dashboard/', views.Home.as_view()),
     path('resources/teamdetails/<int:issue_id>/', views.IssueCard.as_view()),
     path('resources/changeteam/<int:team_id>/', views.ChangeTeam.as_view()),
-    path('resources/changemissiontype/<int:missiontype_id>/', views.ChangeMissionType.as_view()),
-    path('resources/removemissiontype/<int:missiontype_id>/', views.RemoveMissionType.as_view()),
+    path('resources/changemissiontype/<int:mission_type_id>/', views.ChangeMissionType.as_view()),
+    path('resources/removemissiontype/<int:mission_type_id>/', views.RemoveMissionType.as_view()),
     path('resources/changespeciality/<int:speciality_id>/', views.ChangeSpeciality.as_view()),
     path('resources/removespeciality/<int:speciality_id>/', views.RemoveSpeciality.as_view()),
     path('resources/addspeciality/', views.AddSpeciality.as_view()),
@@ -36,6 +36,6 @@ urlpatterns = [
     path('resources/removemachinery/<int:machinery_id>/', views.RemoveMachinery.as_view()),
     path('resources/addmachinery/<int:machinery_id>/', views.AddMachinery.as_view()),
     path('resources/removeteam/<int:team_id>/', views.RemoveTeam.as_view()),
-    path('resources/', views.Resources.as_view()),
+    path('resources/', views.Resources.as_view(), name='resources'),
     path('', RedirectView.as_view(url='/dashboard/', permanent=False), name='dashboard'),
 ]

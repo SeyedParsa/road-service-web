@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import logout, authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
@@ -22,6 +22,7 @@ class Logout(View):
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
 
+# TODO: should be moved to core
 class Signup(View):
     def get(self, request):
         # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
@@ -48,7 +49,8 @@ class Signup(View):
 
 class Login(View):
     def get(self, request):
-        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
         form = LoginForm()
         context = {'form': form}
         return render(request=request,
@@ -57,13 +59,16 @@ class Login(View):
     def post(self, request):
         form = LoginForm(request.POST)
         if form.is_valid():
-            messages.success(request, "شما با موافقیت وارد شدید!")
-            # TODO: Log in!
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
-        else:
-            messages.error(request, "فرم متعبر نیست!")
-            return render(request=request,
-                          template_name='accounts/login.html', context={'form': form})
+            phone_number = form.cleaned_data['phone_number']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=phone_number, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "شما با موافقیت وارد شدید!")
+                return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        messages.error(request, "فرم متعبر نیست!")
+        return render(request=request,
+                      template_name='accounts/login.html', context={'form': form})
 
 
 class PasswordReset(View):
