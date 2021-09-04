@@ -1,9 +1,14 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from accounts.exceptions import WeakPasswordError
+from sms.models import SmsSender
 
 
 class User(AbstractUser):
@@ -23,6 +28,13 @@ class User(AbstractUser):
             self.save()
         except ValidationError:
             raise WeakPasswordError()
+
+    def send_reset_password_link(self):
+        uid = urlsafe_base64_encode(force_bytes(self.pk))
+        token = default_token_generator.make_token(self)
+        link = 'http://%s/reset/%s/%s/' % (settings.DOMAIN, uid, token)
+        message = 'امدادرسانان جاده\n\nلینک بازیابی رمز عبور: %s' % link
+        SmsSender.get_instance().send_to_number(self.phone_number, message)
 
 
 class Role(models.Model):

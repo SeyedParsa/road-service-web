@@ -5,9 +5,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
+from django.urls import reverse
 from django.views import View
 
 from accounts.forms import SignUpForm
+
+
+class PasswordResetComplete(View):
+    def get(self, request):
+        messages.success(request, "گذرواژه شما با موافقیت به‌روز شد!")
+        return HttpResponseRedirect(reverse('accounts:login'))
 
 
 class Logout(View):
