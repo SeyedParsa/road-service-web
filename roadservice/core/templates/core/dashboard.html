@@ -4,7 +4,23 @@
 {% block content %}
 
     <div class="ui stackable grid">
+<div class="ui row">
+            <form class="ui form" method="post">
+                {% csrf_token %}
+                <div class="fields">
+                    <div class="field" style="width: 400px">
+                        {{ form.regions }}
+                    </div>
 
+                    <div class="field">
+                        <input type="submit" class="ui button" value="فیلتر">
+                    </div>
+                </div>
+
+
+            </form>
+
+        </div>
         {% for issue in issues %}
 
             <div class="four wide column swing-in-top-fwd">

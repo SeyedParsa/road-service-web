@@ -86,15 +86,15 @@
                         {% for machinery in machineries %}
                             <div class="ui segment">
                                 <div class="ui grid">
-                                    <div class="ui nine wide column">
+                                    <div class="ui six wide column">
                                         {{ machinery.type.name }}
                                         {#                                    جرثقیل#}
                                     </div>
-                                    <div class="ui seven wide column machinery">
+                                    <div class="ui ten wide column machinery" style="white-space: nowrap">
                                         <a href="/resources/addmachinery/{{ machinery.id }}/" style="color: black"><i
                                                 class="right floated plus icon"></i></a>
                                         {#                                    18#}
-                                        {{ machinery.total_count }}
+                                        {{ machinery.total_count }} (۳ مشغول)
                                         <a href="/resources/removemachinery/{{ machinery.id }}/" style="color: black"><i
                                                 class="left floated minus icon"></i></a>
                                     </div>
@@ -120,7 +120,7 @@
                             <div class="ui segment"
                                  style="display: flex; justify-content: space-between; align-items: center">
                                 {{ mission_type.name }}
-                                <div>
+                                <div style="white-space: nowrap;">
                                     <a style="color: black" href="/resources/removemissiontype/{{ mission_type.id }}">
                                         <i class="left floated times icon"></i></a>
                                     <a style="color: black" href="#">
@@ -149,7 +149,7 @@
                             <div class="ui segment"
                                  style="display: flex; justify-content: space-between; align-items: center">
                                 {{ speciality.name }}
-                                <div>
+                                <div style="white-space: nowrap;">
                                     <a style="color: black" href="/resources/removespeciality/{{ speciality.id }}">
                                         <i class="left floated times icon"></i></a>
                                     <a style="color: black" href="#">

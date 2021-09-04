@@ -25,7 +25,29 @@ class Home(LoginRequiredMixin, UserPassesTestMixin, View):
         else:
             regions = [request.user.role.get_concrete().region]
             issues = request.user.role.get_concrete().get_issues(regions)
-        context = {'issues': issues}
+        context = {'issues': issues, 'form': RegionMultipleFilterForm(user=self.request.user)}
+
+        return render(request=request,
+                      template_name='core/dashboard.html',
+                      context=context)
+
+    def post(self, request, *args, **kwargs):
+        form = RegionMultipleFilterForm(request.POST, user=self.request.user)
+        if request.user.role.type == Role.Type.COUNTY_EXPERT:
+            issues = request.user.role.get_concrete().get_issues()
+        else:
+            regions = [request.user.role.get_concrete().region]
+            issues = request.user.role.get_concrete().get_issues(regions)
+        if form.is_valid():
+            messages.add_message(request, messages.INFO, 'جدول بروز شد!')
+            region_ids = form.cleaned_data.get('regions')
+            regions = [Region.objects.get(id=region_id) for region_id in region_ids]
+            print(regions[0])
+            issues = request.user.role.get_concrete().get_issues(regions)
+        else:
+            messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
+        context = {'issues': issues, 'form': form}
+
         return render(request=request,
                       template_name='core/dashboard.html',
                       context=context)
