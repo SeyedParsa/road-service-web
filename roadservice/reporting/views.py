@@ -4,6 +4,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views import View
 
+from core.models import Region
 from reporting.forms import TimeReportForm, StatusReportForm
 from reporting.models import IntervalReport, ReportGenerator
 
@@ -12,10 +13,14 @@ class StatusReport(View):
     def get(self, request, *args, **kwargs):
         status_report_form = StatusReportForm()
         # print(time_report_form.region.choices)
-        ReportGenerator.get_instance()
+        report = ReportGenerator.get_instance().get_distribution_report(Region.objects.get(name='قلات'))
+        print(report.mission_type_dist)
         return render(request=request,
                       template_name='reporting/statusreport.html',
-                      context={'form': status_report_form })
+                      context={'form': status_report_form, 'speciality_dist': dict(report.speciality_dist),
+                               'mission_type_dist': dict(report.mission_type_dist),
+                               'score_dist': dict(report.score_dist),
+                               'machinery_type_dist': dict(report.machinery_type_dist)})
 
     def post(self, request, *args, **kwargs):
         form = StatusReportForm(request.POST)
