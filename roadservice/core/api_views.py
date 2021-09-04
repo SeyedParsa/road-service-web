@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -58,9 +59,12 @@ class ReportIssueView(APIView):
             county = serializer.validated_data['county']
             base64_image = serializer.validated_data.get('base64_image', None)
             citizen = request.user.role.citizen
-            issue = citizen.submit_issue(title=title, description=description, county=county,
-                                         location=Location(lat, long), base64_image=base64_image)
-            return Response(IssueSerializer(issue).data)
+            try:
+                citizen.submit_issue(title=title, description=description, county=county,
+                                     location=Location(lat, long), base64_image=base64_image)
+                return Response({'status': True})
+            except ValidationError as e:
+                return Response({'status': False})
         return Response(serializer.errors)
 
 
@@ -181,4 +185,4 @@ class RejectIssueView(APIView):
                 return Response({'status': True})
             except IllegalOperationInStateError as e:
                 return Response({'status': False})
-        return Response(serializer.error_messages)
+        return Response(serializer.errors)
