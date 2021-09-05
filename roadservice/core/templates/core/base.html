@@ -88,30 +88,30 @@
                     </div>
 
                 {% endif %}
-
-                <div class="ui dropdown link item" id="users_dropdown">
-                    <i class="user icon" style="margin: 10px"></i>
-                    <span class="text">مدیریت کاربرها</span>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        {% if user.role.type == 'CM' %}
-                            <a href="/assignmoderator">
-                                <div class="item">تعیین کارشناس</div>
-                            </a>
-                        {% endif %}
-                        {% if user.role.type == 'PR' or user.role.type == 'PM' %}
-                            <a href="/assignmoderator">
-                                <div class="item">تعیین مدیر زیربخش</div>
-                            </a>
-                        {% endif %}
-                        {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
-                            <a href="/signup">
-                                <div class="item">ثبت‌نام کاربر جدید</div>
-                            </a>
-                        {% endif %}
+                {% if user.role != 'CE' %}
+                    <div class="ui dropdown link item" id="users_dropdown">
+                        <i class="user icon" style="margin: 10px"></i>
+                        <span class="text">مدیریت کاربرها</span>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            {% if user.role.type == 'CM' %}
+                                <a href="/assignmoderator">
+                                    <div class="item">تعیین کارشناس</div>
+                                </a>
+                            {% endif %}
+                            {% if user.role.type == 'PR' or user.role.type == 'PM' %}
+                                <a href="/assignmoderator">
+                                    <div class="item">تعیین مدیر زیربخش</div>
+                                </a>
+                            {% endif %}
+                            {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                                <a href="/signup">
+                                    <div class="item">ثبت‌نام کاربر جدید</div>
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-
+                {% endif %}
 
                 <a href="/resources" class="item"><i class="bullseye icon" style="margin: 5px;"></i> مدیریت منابع </a>
 
@@ -183,28 +183,30 @@
                             </div>
                         </div>
                     {% endif %}
-                    <div class="item">
-                        <i class="user icon" style="margin: 10px"></i>
-                        <span class="text">مدیریت کاربرها</span>
-                        <i class="caret right icon"></i>
-                        <div class="right menu">
-                            {% if user.role.type == 'CM' %}
-                                <a href="/assignmoderator">
-                                    <div class="item">تعیین کارشناس</div>
-                                </a>
-                            {% endif %}
-                            {% if user.role.type == 'PR' or user.role.type == 'PM' %}
-                                <a href="/assignmoderator">
-                                    <div class="item">تعیین مدیر زیربخش</div>
-                                </a>
-                            {% endif %}
-                            {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
-                                <a href="/signup">
-                                    <div class="item">ثبت‌نام کاربر جدید</div>
-                                </a>
-                            {% endif %}
+                    {% if user.role != 'CE' %}
+                        <div class="item">
+                            <i class="user icon" style="margin: 10px"></i>
+                            <span class="text">مدیریت کاربرها</span>
+                            <i class="caret right icon"></i>
+                            <div class="right menu">
+                                {% if user.role.type == 'CM' %}
+                                    <a href="/assignmoderator">
+                                        <div class="item">تعیین کارشناس</div>
+                                    </a>
+                                {% endif %}
+                                {% if user.role.type == 'PR' or user.role.type == 'PM' %}
+                                    <a href="/assignmoderator">
+                                        <div class="item">تعیین مدیر زیربخش</div>
+                                    </a>
+                                {% endif %}
+                                {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                                    <a href="/signup">
+                                        <div class="item">ثبت‌نام کاربر جدید</div>
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
 
                     <a href="/resources" class="item"><i class="bullseye icon"></i> مدیریت
                         منابع </a>
