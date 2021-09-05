@@ -24,6 +24,7 @@ urlpatterns = [
 
     path('signup/', views.Signup.as_view()),
     path('assignmoderator/', views.AssignModerator.as_view()),
+    path('assignexpert/', views.AssignExpert.as_view()),
     path('dashboard/<int:issue_id>/', views.IssueCard.as_view()),
     path('dashboard/', views.Home.as_view()),
     path('resources/teamdetails/<int:issue_id>/', views.IssueCard.as_view()),

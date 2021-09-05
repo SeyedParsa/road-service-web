@@ -366,7 +366,8 @@ class Signup(LoginRequiredMixin, UserPassesTestMixin, View):
 class AssignModerator(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
         return self.request.user.has_role() and \
-            self.request.user.role.type in [Role.Type.PROVINCE_MODERATOR, Role.Type.COUNTY_MODERATOR]
+            self.request.user.role.type in [Role.Type.PROVINCE_MODERATOR, Role.Type.COUNTY_MODERATOR,
+                                            Role.Type.COUNTRY_MODERATOR]
 
     def get(self, request, *args, **kwargs):
         assign_moderator_form = AssignModeratorForm(moderator=request.user.role.get_concrete())
@@ -394,4 +395,38 @@ class AssignModerator(LoginRequiredMixin, UserPassesTestMixin, View):
             messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
         return render(request=request,
                       template_name='core/assignmoderator.html',
+                      context={'form': form})
+
+
+class AssignExpert(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type in [Role.Type.COUNTY_MODERATOR]
+
+    def get(self, request, *args, **kwargs):
+        assign_moderator_form = AssignModeratorForm(moderator=request.user.role.get_concrete())
+        return render(request=request,
+                      template_name='core/assignexpert.html',
+                      context={'form': assign_moderator_form})
+
+    def post(self, request, *args, **kwargs):
+        moderator = request.user.role.get_concrete()
+        form = AssignModeratorForm(request.POST, moderator=moderator)
+        if form.is_valid():
+            region_id = form.cleaned_data['region']
+            region = Region.objects.get(id=region_id)
+            phone_number = form.cleaned_data['phone_number']
+            user = User.objects.get(phone_number=phone_number)
+            try:
+                moderator.assign_moderator(user, region)
+                messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
+            except AccessDeniedError:
+                messages.add_message(request, messages.ERROR, 'شما مدیر این بخش نیستید!')
+            except OccupiedUserError:
+                messages.add_message(request, messages.ERROR, 'کاربر نقش دیگری دارد!')
+            return HttpResponseRedirect(reverse('core:dashboard'))
+        else:
+            messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
+        return render(request=request,
+                      template_name='core/assignexpert.html',
                       context={'form': form})
