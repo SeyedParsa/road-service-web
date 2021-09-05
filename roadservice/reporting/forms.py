@@ -3,37 +3,20 @@ from django import forms
 from core.models import Region, Country, Province, County
 
 
-class TimeReportForm(forms.Form):
-    region_instances = ()
-    regions = ()
-    region = forms.ChoiceField(label='بخش', choices=regions)
+class SingleRegionSelectForm(forms.Form):
+    region = forms.ChoiceField(label='بخش')
+
+    def __init__(self, *args, **kwargs):
+        moderator = kwargs.pop('moderator')
+        super().__init__(*args, **kwargs)
+        regions = moderator.region.get_included_regions()
+        region_choices = [(region.id,
+                           ('استان %s' if region.type == Region.Type.PROVINCE else
+                            'شهرستان %s' if region.type == Region.Type.COUNTY else 'کشور %s') % region.name)
+                          for region in regions]
+        self.fields['region'].choices = region_choices
+
+
+class TimeReportForm(SingleRegionSelectForm):
     start_date = forms.DateField(label='شروع بازه', input_formats=['%Y-%m-%d'])
     end_date = forms.DateField(label='پایان بازه', input_formats=['%Y-%m-%d'])
-
-    def __init__(self, *args, **kwargs):
-        countries = Country.objects.all()
-        provinces = Province.objects.all()
-        counties = County.objects.all()
-        self.region_field = list((region.id-1, "کشور " + region.name) for region in countries)\
-                            + list((region.id-1 + len(countries), "استان " + region.name) for region in provinces)\
-                            + list((region.id-1 + len(countries) + len(provinces), "شهرستان " + region.name) for region in counties)
-        self.region_instances = list(countries) + list(provinces) + list(counties)
-        super().__init__(*args, **kwargs)
-        self.fields['region'].choices = self.region_field
-
-
-class StatusReportForm(forms.Form):
-    region_instances = ()
-    regions = ()
-    region = forms.ChoiceField(label='بخش', choices=regions)
-
-    def __init__(self, *args, **kwargs):
-        countries = Country.objects.all()
-        provinces = Province.objects.all()
-        counties = County.objects.all()
-        self.region_field = list((region.id-1, "کشور " + region.name) for region in countries)\
-                            + list((region.id-1 + len(countries), "استان " + region.name) for region in provinces)\
-                            + list((region.id-1 + len(countries) + len(provinces), "شهرستان " + region.name) for region in counties)
-        self.region_instances = list(countries) + list(provinces) + list(counties)
-        super().__init__(*args, **kwargs)
-        self.fields['region'].choices = self.region_field
