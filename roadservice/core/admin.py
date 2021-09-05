@@ -2,8 +2,9 @@ from django.contrib import admin
 
 from core.models import Province, County, Speciality, Machinery, ServiceTeam, Citizen, Serviceman, Issue, \
     SpecialityRequirement, MachineryRequirement, MissionType, Mission, CountyExpert, Country, CountryModerator, \
-    ProvinceModerator, CountyModerator, MachineryType
+    ProvinceModerator, CountyModerator, MachineryType, Region
 
+admin.site.register(Region)
 admin.site.register(Country)
 admin.site.register(Province)
 admin.site.register(County)

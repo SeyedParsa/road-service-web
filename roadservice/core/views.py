@@ -1,7 +1,5 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.forms import ModelForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
@@ -10,10 +8,10 @@ from khayyam import *
 
 from accounts.forms import SignUpForm
 from accounts.models import User, Role
-from core.exceptions import DuplicatedInfoError, BusyResourceError
-from core.forms import AssignModeratorForm, RegionMultipleFilterForm, SingleStringForm
-from core.models import Region, CountryModerator, ProvinceModerator, Issue, MissionType, Speciality, MachineryType, \
-    Machinery, ServiceTeam
+from core.exceptions import DuplicatedInfoError, BusyResourceError, ResourceNotFoundError, AccessDeniedError, \
+    OccupiedUserError
+from core.forms import AssignModeratorForm, RegionMultipleFilterForm, SingleStringForm, TeamCustomForm
+from core.models import Region, Issue, MissionType, Speciality, MachineryType, Machinery, ServiceTeam
 
 
 class Home(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -22,37 +20,32 @@ class Home(LoginRequiredMixin, UserPassesTestMixin, View):
             self.request.user.role.type in [Role.Type.COUNTY_EXPERT, Role.Type.COUNTRY_MODERATOR,
                                             Role.Type.PROVINCE_MODERATOR, Role.Type.COUNTY_MODERATOR]
 
-    def get(self, request, *args, **kwargs):
+    def process(self, request, form, regions=None):
         if request.user.role.type == Role.Type.COUNTY_EXPERT:
             issues = request.user.role.get_concrete().get_issues()
         else:
-            regions = [request.user.role.get_concrete().region]
+            if not regions:
+                regions = [request.user.role.get_concrete().region]
             issues = request.user.role.get_concrete().get_issues(regions)
-        context = {'issues': issues, 'form': RegionMultipleFilterForm(user=self.request.user)}
-
+        context = {'issues': issues.order_by('-created_at'), 'form': form}
         return render(request=request,
                       template_name='core/dashboard.html',
                       context=context)
 
+    def get(self, request, *args, **kwargs):
+        form = RegionMultipleFilterForm(user=self.request.user)
+        return self.process(request, form)
+
     def post(self, request, *args, **kwargs):
         form = RegionMultipleFilterForm(request.POST, user=self.request.user)
-        if request.user.role.type == Role.Type.COUNTY_EXPERT:
-            issues = request.user.role.get_concrete().get_issues()
-        else:
-            regions = [request.user.role.get_concrete().region]
-            issues = request.user.role.get_concrete().get_issues(regions)
+        regions = None
         if form.is_valid():
             messages.add_message(request, messages.INFO, 'جدول بروز شد!')
             region_ids = form.cleaned_data.get('regions')
             regions = [Region.objects.get(id=region_id) for region_id in region_ids]
-            issues = request.user.role.get_concrete().get_issues(regions)
         else:
             messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
-        context = {'issues': issues, 'form': form}
-
-        return render(request=request,
-                      template_name='core/dashboard.html',
-                      context=context)
+        return self.process(request, form, regions)
 
 
 class IssueCard(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -72,39 +65,6 @@ class IssueCard(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request=request,
                       template_name='core/issuecard.html', context=context)
-
-
-class AssignModerator(LoginRequiredMixin, UserPassesTestMixin, View):
-    def test_func(self):
-        return self.request.user.has_role() and \
-            self.request.user.role.type in [Role.Type.PROVINCE_MODERATOR, Role.Type.COUNTY_MODERATOR]
-
-    def get(self, request, *args, **kwargs):
-        assign_moderator_form = AssignModeratorForm()
-        return render(request=request,
-                      template_name='core/assignmoderator.html',
-                      context={'form': assign_moderator_form})
-
-    def post(self, request, *args, **kwargs):
-        # TODO: just wrong! :D
-        form = AssignModeratorForm(request.POST)
-        context = {'form': form}
-        if form.is_valid():
-            region_id = int(form.cleaned_data['region'])
-            region = form.region_instances[region_id]
-            user_id = form.cleaned_data['user']
-            user = User.objects.get(id=user_id)
-            if region.type == Region.Type.PROVINCE:
-                CountryModerator.assign_province_moderator(user, region)
-            else:
-                ProvinceModerator.assign_county_moderator(user, region)
-            messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
-        else:
-            messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
-            print('invalid form!')
-        return render(request=request,
-                      template_name='core/assignmoderator.html',
-                      context=context)
 
 
 class Resources(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -130,11 +90,10 @@ class Resources(LoginRequiredMixin, UserPassesTestMixin, View):
         mission_types = MissionType.objects.all()
         specialities = Speciality.objects.all()
         context = {'filter_form': form,
-                   'teams': teams,
+                   'teams': teams.order_by('-id'),
                    'machinery_count': machinery_count,
-                   'machineries': Machinery.objects.all(),
-                   'mission_types': mission_types,
-                   'specialities': specialities}
+                   'mission_types': mission_types.order_by('-id'),
+                   'specialities': specialities.order_by('-id')}
         return render(request=request,
                       template_name='core/resources.html',
                       context=context)
@@ -155,59 +114,94 @@ class Resources(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.process(request, form, regions)
 
 
-class ChangeTeam(View):
-    # TODO
-    def get(self, request, *args, **kwargs):
-        team_id = kwargs['team_id']
-        context = {'team': ServiceTeam.objects.get(id=team_id), 'specialities': Speciality.objects.all()}
-        return render(request=request,
-                      template_name='core/changeteam.html', context=context)
+class AddTeam(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type == Role.Type.COUNTY_MODERATOR
 
-    def post(self, request, *args, **kwargs):
-        messages.add_message(request, messages.INFO, 'تیم  بروز شد!')
-        team_id = kwargs['team_id']
-        return HttpResponseRedirect('/resources/')
-
-
-class AddTeam(View):
-    # TODO
     def get(self, request, *args, **kwargs):
         context = {'specialities': Speciality.objects.all()}
         return render(request=request,
                       template_name='core/changeteam.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        messages.add_message(request, messages.INFO, 'تیم  اضافه  شد!')
-        return HttpResponseRedirect('/resources/')
+        try:
+            form = TeamCustomForm(request.POST)
+            request.user.role.moderator.countymoderator.add_service_team(form.speciality, form.users)
+            messages.add_message(request, messages.INFO, 'تیم اضافه  شد!')
+        except ResourceNotFoundError:
+            messages.add_message(request, messages.ERROR, 'منابع درخواستی وجود ندارند!')
+        except OccupiedUserError:
+            messages.add_message(request, messages.ERROR, 'منابع درخواستی نقش دیگری دارند!')
+        return HttpResponseRedirect(reverse('core:resources'))
 
 
-class RemoveTeam(View):
-    def get(self, request, *args, **kwargs):
-        team_id = kwargs['team_id']
-        context = {'team_id': team_id}
-        # TODO: remove team!
-        messages.add_message(request, messages.INFO, 'تیم  حذف شد!')
-        return HttpResponseRedirect('/resources/')
+class ChangeTeam(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type == Role.Type.COUNTY_MODERATOR
+
+    def get(self, request, team_id):
+        team = ServiceTeam.objects.get(id=team_id)
+        context = {'team': team, 'specialities': Speciality.objects.all()}
+        return render(request=request,
+                      template_name='core/changeteam.html', context=context)
+
+    def post(self, request, team_id):
+        team = ServiceTeam.objects.get(id=team_id)
+        try:
+            form = TeamCustomForm(request.POST)
+            request.user.role.moderator.countymoderator.edit_service_team(team, form.speciality, form.users)
+            messages.add_message(request, messages.INFO, 'تیم بروز شد!')
+        except ResourceNotFoundError:
+            messages.add_message(request, messages.ERROR, 'منابع درخواستی وجود ندارند!')
+        except OccupiedUserError:
+            messages.add_message(request, messages.ERROR, 'منابع درخواستی نقش دیگری دارند!')
+        return HttpResponseRedirect(reverse('core:resources'))
 
 
+class RemoveTeam(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type == Role.Type.COUNTY_MODERATOR
 
-class AddMachinery(View):
-    def get(self, request, machinery_id):
-        machinery = MachineryType.objects.get(id=machinery_id)
-        context = {'machinery': machinery_id}
-        # TODO: Add a new machinery!
-        messages.add_message(request, messages.INFO, str('یک ' + machinery.name + ' اضافه شد!'))
-        return HttpResponseRedirect('/resources/')
+    def get(self, request, team_id):
+        team = ServiceTeam.objects.get(id=team_id)
+        try:
+            request.user.role.moderator.countymoderator.delete_service_team(team)
+            messages.add_message(request, messages.INFO, 'تیم حذف شد!')
+        except BusyResourceError:
+            messages.add_message(request, messages.ERROR, 'تیم مشغول ماموریت است!')
+        return HttpResponseRedirect(reverse('core:resources'))
 
 
-class RemoveMachinery(View):
-    def get(self, request, *args, **kwargs):
-        machinery_id = kwargs['machinery_id']
-        machinery = MachineryType.objects.get(id=machinery_id)
-        context = {'machinery': machinery_id}
-        # TODO: remove a single machinery!
-        messages.add_message(request, messages.INFO, str('یک ' + machinery.name + ' حذف شد!'))
-        return HttpResponseRedirect('/resources/')
+class AddMachinery(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type == Role.Type.COUNTY_MODERATOR
+
+    def get(self, request, machinery_type_id):
+        machinery_type = MachineryType.objects.get(id=machinery_type_id)
+        request.user.role.moderator.countymoderator.increase_machinery(machinery_type)
+        messages.add_message(request, messages.INFO, str('یک ' + machinery_type.name + ' اضافه شد!'))
+        return HttpResponseRedirect(reverse('core:resources'))
+
+
+class RemoveMachinery(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type == Role.Type.COUNTY_MODERATOR
+
+    def get(self, request, machinery_type_id):
+        machinery_type = MachineryType.objects.get(id=machinery_type_id)
+        try:
+            request.user.role.moderator.countymoderator.decrease_machinery(machinery_type)
+            messages.add_message(request, messages.INFO, str('یک ' + machinery_type.name + ' حذف شد!'))
+        except ResourceNotFoundError:
+            messages.add_message(request, messages.ERROR, str('ماشینی از این نوع وجود ندارد!'))
+        except BusyResourceError:
+            messages.add_message(request, messages.ERROR, str('همه‌ی ماشین‌های این نوع مشغولند!'))
+        return HttpResponseRedirect(reverse('core:resources'))
 
 
 class AddMissionType(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -336,25 +330,68 @@ class RemoveSpeciality(LoginRequiredMixin, UserPassesTestMixin, View):
         return HttpResponseRedirect(reverse('core:resources'))
 
 
-class Signup(View):
+class Signup(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type in [Role.Type.COUNTRY_MODERATOR,
+                                            Role.Type.PROVINCE_MODERATOR, Role.Type.COUNTY_MODERATOR]
+
     def get(self, request):
-        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
         form = SignUpForm()
         return render(request=request,
                       template_name='core/signup.html',
                       context={'form': form})
 
     def post(self, request):
-        # TODO: If logged in, redirect to LOGIN_REDIRECT_URL!
         form = SignUpForm(request.POST)
         if form.is_valid():
-            print('VALID FORMMMM!!', form)
-            # TODO: Add a new user
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            phone_number = form.cleaned_data['phone_number']
+            password = form.cleaned_data['password1']
+            request.user.role.get_concrete().create_new_user(phone_number,
+                                                             password,
+                                                             phone_number,
+                                                             first_name,
+                                                             last_name)
             messages.success(request, "کاربر جدید با موافقیت اضافه شد!")
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+            return HttpResponseRedirect(reverse('core:dashboard'))
         else:
-            # TODO: show specific error
             messages.error(request, "فرم معتبر نیست!")
             return render(request=request,
                           template_name='core/signup.html',
                           context={'form': form})
+
+
+class AssignModerator(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.has_role() and \
+            self.request.user.role.type in [Role.Type.PROVINCE_MODERATOR, Role.Type.COUNTY_MODERATOR]
+
+    def get(self, request, *args, **kwargs):
+        assign_moderator_form = AssignModeratorForm(moderator=request.user.role.get_concrete())
+        return render(request=request,
+                      template_name='core/assignmoderator.html',
+                      context={'form': assign_moderator_form})
+
+    def post(self, request, *args, **kwargs):
+        moderator = request.user.role.get_concrete()
+        form = AssignModeratorForm(request.POST, moderator=moderator)
+        if form.is_valid():
+            region_id = form.cleaned_data['region']
+            region = Region.objects.get(id=region_id)
+            phone_number = form.cleaned_data['phone_number']
+            user = User.objects.get(phone_number=phone_number)
+            try:
+                moderator.assign_moderator(user, region)
+                messages.add_message(request, messages.INFO, 'دسترسی داده شد!')
+            except AccessDeniedError:
+                messages.add_message(request, messages.ERROR, 'شما مدیر این بخش نیستید!')
+            except OccupiedUserError:
+                messages.add_message(request, messages.ERROR, 'کاربر نقش دیگری دارد!')
+            return HttpResponseRedirect(reverse('core:dashboard'))
+        else:
+            messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
+        return render(request=request,
+                      template_name='core/assignmoderator.html',
+                      context={'form': form})

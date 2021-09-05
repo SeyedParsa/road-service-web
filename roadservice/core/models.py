@@ -92,6 +92,13 @@ class Region(models.Model):
             res |= self.super_region.get_including_regions()
         return res
 
+    def get_included_regions(self):
+        """returns a queryset consisting of regions below this region"""
+        res = Region.objects.filter(pk=self.pk)
+        for sub_region in self.sub_regions.all():
+            res |= sub_region.get_included_regions()
+        return res
+
     def get_counties(self):
         if not self.is_concrete():
             return self.get_concrete().get_counties()

@@ -21,7 +21,25 @@
                             {% csrf_token %}
                             <div class="field">
                                 <div class="ui right icon input">
-                                    <input dir="ltr" type="text" name="phone" autocomplete="phone"
+                                    <input dir="ltr" type="text" name="first_name" autocomplete="first_name"
+                                           placeholder="نام">
+
+                                    <i class="address card icon"></i>
+                                </div>
+
+                            </div>
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <input dir="rtl" type="text" name="last_name" autocomplete="last_name"
+                                           placeholder="نام خانوادگی">
+
+                                    <i class="address card icon"></i>
+                                </div>
+
+                            </div>
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <input dir="ltr" type="text" name="phone_number" autocomplete="phone"
                                            placeholder="شماره موبایل">
 
                                     <i class="phone icon"></i>
@@ -31,7 +49,7 @@
                             <div class="field">
                                 <div class="ui right icon input">
                                     <i class="lock icon"></i>
-                                    <input dir="ltr" type="password" name="password" placeholder="گذرواژه">
+                                    <input dir="ltr" type="password" name="password1" placeholder="گذرواژه">
                                 </div>
 
                             </div>

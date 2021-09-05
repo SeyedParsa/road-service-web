@@ -43,7 +43,7 @@
 
                         {% for team in teams %}
                             <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                                <div class="ui  grid" id="1">
+                                <div class="ui  grid" id="{{ team.id }}">
                                     <div class="ui five wide column">
                                         <i class="ui angle left icon"></i>
                                         {#                                        آهنگر#}
@@ -105,7 +105,7 @@
                                                     class="right floated plus icon"></i></a>
                                         {% endif %}
                                         {#                                    18#}
-                                        {{ value.total }} ({{ value.available }} مشغول)
+                                        {{ value.total }} ({{ value.available }} آزاد)
                                         {% if user.role.type == 'CM' %}
                                             <a href="/resources/removemachinery/{{ key.id }}/"
                                                style="color: black"><i

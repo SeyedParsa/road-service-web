@@ -1,12 +1,15 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth import logout, authenticate, login, update_session_auth_hash
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.urls import reverse
-
 from django.shortcuts import render
+from django.urls import reverse
 from django.views import View
-from accounts.forms import LoginForm, PasswordResetForm, NewPasswordForm
+
+from accounts.exceptions import WeakPasswordError
+from accounts.forms import LoginForm, PasswordResetForm, ChangePasswordForm
+from accounts.models import User
 
 
 class PasswordResetComplete(View):
@@ -50,35 +53,46 @@ class PasswordReset(View):
     def get(self, request):
         form = PasswordResetForm()
         return render(request=request,
-                      template_name='accounts/resetpassword.html', context={'form': form})
+                      template_name='accounts/fortgotpassword.html', context={'form': form})
 
     def post(self, request):
         form = PasswordResetForm(request.POST)
         if form.is_valid():
+            phone_number = form.cleaned_data['phone_number']
+            try:
+                user = User.objects.get(phone_number=phone_number)
+                user.send_reset_password_link()
+            except:  # TODO: Check if user exists
+                pass
             messages.success(request, "لینک بازیابی گذرواژه برای شما پیامک شد!")
-            # TODO: Send the SMS!
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+            return HttpResponseRedirect(reverse('accounts:login'))
         else:
             messages.error(request, "فرم متعبر نیست!")
             return render(request=request,
-                          template_name='accounts/resetpassword.html', context={'form': form})
+                          template_name='accounts/fortgotpassword.html', context={'form': form})
 
 
-class PasswordSet(View):
+class ChangePassword(LoginRequiredMixin, View):
     def get(self, request):
-        # TODO: Check validity of the url
-        form = NewPasswordForm()
+        form = ChangePasswordForm()
         return render(request=request,
-                      template_name='accounts/setnewpassword.html', context={'form': form})
+                      template_name='accounts/changepassword.html', context={'form': form})
 
     def post(self, request):
-        # TODO: Check validity of the url
-        form = NewPasswordForm(request.POST)
+        form = ChangePasswordForm(request.POST)
         if form.is_valid():
-            messages.success(request, "گذرواژه جدید شما با موفقیت ذخیره شد!")
-            # TODO: Reset The Password!
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
-        else:
-            messages.error(request, "فرم متعبر نیست!")
-            return render(request=request,
-                          template_name='accounts/setnewpassword.html', context={'form': form})
+            old_passowrd = form.cleaned_data['old_password']
+            correct_password = request.user.check_password(old_passowrd)
+            password1 = form.cleaned_data['password1']
+            password2 = form.cleaned_data['password2']
+            if correct_password and password1 == password2:
+                try:
+                    request.user.change_password(password1)
+                    update_session_auth_hash(request, request.user)
+                    messages.success(request, "گذرواژه جدید شما با موفقیت ذخیره شد!")
+                    return HttpResponseRedirect(reverse('core:dashboard'))
+                except WeakPasswordError:
+                    messages.error(request, "گذرواژه ضعیف است!")
+        messages.error(request, "فرم متعبر نیست!")
+        return render(request=request,
+                      template_name='accounts/changepassword.html', context={'form': form})

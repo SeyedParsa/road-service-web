@@ -13,7 +13,7 @@
             <label>تخصص</label>
             <select class="ui fluid right aligned search dropdown" name="spaciality">
                 {% for speciality in specialities %}
-                    <option id="{{ speciality.id }}">{{ speciality.name }}</option>
+                    <option value="{{ speciality.id }}" {% if team.speciality == speciality %}selected{% endif %}>{{ speciality.name }}</option>
                 {% endfor %}
             </select>
         </div>
