@@ -69,7 +69,7 @@ class Region(models.Model):
                                      on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.name
+        return '%s: %s' % (self.type, self.name)
 
     def has_moderator(self):
         return hasattr(self, 'moderator')
@@ -205,7 +205,7 @@ class Moderator(Role):
     region = models.OneToOneField(Region, on_delete=models.PROTECT)
 
     def __str__(self):
-        return ' '.join([str(self.user), str(self.region)])
+        return '%s %s %s' % (self.type, self.region, self.user)
 
     def pre_assign_moderator(self, user, region):
         """Check if the assignment is valid and dismiss the previous moderator if applicable.\
@@ -481,7 +481,8 @@ class Citizen(Role):
     @classmethod
     def sign_up(cls, username, password, phone_number, first_name, last_name):
         try:
-            validate_password(password)
+            # Removed due to lack of error handling in Android app
+            # validate_password(password)
             user = User.objects.create(username=username, phone_number=phone_number,
                                        first_name=first_name, last_name=last_name)
             user.set_password(password)
@@ -701,7 +702,7 @@ class CountyExpert(Role):
         self.type = Role.Type.COUNTY_EXPERT
 
     def __str__(self):
-        return str(self.user)
+        return '%s: %s' % (self.county, self.user)
 
     def get_concrete(self):
         return self
