@@ -2,7 +2,11 @@ from django import forms
 
 from accounts.models import Role, User
 from core.exceptions import ResourceNotFoundError
-from core.models import Country, Province, County, Region, Speciality
+from core.models import Region, Speciality
+
+
+class AssignExpertForm(forms.Form):
+    phone_number = forms.CharField(max_length=30, label="شماره تماس")
 
 
 class AssignModeratorForm(forms.Form):

@@ -88,7 +88,7 @@
                     </div>
 
                 {% endif %}
-                {% if user.role != 'CE' %}
+                {% if user.role.type != 'CE' %}
                     <div class="ui dropdown link item" id="users_dropdown">
                         <i class="user icon" style="margin: 10px"></i>
                         <span class="text">مدیریت کاربرها</span>

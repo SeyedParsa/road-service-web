@@ -15,6 +15,7 @@ class SingleRegionSelectForm(forms.Form):
                             'شهرستان %s' if region.type == Region.Type.COUNTY else 'کشور %s') % region.name)
                           for region in regions]
         self.fields['region'].choices = region_choices
+        self.fields['region'].widget.attrs['class'] = 'ui fluid right aligned search dropdown'
 
 
 class TimeReportForm(SingleRegionSelectForm):
