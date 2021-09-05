@@ -241,7 +241,7 @@ class BaseTestCase(TestCase):
 
 class CitizenTestCase(BaseTestCase):
     def test_sign_up(self):
-        citizen = Citizen.sign_up('09192053164', 'salam1234', phone_number='09192053164', first_name='سید پارسا', last_name='میرطاهری')
+        citizen = Citizen.sign_up('0919', 'salam1234', phone_number='0919', first_name='parsa', last_name='asrap')
         citizen.submit_issue(title='Test Issue', description='Just to test', county=self.tehran,
                              location=Location(1.5, 3), base64_image=None)
 
@@ -430,15 +430,15 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.tehran_province.moderator.user, self.kiarash)
         tehran_province_moderator.assign_moderator(self.majid, self.damavand.region_ptr)
         self.assertEqual(self.damavand.moderator.user, self.majid)
-        with self.assertRaisesMessage(AccessDeniedError, ''):
+        with self.assertRaises(AccessDeniedError):
             tehran_province_moderator.assign_moderator(self.mahdi, self.iran.region_ptr)
-        with self.assertRaisesMessage(AccessDeniedError, ''):
+        with self.assertRaises(AccessDeniedError):
             tehran_province_moderator.assign_moderator(self.mahdi, self.shiraz_province.region_ptr)
-        with self.assertRaisesMessage(AccessDeniedError, ''):
+        with self.assertRaises(AccessDeniedError):
             tehran_province_moderator.assign_moderator(self.mahdi, self.marvdasht.region_ptr)
-        with self.assertRaisesMessage(OccupiedUserError, ''):
+        with self.assertRaises(OccupiedUserError):
             self.iran_moderator.assign_moderator(self.kiarash, self.tehran_province.region_ptr)
-        with self.assertRaisesMessage(OccupiedUserError, ''):
+        with self.assertRaises(OccupiedUserError):
             self.iran_moderator.assign_moderator(self.majid, self.shiraz_province.region_ptr)
         self.iran_moderator.assign_moderator(self.mahdi, self.tehran_province.region_ptr)
         self.kiarash.refresh_from_db()
@@ -463,9 +463,9 @@ class ModeratorTestCase(BaseTestCase):
         self.shahrerey_moderator.rename_speciality(speciality, 'sade mabar')
         speciality.refresh_from_db()
         self.assertEqual(speciality.name, 'sade mabar')
-        with self.assertRaisesMessage(DuplicatedInfoError, ''):
+        with self.assertRaises(DuplicatedInfoError):
             self.shahrerey_moderator.add_speciality('sade mabar')
-        with self.assertRaisesMessage(DuplicatedInfoError, ''):
+        with self.assertRaises(DuplicatedInfoError):
             self.shahrerey_moderator.rename_speciality(speciality2, 'sade mabar')
         self.shahrerey_moderator.delete_speciality(speciality)
         self.shahrerey_moderator.delete_speciality(speciality2)
@@ -524,7 +524,7 @@ class ModeratorTestCase(BaseTestCase):
         self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
         self.assertEqual(self.shahrerey.expert.user, self.akbar)
         self.assertEqual(self.shahrerey.has_expert(), True)
-        with self.assertRaisesMessage(OccupiedUserError, ''):
+        with self.assertRaises(OccupiedUserError):
             self.shahrerey.moderator.get_concrete().assign_expert(self.akbar)
 
     def test_user_creation(self):
@@ -532,7 +532,7 @@ class ModeratorTestCase(BaseTestCase):
         self.jfk = self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+1 555', 'John',
                                                             'Kennedy')
         self.assertEqual(self.jfk.username, 'JohnFKennedy')
-        with self.assertRaisesMessage(DuplicatedInfoError, ''):
+        with self.assertRaises(DuplicatedInfoError):
             self.shahrerey.moderator.create_new_user('JohnFKennedy', 'LeeHarveyOswald', '+98 21', 'John', 'Kennedy')
 
     def test_team_manipulation(self):
@@ -546,9 +546,9 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.abubakr.role.get_concrete().team, self.team17)
         self.vladimir.refresh_from_db()
         self.assertFalse(self.vladimir.has_role())
-        with self.assertRaisesMessage(OccupiedUserError, ''):
+        with self.assertRaises(OccupiedUserError):
             self.shahrerey.moderator.get_concrete().add_service_team(self.my_speciality, [self.nagamuto, self.osama])
-        with self.assertRaisesMessage(OccupiedUserError, ''):
+        with self.assertRaises(OccupiedUserError):
             self.shahrerey.moderator.get_concrete().edit_service_team(self.team17, self.my_speciality,
                                                        [self.osama, self.vladimir, self.kiarash])
         #TODO: Mark team17 as busy on a mission and see that we can't delete it due to BusyResourceError
@@ -580,7 +580,7 @@ class ModeratorTestCase(BaseTestCase):
         self.assertEqual(self.bulldozer.available_count, 1)
         self.assertEqual(self.bulldozer.county.get_concrete(), self.shahrerey)
         self.shahrerey.moderator.get_concrete().decrease_machinery(self.bulldozer_type)
-        with self.assertRaisesMessage(ResourceNotFoundError, ''):
+        with self.assertRaises(ResourceNotFoundError):
             self.shahrerey.moderator.get_concrete().decrease_machinery(self.bulldozer_type)
 
 
