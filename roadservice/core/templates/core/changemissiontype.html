@@ -1,0 +1,3 @@
+{% load static core_extras %}
+
+{% include 'core/single-charfield-modal-form.html' with action="/resources/changemissiontype/"|addstr:missiontype.id|addstr:"/" header="ویرایش نوع ماموریت" icon="truck" placeholder="" value=missiontype.name  %}

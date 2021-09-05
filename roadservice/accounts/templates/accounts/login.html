@@ -30,9 +30,9 @@
                             {% csrf_token %}
                             <div class="field">
                                 <div class="ui right icon input">
-                                    <i class="id card icon"></i>
-                                    <input dir="ltr" id="identification_number" type="text" name="identification_number"
-                                           autocomplete="identification_number" required="" placeholder="کد ملی">
+                                    <i class="id phone icon"></i>
+                                    <input dir="ltr" id="phone_number" type="text" name="phone_number"
+                                           autocomplete="phone_number" required="" placeholder="شماره تماس">
 
                                 </div>
 
@@ -68,10 +68,10 @@
                 $('.ui.form').form({
                     inline: true,
                     fields: {
-                        identification_number: {
-                            identifier: 'identification_number',
+                        phone_number: {
+                            identifier: 'phone_number',
                             rules: [
-                                {type: 'empty', prompt: 'لطفا کد ملی خود را وارد کنید.'}
+                                {type: 'empty', prompt: 'لطفا شماره تماس خود را وارد کنید.'}
                             ]
                         },
                         password: {

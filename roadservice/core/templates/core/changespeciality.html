@@ -1,28 +1,3 @@
-{% load static %}
+{% load static core_extras %}
 
-<div class="ui mini modal" style="display: block !important;">
-{#<div class="ui segment" style="display: block !important;">#}
-    <div class="header" style="text-align: right">
-        ویرایش نوع تخصص
-    </div>
-    <div class="content">
-        <form class="ui form" method="post">
-            {% csrf_token %}
-                <div class="ui left icon input">
-                    <i class="wrench icon"> </i>
-                    <input type="text" value="آهنگر">
-                </div>
-
-        </form>
-
-    </div>
-    <div class="left aligned actions" style="overflow: hidden;">
-        <div class="ui positive right labeled icon button" style="float: left;">
-            ذخیره
-            <i class="checkmark icon"></i>
-        </div>
-        <div class="ui black deny button" style="float: left;">
-            انصراف
-        </div>
-    </div>
-</div>
+{% include 'core/single-charfield-modal-form.html' with action="/resources/changespeciality/"|addstr:speciality.id|addstr:"/" header="ویرایش نوع تخصص" icon="wrench" placeholder="" value=speciality.name  %}

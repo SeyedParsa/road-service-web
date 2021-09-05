@@ -1,7 +1,6 @@
 {% load static %}
 
-{% if card %}
-
+{% if issue %}
     <div id="thecard" class="ui container" style="height:100%;width:100%;">
         <div class="ui stackable right aligned grid" style="margin: 10px">
             <div class="ui row" style="height: 60px">
@@ -9,7 +8,14 @@
 
                     <h2>
                         <i class="close icon right floated" style="margin: 10px; color: black;"></i>
-                        گاردریل | گیر کردن گاو روی گاردریل اتوبان شیراز-اصفهان
+                        {#                        گاردریل | گیر کردن گاو روی گاردریل اتوبان شیراز-اصفهان#}
+                        {% if issue.state == 'AS' or issue.state == 'DO' or issue.state == 'SC' or issue.state == 'AC' %}
+                            {{ issue.mission.type.name }}
+                        {% else %}
+                            نوع ماموریت نامشخص
+                        {% endif %}
+                        |
+                        {{ issue.title }}
                     </h2>
                 </div>
             </div>
@@ -17,160 +23,236 @@
             <div class="ui ten wide column" style="text-align: right">
                 <div class="ui row" style="font-size: 1em; color: rgba(0, 0, 0, 0.4);">
                     <i class="user icon"></i>
-                    اصغر فرهادی
-
-                    <i class="id card icon" style="margin-right: 10px"></i>
-                    ۰۳۷۱۵۳۲۶۷۳۲
+                    {#                    اصغر فرهادی#}
+                    {{ issue.reporter.user.first_name }}
+                    {{ issue.reporter.user.last_name }}
+                    {#                    <i class="id card icon" style="margin-right: 10px"></i>#}
+                    {#                    ۰۳۷۱۵۳۲۶۷۳۲#}
 
                     <i class="phone icon" style="margin-right: 10px"></i>
-                    ۰۹۱۲۵۵۴۳۱۳۱
+                    {#                    ۰۹۱۲۵۵۴۳۱۳۱#}
+                    {{ issue.reporter.user.phone_number }}
+
 
                 </div>
                 <div class="ui row">
                     <div class="ui text container" style="width: 100%; margin-top: 20px">
                         <p>
-                            چشمتون روز بد نبینه، امروز که داشتم از بزرگراه رد می&zwnj;شدم دیدم که لورم ایپسوم متن ساختگی
-                            با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه
-                            روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و
-                            کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد. کتابهای زیادی در شصت و سه درصد گذشته،
-                            حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای
-                            طرا
+                            {#                            چشمتون روز بد نبینه، امروز که داشتم از بزرگراه رد می&zwnj;شدم دیدم که لورم ایپسوم متن ساختگی#}
+                            {#                            با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه#}
+                            {#                            روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و#}
+                            {#                            کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد. کتابهای زیادی در شصت و سه درصد گذشته،#}
+                            {#                            حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای#}
+                            {#                            طرا#}
+                            {{ issue.description | safe }}
                         </p>
                     </div>
                 </div>
                 <div class="ui row" style="margin: 20px">
 
                     <div class="ui label" style="line-height:2">
-                        <i class="green check circle icon" style="margin-left: 10px"></i>
+                        {% if issue.state == 'DO' or issue.state == 'SC' %}
+                            <i class="green check circle icon" style="color:green" data-content="ماموریت انجام شده"
+                               style="margin-left: 10px"></i>
+                        {% endif %}
 
-                        ماموریت انجام شد!
+                        {% if issue.state == 'AS' %}
+                            <i class="truck circle icon" data-content="ماموریت در حال انجام است"
+                               style="margin-left: 10px"></i>
+                        {% endif %}
+
+                        {% if issue.state == 'RJ' %}
+                            <i class="times circle icon" data-content="ماموریت رد شده است"
+                               style="margin-left: 10px"></i>
+                        {% endif %}
+
+                        {% if issue.state == 'FL' %}
+                            <i class="times red circle icon" data-content="ماموریت شکست خورده است"
+                               style="margin-left: 10px"></i>
+                        {% endif %}
+
+                        {% if issue.state == 'RP' %}
+                            <i class="yellow exclamation circle icon" data-content="در انتظار وارد کردن منابع مورد نیاز"
+                               style="margin-left: 10px"></i>
+                        {% endif %}
+
+                        {% if issue.state == 'AC' %}
+                            <i class="yellow exclamation circle icon" data-content="در انتظار تخصیص تیم و ماشین‌آلات"
+                               style="margin-left: 10px"></i>
+                        {% endif %}
 
 
+                        {% if issue.state == 'DO' or issue.state == 'SC' %}
+                            ماموریت انجام شده
+                        {% endif %}
+
+                        {% if issue.state == 'AS' %}
+                            ماموریت در حال انجام است
+                        {% endif %}
+
+                        {% if issue.state == 'RJ' %}
+                            ماموریت رد شده است
+                        {% endif %}
+
+                        {% if issue.state == 'FL' %}
+                            ماموریت شکست خورده است
+                        {% endif %}
+
+                        {% if issue.state == 'RP' %}
+                            در انتظار وارد کردن منابع مورد نیاز
+                        {% endif %}
+
+                        {% if issue.state == 'AC' %}
+                            در انتظار تخصیص تیم و ماشین‌آلات
+                        {% endif %}
                     </div>
-                    <div class="ui label" style="line-height:2">
-                        <i class="yellow star icon"></i>
-                        <i class="yellow star icon"></i>
-                        <i class="yellow star icon"></i>
-                        <i class="star icon"></i>
-                        <i class="star icon"></i>
+                    {% if issue.state == 'SC' %}
+                        <div class="ui label" style="line-height:2">
 
-                    </div>
-                    <div class="ui button">
-                        <i class="download icon" style="margin-left: 10px"></i>دانلود گزارش
-                    </div>
+                            {% for i in '12345'|make_list %}
+                                <i class="{% if forloop.counter <= issue.mission.score %}yellow {% endif %}star icon"></i>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if issue.state == 'DO' or issue.state == 'SC' %}
+                        <div class="ui button">
+                            <i class="download icon" style="margin-left: 10px"></i>دانلود گزارش
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="ui hidden divider"></div>
-                <div class="ui grid">
-                    <div class="ui eight wide column">
-                        <div class="ui center aligned header">
-                            <div class="content">
-                                تیم&zwnj;های مورد نیاز
+                {% if issue.state != 'RP' and issue.state != 'RJ' %}
+                    <div class="ui grid">
+                        <div class="ui eight wide column">
+                            <div class="ui center aligned header">
+                                <div class="content">
+                                    تیم&zwnj;های مورد نیاز
+                                </div>
                             </div>
+
+                            <table class="ui basic right aligned table" style="text-align: center">
+                                <thead>
+                                <tr>
+                                    <th>تخصص</th>
+                                    <th>تعداد</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for specialityrequirement in issue.specialityrequirement_set.all %}
+                                    <tr>
+                                        <td>
+                                            <h4 class="ui header">
+                                                {{ specialityrequirement.speciality.name }}
+                                                {#                                        متخصص گاو#}
+                                            </h4></td>
+                                        <td>
+                                            {#                                    12#}
+                                            {{ specialityrequirement.amount }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                {#                            <tr>#}
+                                {#                                <td>#}
+                                {#                                    <h4 class="ui header">#}
+                                {#                                        آهنگر#}
+                                {#                                    </h4></td>#}
+                                {#                                <td>#}
+                                {#                                    61#}
+                                {#                                </td>#}
+                                {#                            </tr>#}
+                                </tbody>
+                            </table>
                         </div>
 
-                        <table class="ui basic right aligned table" style="text-align: center">
-                            <thead>
-                            <tr>
-                                <th>تخصص</th>
-                                <th>تعداد</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <h4 class="ui header">
-                                        متخصص گاو
-                                    </h4></td>
-                                <td>
-                                    12
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>
-                                    <h4 class="ui header">
-                                        آهنگر
-                                    </h4></td>
-                                <td>
-                                    61
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="ui eight wide column">
-                        <div class="ui center aligned header">
-                            <div class="content">
-                                ماشین&zwnj;آلات مورد نیاز
+                        <div class="ui eight wide column">
+                            <div class="ui center aligned header">
+                                <div class="content">
+                                    ماشین&zwnj;آلات مورد نیاز
+                                </div>
                             </div>
+
+                            <table class="ui basic right aligned table" style="text-align: center">
+                                <thead>
+                                <tr>
+                                    <th>ماشین&zwnj;آلات</th>
+                                    <th>تعداد</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for machineryrequirement in issue.machineryrequirement_set.all %}
+                                    <tr>
+                                        <td>
+                                            <h4 class="ui header">
+                                                {{ machineryrequirement.machinery_type.name }}
+                                                {#                                            بیل مکانیکی#}
+                                            </h4></td>
+                                        <td>
+                                            {{ machineryrequirement.amount }}
+                                            {#                                        22#}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                                {#                                <tr>#}
+                                {#                                    <td>#}
+                                {#                                        <h4 class="ui header">#}
+                                {#                                            باب&zwnj;کت#}
+                                {#                                        </h4></td>#}
+                                {#                                    <td>#}
+                                {#                                        12#}
+                                {#                                    </td>#}
+                                {#                                </tr>#}
+                                {#                                <tr>#}
+                                {#                                    <td>#}
+                                {#                                        <h4 class="ui header">#}
+                                {#                                            جرثقیل#}
+                                {#                                        </h4></td>#}
+                                {#                                    <td>#}
+                                {#                                        56#}
+                                {#                                    </td>#}
+                                {#                                </tr>#}
+                                </tbody>
+                            </table>
                         </div>
-
-                        <table class="ui basic right aligned table" style="text-align: center">
-                            <thead>
-                            <tr>
-                                <th>ماشین&zwnj;آلات</th>
-                                <th>تعداد</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <h4 class="ui header">
-                                        بیل مکانیکی
-                                    </h4></td>
-                                <td>
-                                    22
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>
-                                    <h4 class="ui header">
-                                        باب&zwnj;کت
-                                    </h4></td>
-                                <td>
-                                    12
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <h4 class="ui header">
-                                        جرثقیل
-                                    </h4></td>
-                                <td>
-                                    56
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
                     </div>
-                </div>
+                {% endif %}
             </div>
             <div class="ui six wide left floated column" style="text-align: right">
                 <div class="ui fluid right aligned card" style="background-color: #486071;color: white">
                     <div class="image" style="margin: 10px">
-                        <img src="/static/images/cow-guardrail.jpg">
+                        {% if issue.image %}
+                            <img src="{{ issue.image.url }}">
+                        {% else %}
+                            <img src="/static/images/cow-guardrail.jpg">
+                        {% endif %}
                     </div>
                     <div class="content">
                         <p>
                             <i class="calendar alternate icon" style="margin-right: 10px"></i>
-                            ۹ تیر ۱۴۰۰، ساعت ۱۲:۱۷
+                            {#                            ۹ تیر ۱۴۰۰، ساعت ۱۲:۱۷#}
+                            {#                            {{ issue.created_at }}#}
+                            {{ persian_datetime }}
                         </p>
 
                         <p style="margin-top:20px">
                             <i class="map icon" style="margin-right: 10px"></i>
-                            استان فارس، شهرستان شیراز
+                            استان {{ issue.county.super_region }}
+                            ،
+                            شهرستان {{ issue.county }}
+
                         </p>
                         <p></p>
 
 
-                        <p style="margin-top:20px">
-                            <i class="map marker icon" style="margin-right: 10px"></i>
-                            آدرس کامل:
-                            <br>
-                            کیلومتر ۱۷ جاده شیراز به اصفهان، نرسیده به خروجی باتلاق گاو خونی
-                        </p>
+                        {#                        <p style="margin-top:20px">#}
+                        {#                            <i class="map marker icon" style="margin-right: 10px"></i>#}
+                        {#                            آدرس کامل:#}
+                        {#                            <br>#}
+                        {#                            {{ issue.address }}#}
+                        {#                            کیلومتر ۱۷ جاده شیراز به اصفهان، نرسیده به خروجی باتلاق گاو خونی#}
+                        {#                        </p>#}
                     </div>
                 </div>
             </div>
@@ -185,7 +267,7 @@
         <div class="eight wide column" style="min-height:40vh">
             <h2 class="ui teal image header">
                 <div class="content" style="font-size:150%">
-                    No Such Question :/
+                    No Such Issue :/
                 </div>
             </h2>
         </div>

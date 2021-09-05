@@ -1,452 +1,458 @@
 {% extends 'core/base.html' %}
 {% load static %}
+    {% block modal_class %}long coupled{% endblock %}
 {% block content %}
 
     <div class="ui stackable grid">
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
+        {% if user.role.type != 'CE' and user.role.type != 'CM' %}
 
+<div class="ui row">
+            <form class="ui form" method="post">
+                {% csrf_token %}
+                <div class="fields">
+                    <div class="field" style="width: 400px">
+                        {{ form.regions }}
+                    </div>
 
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                گیر کردن گاو روی گاردریل اتوبان شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                        </div>
+                    <div class="field">
+                        <input type="submit" class="ui button" value="فیلتر">
                     </div>
                 </div>
-            </div>
+
+
+            </form>
+
         </div>
+    {% endif %}
+        {% for issue in issues %}
 
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="2" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                ماموریت‌های زمستانی
-
-                                    <span class="left floated item">
-                                        <i class="truck circle icon" data-content="ماموریت در حال انجام است"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                یخ زدگی جاده کنار رودخانه شیراز
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            ماموریت در حال انجام است
-                        </div>
-                    </div>
+            <div class="four wide column swing-in-top-fwd">
+                <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
+                    {% include 'core/issuepreview.html' with issue=issue %}
                 </div>
             </div>
-        </div>
 
+        {% endfor %}
 
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="3" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="times circle icon" data-content="ماموریت رد شده است"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-بوشهر
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            ماموریت رد شده است
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="4" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="times red circle icon" data-content="ماموریت شکست خورده است"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                خراب شدن گاردریل جاده قلات
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            ماموریت شکست خورده است
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="5" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="yellow exclamation circle icon"
-                                           data-content="در انتظار وارد کردن منابع مورد نیاز"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            در انتظار وارد کردن منابع مورد نیاز
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="6" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            در انتظار امتیازدهی کاربر
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                ماموریت‌های زمستانی
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                ریزش برف روی جاده بهشت گم‌شده
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="four wide column swing-in-top-fwd">
-            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">
-                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">
-                    <div class="ui card" style="width: 100%; height: 100%;">
-                        <div class="content">
-                            <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-                                گاردریل
-
-                                    <span class="left floated item">
-                                        <i class="green check circle icon" style="color:green"
-                                           data-content="ماموریت انجام شده"></i>
-                                    </span>
-                            </div>
-                            <div class="meta">
-                                <i class="map marker alternate icon"></i>
-                                استان فارس، شهرستان شیراز
-                            </div>
-
-                            <div class="description">
-                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان
-                            </div>
-
-                        </div>
-                        <div class="center aligned extra content" style="">
-                            <i class="star icon active"></i>
-                            <i class="star icon active"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                            <i class="star icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="2" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                ماموریت‌های زمستانی#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="truck circle icon" data-content="ماموریت در حال انجام است"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                یخ زدگی جاده کنار رودخانه شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            ماموریت در حال انجام است#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="3" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="times circle icon" data-content="ماموریت رد شده است"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-بوشهر#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            ماموریت رد شده است#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="4" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="times red circle icon" data-content="ماموریت شکست خورده است"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                خراب شدن گاردریل جاده قلات#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            ماموریت شکست خورده است#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="5" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="yellow exclamation circle icon"#}
+        {#                                           data-content="در انتظار وارد کردن منابع مورد نیاز"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            در انتظار وارد کردن منابع مورد نیاز#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="6" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            در انتظار امتیازدهی کاربر#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                ماموریت‌های زمستانی#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                ریزش برف روی جاده بهشت گم‌شده#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {##}
+        {##}
+        {#        <div class="four wide column swing-in-top-fwd">#}
+        {#            <div class="wobble-hor-bottom" style="width: 100%; height: 100%;opacity:0.9;">#}
+        {#                <div id="1" class="issuecard ui fluid card eq-card" style="width: 100%; height: 100%">#}
+        {#                    <div class="ui card" style="width: 100%; height: 100%;">#}
+        {#                        <div class="content">#}
+        {#                            <div class="header"#}
+        {#                                 style="display: flex; justify-content: space-between; align-items: center;">#}
+        {#                                گاردریل#}
+        {##}
+        {#                                <span class="left floated item">#}
+        {#                                        <i class="green check circle icon" style="color:green"#}
+        {#                                           data-content="ماموریت انجام شده"></i>#}
+        {#                                    </span>#}
+        {#                            </div>#}
+        {#                            <div class="meta">#}
+        {#                                <i class="map marker alternate icon"></i>#}
+        {#                                استان فارس، شهرستان شیراز#}
+        {#                            </div>#}
+        {##}
+        {#                            <div class="description">#}
+        {#                                جدا شدن گاردریل کنار بزرگراه شیراز-اصفهان#}
+        {#                            </div>#}
+        {##}
+        {#                        </div>#}
+        {#                        <div class="center aligned extra content" style="">#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon active"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                            <i class="star icon"></i>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
 
 
     </div>

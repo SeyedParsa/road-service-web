@@ -37,20 +37,21 @@
 <body>
 
 
-<div id="secretbox" class="ui long coupled modal">
+<div id="secretbox" class="ui {% block modal_class %}{% endblock %} modal">
 </div>
 
 
 <link rel="shortcut icon" type="image/png" style="width:auto;height:60px;border:0;padding:0;"
       href="{% static "images/logo.png" %}"/>
-<div id="messagebox" class="messages">
-</div>
+{#<div id="messagebox" class="messages">#}
+{#</div>#}
 
 
 <div class="ui borderless huge menu"
      style="z-index:50;position:relative;filter: alpha(opacity=90);-moz-opacity: 0.9;-khtml-opacity: 0.9;opacity: 0.9;">
     <div class="ui container grid">
-        <div class="row">
+        <div class="computer only row"
+             style="display: flex;justify-content: space-between;align-items: stretch;flex-wrap: nowrap;">
             <a href="/" class="item">
                 <div>
                     <img class="item" style="width:auto;height:70px;" src="{% static "images/logo.png" %}">
@@ -68,113 +69,230 @@
 
 
             {% if user.is_authenticated %}
-            {% endif %}
+                {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                    <div class="ui dropdown link item" id="reports_dropdown">
+                        <i class="newspaper icon" style="margin: 10px"></i>
+                        <span class="text">گزارش‌ها</span>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a href="/timereport">
+                                <div class="item">گزارش‌های زمانی</div>
+                            </a>
+                            <a href="/statusreport">
+                                <div class="item">گزارش وضعیت بخش</div>
+                            </a>
+                            <a href="/regionreport">
+                                <div class="item">گزارش زیربخش‌ها</div>
+                            </a>
+                        </div>
+                    </div>
 
-
-
-            <div class="ui dropdown link item" id="reports_dropdown">
-                <i class="newspaper icon" style="margin: 10px"></i>
-                <span class="text">گزارش‌ها</span>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a href="/timereport"> <div class="item">گزارش‌های زمانی</div></a>
-                    <a href="/statusreport"><div class="item">گزارش وضعیت بخش</div> </a>
-                    <a href="/regionreport"> <div class="item">گزارش زیربخش‌ها</div></a>
-                </div>
-            </div>
-
-
-            <div class="ui dropdown link item" id="users_dropdown">
-                <i class="user icon" style="margin: 10px"></i>
-                <span class="text">مدیریت کاربرها</span>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a href="/assignmoderator"> <div class="item">تعیین کارشناس</div></a>
-                    <a href="/signup"><div class="item">ثبت‌نام کاربر جدید</div> </a>
-                </div>
-            </div>
-
-
-            <a href="/resources" class="item"><i class="bullseye icon" style="margin: 10px;"></i> مدیریت منابع </a>
-
-
-
-
-            <div class="right menu"></div>
-
-
-            <div class="ui dropdown item" id="profile_dropdown">
-                {% if user.profile_picture %}
-                    <img class="item" style="width:auto;height:60px;border:0;padding:0;"
-                         src="{{ user.profile_picture.url }}">
-                {% else %}
-                    <img class="item" style="width:auto;height:60px;border:0;padding:0;"
-                         src="{% static "images/repairer2.png" %}">
                 {% endif %}
-                <i class="dropdown icon"></i>
-                <div class="menu" id="top-bar-menu">
+
+                <div class="ui dropdown link item" id="users_dropdown">
+                    <i class="user icon" style="margin: 10px"></i>
+                    <span class="text">مدیریت کاربرها</span>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        {% if user.role.type == 'CM' %}
+                            <a href="/assignmoderator">
+                                <div class="item">تعیین کارشناس</div>
+                            </a>
+                        {% endif %}
+                        {% if user.role.type == 'PR' or user.role.type == 'PM' %}
+                            <a href="/assignmoderator">
+                                <div class="item">تعیین مدیر زیربخش</div>
+                            </a>
+                        {% endif %}
+                        {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                            <a href="/signup">
+                                <div class="item">ثبت‌نام کاربر جدید</div>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
 
 
-                    <div class="header" style="text-align: center">محمد مهدی شکری</div>
-                    <div class="divider hide-in-mobile"></div>
-                    <a class="item" href="/password/set" style="text-align: right">
-                        <i class="key icon"></i>
+                <a href="/resources" class="item"><i class="bullseye icon" style="margin: 5px;"></i> مدیریت منابع </a>
 
-                        تغییر گذرواژه
-                    </a>
+                <div class="right menu"></div>
 
 
-                     <a href="/admin" class="item">
-                         <i class="cogs icon" style="margin: 10px;">
+                <div class="ui dropdown item" id="profile_dropdown">
+                    {% if user.profile_picture %}
+                        <img class="item" style="width:auto;height:60px;border:0;padding:0;"
+                             src="{{ user.profile_picture.url }}">
+                    {% else %}
+                        <img class="item" style="width:auto;height:60px;border:0;padding:0;"
+                             src="{% static "images/repairer2.png" %}">
+                    {% endif %}
+                    <i class="dropdown icon"></i>
+                    <div class="menu" id="top-bar-menu">
 
-                         </i> مدیریت
-                     </a>
 
-                    <a class="item" href="/logout" style="text-align: right">
-                        <i class="sign out icon"></i>
-                        خروج
+                        <div class="header" style="text-align: center">{{ user.first_name }} {{ user.last_name }}</div>
+                        <div class="divider hide-in-mobile"></div>
+                        <a class="item" href="/password/change/" style="text-align: right">
+                            <i class="key icon"></i>
 
-                    </a>
+                            تغییر گذرواژه
+                        </a>
 
+
+                        <a href="/admin" class="item">
+                            <i class="cogs icon" style="margin: 10px;">
+
+                            </i> مدیریت
+                        </a>
+
+                        <a class="item" href="/logout" style="text-align: right">
+                            <i class="sign out icon"></i>
+                            خروج
+
+                        </a>
+
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="right menu"></div>
+                <a href="/login" class="item"><i class="user icon" style="margin: 10px;"></i> ورود </a>
+            {% endif %}
+        </div>
+        <div class="tablet mobile only row"
+             style="display: flex;justify-content: space-between;align-items: stretch;flex-wrap: nowrap;">
+            <div class="ui dropdown link item" id="reports_dropdown">
+                <i class="big bars icon" style="margin: 10px"></i>
+                <div class="menu">
+                    {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+
+                        <div class="item">
+                            <i class="newspaper icon" style="margin: 10px"></i>
+                            <span class="text">گزارش‌ها</span>
+                            <i class="caret right icon"></i>
+                            <div class="right menu">
+                                <a href="/timereport">
+                                    <div class="item">گزارش‌های زمانی</div>
+                                </a>
+                                <a href="/statusreport">
+                                    <div class="item">گزارش وضعیت بخش</div>
+                                </a>
+                                <a href="/regionreport">
+                                    <div class="item">گزارش زیربخش‌ها</div>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="item">
+                        <i class="user icon" style="margin: 10px"></i>
+                        <span class="text">مدیریت کاربرها</span>
+                        <i class="caret right icon"></i>
+                        <div class="right menu">
+                            {% if user.role.type == 'CM' %}
+                                <a href="/assignmoderator">
+                                    <div class="item">تعیین کارشناس</div>
+                                </a>
+                            {% endif %}
+                            {% if user.role.type == 'PR' or user.role.type == 'PM' %}
+                                <a href="/assignmoderator">
+                                    <div class="item">تعیین مدیر زیربخش</div>
+                                </a>
+                            {% endif %}
+                            {% if user.role.type == 'PR' or user.role.type == 'PM' or user.role.type == 'CM' %}
+                                <a href="/signup">
+                                    <div class="item">ثبت‌نام کاربر جدید</div>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <a href="/resources" class="item"><i class="bullseye icon"></i> مدیریت
+                        منابع </a>
                 </div>
             </div>
 
-        </div>
-{#        <div class="tablet mobile only row">#}
-{#            <a class="header item"> ساج</a>#}
-{#            <div class="right menu">#}
-{#                <a class="menu item">#}
-{#                    <div class="ui basic icon toggle button">#}
-{#                        <i class="content icon"></i>#}
-{#                    </div>#}
-{#                </a>#}
-{#            </div>#}
-{##}
-{##}
-{#            <div class="ui vertical accordion borderless fluid menu">#}
-{#                   <div class="ui dropdown link item">#}
-{#                        <span class="text">گزارش‌ها</span>#}
-{#                        <i class="dropdown icon"></i>#}
-{#                        <div class="menu">#}
-{#                            <a href="/timereport"> <div class="item">گزارش‌های زمانی</div></a>#}
-{#                            <a href="/statusreport"><div class="item">گزارش وضعیت بخش</div> </a>#}
-{#                            <a href="/regionreport"> <div class="item">گزارش زیربخش‌ها</div></a>#}
-{#                        </div>#}
-{#                    </div>#}
-{##}
-{##}
-{#                <a class="item">خروج </a>#}
-{#                <div class="ui divider"></div>#}
-{#            </div>#}
-{#        </div>#}
-    </div>
+            <a href="/" class="item">
+                <h style="font-size:120%" class="header item">ساج</h>
+            </a>
 
+            {% if user.is_authenticated %}
+
+                <div class="ui dropdown item" id="profile_dropdown">
+                    {% if user.profile_picture %}
+                        <img class="item" style="width:auto;height:60px;border:0;padding:0;"
+                             src="{{ user.profile_picture.url }}">
+                    {% else %}
+                        <img class="item" style="width:auto;height:60px;border:0;padding:0;"
+                             src="{% static "images/repairer2.png" %}">
+                    {% endif %}
+                    <i class="dropdown icon"></i>
+                    <div class="left menu" id="top-bar-menu">
+
+
+                        <div class="header" style="text-align: center">{{ user.first_name }} {{ user.last_name }}</div>
+                        <div class="divider hide-in-mobile"></div>
+                        <a class="item" href="/password/set" style="text-align: right">
+                            <i class="key icon"></i>
+                            تغییر گذرواژه
+                        </a>
+
+
+                        <a href="/admin" class="item">
+                            <i class="cogs icon" style="margin: 10px;">
+
+                            </i> مدیریت
+                        </a>
+
+                        <a class="item" href="/logout" style="text-align: right">
+                            <i class="sign out icon"></i>
+                            خروج
+
+                        </a>
+
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="right menu"></div>
+                <a href="/login" class="item"><i class="user icon" style="margin: 10px;"></i> ورود </a>
+            {% endif %}
+            {#            <a class="header item"> ساج</a>#}
+            {#            <div class="right menu">#}
+            {#                <a class="menu item">#}
+            {#                    <div class="ui basic icon toggle button">#}
+            {#                        <i class="content icon"></i>#}
+            {#                    </div>#}
+            {#                </a>#}
+            {#            </div>#}
+            {#            <div class="ui vertical accordion borderless fluid menu">#}
+            {#                <div class="ui dropdown link item">#}
+            {#                    <span class="text">گزارش‌ها</span>#}
+            {#                    <i class="dropdown icon"></i>#}
+            {#                    <div class="menu">#}
+            {#                        <a href="/timereport">#}
+            {#                            <div class="item">گزارش‌های زمانی</div>#}
+            {#                        </a>#}
+            {#                        <a href="/statusreport">#}
+            {#                            <div class="item">گزارش وضعیت بخش</div>#}
+            {#                        </a>#}
+            {#                        <a href="/regionreport">#}
+            {#                            <div class="item">گزارش زیربخش‌ها</div>#}
+            {#                        </a>#}
+            {#                    </div>#}
+            {#                </div>#}
+            {#                <a class="item">خروج </a>#}
+            {#                <div class="ui divider"></div>#}
+            {#            </div>#}
+        </div>
+    </div>
 </div>
+
 <div class="ui container">
     {% block content %}
     {% endblock %}
 
 </div>
+
 <style type="text/css">
 
     @font-face {
@@ -190,7 +308,7 @@
         background-color: #f0f4f7;
         background-image: url({% static "/images/spanner.png" %});
         min-height: 20px;
-        background-position: center;
+        background-position: bottom;
         background-repeat: no-repeat;
         background-size: cover;
         background-attachment: fixed;
@@ -399,6 +517,7 @@
             width: 100vw;
         }
     }
+
 </style>
 <script>
     $(document).ready(function () {
@@ -417,13 +536,19 @@
 </script>
 <script>
     function floatMessage(title, detail, color) {
-        $html = $("<div class=\"ui small " + color + " floating message\"><i class=\"close icon\"></i><div class=\"header\">" + title + "</div><p>" + detail + "</p></div>");
+        $html = $("<div id=\"messagebox\" class=\"messages\"> <div class=\"ui small " + color + " floating message\"><i class=\"close icon\"></i><div class=\"header\">" + title + "</div><p>" + detail + "</p></div></div>");
         $html.find('.close.icon').on('click', function () {
             $(this).parent().transition('fade');
         });
         $html.delay(5000).fadeOut();
-        $("#messagebox").append($html);
+        $("body").append($html);
     }
+
+    $('.ui.sidebar').sidebar({
+        context: $('.ui.pushable.segment'),
+        transition: 'overlay'
+    }).sidebar('attach events', '#mobile_item');
+
 </script>
 
 {% if messages %}

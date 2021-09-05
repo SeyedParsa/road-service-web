@@ -1,0 +1,113 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+    <div style="padding: 5em 0">
+        <div style="margin-bottom: 3em" id="form-section">
+            <div id="auth-form" class="center-text" style="max-width: 352px; margin: auto">
+
+                <div class="ui stacked segments" style="border: none">
+
+
+                    <div class="ui segment center-text">
+                        <div class="ui small header">
+                            ثبت‌نام مدیر، کارشناس، یا عضو تیم امداد جدید
+                        </div>
+                    </div>
+
+                    <div class="ui segment">
+                        <form class="ui large form" style="text-align: center" method="post" action="/signup/"
+                              novalidate>
+                            {% csrf_token %}
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <input dir="ltr" type="text" name="first_name" autocomplete="first_name"
+                                           placeholder="نام">
+
+                                    <i class="address card icon"></i>
+                                </div>
+
+                            </div>
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <input dir="rtl" type="text" name="last_name" autocomplete="last_name"
+                                           placeholder="نام خانوادگی">
+
+                                    <i class="address card icon"></i>
+                                </div>
+
+                            </div>
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <input dir="ltr" type="text" name="phone_number" autocomplete="phone"
+                                           placeholder="شماره موبایل">
+
+                                    <i class="phone icon"></i>
+                                </div>
+
+                            </div>
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <i class="lock icon"></i>
+                                    <input dir="ltr" type="password" name="password1" placeholder="گذرواژه">
+                                </div>
+
+                            </div>
+                            <div class="field">
+                                <div class="ui right icon input">
+                                    <i class="lock icon"></i>
+                                    <input dir="ltr" type="password" name="password2" placeholder="تکرار گذرواژه">
+                                </div>
+
+                            </div>
+
+                            <button type="submit" class="ui fluid large primary submit button">ثبت‌نام</button>
+                        </form>
+
+                    </div>
+
+
+                    <div class="ui segment center-text">
+                        <div class="ui horizontal link list">
+                            <a href="/" class="item">بازگشت</a>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                $('.ui.form').form({
+                    inline: true,
+                    fields: {
+                        phone: {
+                            identifier: 'phone',
+                            rules: [
+                                {type: 'empty', prompt: 'لطفا شماره تماس را وارد کنید.'}
+                            ]
+                        },
+                        password: {
+                            identifier: 'password',
+                            rules: [
+                                {type: 'empty', prompt: 'لطفا گذرواژه را وارد کنید.'}
+                            ]
+                        },
+                        password2: {
+                            identifier: 'password2',
+                            rules: [
+                                {type: 'empty', prompt: 'لطفا تکرار گذرواژه را وارد کنید.'}
+                            ]
+                        }
+                    }
+                });
+            });
+        </script>
+
+    </div>
+
+
+{% endblock %}

@@ -1,122 +1,81 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% block modal_class %}mini{% endblock %}
 {% block content %}
-
 
     <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/css/jquery-editable.css"
           rel="stylesheet"/>
     <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/js/jquery-editable-poshytip.min.js"></script>
 
     <div class="ui stackable grid" id="resources">
-    <div class="ui row">
-
-                 <form class="ui form" method="post">
+        {% if user.role.type != 'CE' and user.role.type != 'CM' %}
+            <div class="ui row">
+                <form class="ui form" method="post">
                     {% csrf_token %}
                     <div class="fields">
                         <div class="field" style="width: 400px">
-                            <select class="ui fluid right aligned search dropdown" multiple="">
-                                <option value="">بخش</option>
-                                <option value="AL">کشور سوئد</option>
-                                <option value="AK">استان البرز</option>
-                                <option value="AZ">استان تهران</option>
-                                <option value="AR">استان فارس</option>
-                                <option value="CA">شهرستان شیراز</option>
-                                <option value="CO">شهرستان فیروزکوه</option>
-                                <option value="CT">شهرستان تهران</option>
-                                <option value="DE">شهرستان کرج</option>
-                                <option value="DC">شهرستان قم</option>
-                                <option value="FL">شهرستان دماوند</option>
-                                <option value="GA">شهرستان اصفهان</option>
-                                <option value="HI">استان اصفهان</option>
-                                <option value="ID">Idaho</option>
-                                <option value="IL">Illinois</option>
-                                <option value="IN">Indiana</option>
-                                <option value="IA">Iowa</option>
-                                <option value="KS">Kansas</option>
-                                <option value="KY">Kentucky</option>
-                                <option value="LA">Louisiana</option>
-                                <option value="ME">Maine</option>
-                                <option value="MD">Maryland</option>
-                                <option value="MA">Massachusetts</option>
-                                <option value="MI">Michigan</option>
-                                <option value="MN">Minnesota</option>
-                                <option value="MS">Mississippi</option>
-                                <option value="MO">Missouri</option>
-                                <option value="MT">Montana</option>
-                                <option value="NE">Nebraska</option>
-                                <option value="NV">Nevada</option>
-                            </select>
+                            {{ filter_form.regions }}
                         </div>
 
                         <div class="field">
-                            <input type="submit" class="ui button" value="فیلتر"></input>
+                            <input type="submit" class="ui button" value="فیلتر">
                         </div>
                     </div>
 
 
                 </form>
 
-    </div>
+            </div>
+        {% endif %}
         <div class="ui six wide column">
             <div class="ui segments" id="teams" style="opacity: 0.9">
                 <div class="ui center aligned segment"
                      style="display: flex; justify-content: space-between; align-items: center; height: 65px;">
                     <h3>لیست تیم&zwnj;ها</h3>
-                    <a href="#" style="color:black;"> <i class="left floated small plus icon"
-                                                         id="add-team-icon"></i></a>
+                    {% if user.role.type == 'CM' %}
+                        <a href="#" style="color:black;"> <i class="left floated small plus icon"
+                                                             id="add-team-icon"></i></a>
+                    {% endif %}
                 </div>
 
                 <div class="ui basic segment">
                     <div class="ui styled fluid accordion" id="accordion" style="line-height: 2; margin-top: 5px">
-                        <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                            <div class="ui  grid" id="1">
-                                <div class="ui four wide column">
-                                    <i class="ui angle left icon"></i>
-                                    آهنگر
-                                </div>
-                                <div class="ui three wide column">
-                                    ۵ نفر
-                                </div>
 
-                                <div class="ui five wide column">
-                                    فارس، شیراز
+                        {% for team in teams %}
+                            <div class="title" style="color: rgba(0, 0, 0, 0.87)">
+                                <div class="ui  grid" id="{{ team.id }}">
+                                    <div class="ui five wide column">
+                                        <i class="ui angle left icon"></i>
+                                        {#                                        آهنگر#}
+                                        {{ team.speciality.name }}
+                                    </div>
+                                    <div class="ui three wide column">
+                                        {#                                        ۵ نفر#}
+                                        {{ team.members.all | length }} نفر
+                                    </div>
 
-                                </div>
-                                <div class="ui four wide column">
-                                    <a style="color: black" href="">
-                                        <i class="times icon"></i></a>
-                                    <i class="edit icon"></i>
+                                    <div class="ui four wide column">
+                                        {#                                        فارس، شیراز#}
+
+                                        {{ team.county.super_region }}
+                                        ،
+                                        {{ team.county }}
+
+                                    </div>
+                                    {% if user.role.type == 'CM' %}
+
+                                        <div class="ui four wide column">
+                                            <a style="color: black" href="/resources/removeteam/{{ team.id }}/">
+                                                <i class="times icon"></i></a>
+                                            <i class="edit icon"></i>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
-                        </div>
-                        <div class="content" id="1-content">
-                            {% include 'core/teamdetails.html' %}
-                        </div>
-
-                        <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                            <div class="ui  grid" id="2">
-                                <div class="ui four wide column">
-                                    <i class="ui angle left icon"></i>
-                                    آهنگر
-                                </div>
-                                <div class="ui three wide column">
-                                    ۵ نفر
-                                </div>
-
-                                <div class="ui five wide column">
-                                    فارس، شیراز
-
-                                </div>
-                                <div class="ui four wide column">
-                                    <a style="color: black" href="">
-                                        <i class="times icon"></i> </a>
-                                    <i class="edit icon"></i>
-                                </div>
+                            <div class="content" id="1-content">
+                                {% include 'core/teamdetails.html' with team=team %}
                             </div>
-                        </div>
-                        <div class="content">
-                            {% include 'core/teamdetails.html' %}
-                        </div>
+                        {% endfor %}
 
                     </div>
                 </div>
@@ -130,108 +89,102 @@
                 </div>
                 <div class="ui basic segment" style="margin-top: 5px">
                     <div class="ui segments">
-                        <div class="ui segment">
-                            <div class="ui grid">
-                                <div class="ui nine wide column">
-                                    جرثقیل
-                                </div>
-                                <div class="ui seven wide column machinery">
-                                    <a href="" style="color: black"><i class="right floated plus icon"></i></a>
-                                    18
-                                    <a href="" style="color: black"><i class="left floated minus icon"></i></a>
+
+                        {% for key, value in machinery_count.items %}
+                            <div class="ui segment">
+                                <div class="ui grid">
+                                    <div class="ui six wide column">
+                                        {{ key.name }}
+                                        {#                                    جرثقیل#}
+                                    </div>
+                                    <div class="ui ten wide column machinery" style="white-space: nowrap">
+                                        {% if user.role.type == 'CM' %}
+
+                                            <a href="/resources/addmachinery/{{ key.id }}/"
+                                               style="color: black"><i
+                                                    class="right floated plus icon"></i></a>
+                                        {% endif %}
+                                        {#                                    18#}
+                                        {{ value.total }} ({{ value.available }} آزاد)
+                                        {% if user.role.type == 'CM' %}
+                                            <a href="/resources/removemachinery/{{ key.id }}/"
+                                               style="color: black"><i
+                                                    class="left floated minus icon"></i></a>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if user.role.type == 'CE' %}
+
+            <div class="ui three wide column">
+                <div class="ui segments" id="mission" style="opacity: 0.9; overflow: hidden">
+                    <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
+                        <h3>انواع ماموریت</h3>
+                        <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
+                    </div>
+                    <div class="ui basic segment" id="list"
+                         style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
+                        <div class="ui segments content">
+
+                            {% for mission_type in mission_types %}
+                                <div class="ui segment"
+                                     style="display: flex; justify-content: space-between; align-items: center">
+                                    {{ mission_type.name }}
+                                    <div style="white-space: nowrap;">
+                                        <a style="color: black"
+                                           href="/resources/removemissiontype/{{ mission_type.id }}">
+                                            <i class="left floated times icon"></i></a>
+                                        <a style="color: black" href="#">
+                                            <i class="left floated edit icon" id="{{ mission_type.id }}"></i></a>
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+
                         </div>
-                        <div class="ui segment">
-                            <div class="ui grid">
-                                <div class="ui nine wide column">
-                                    لودر
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if user.role.type == 'CM' or user.role.type == 'CE' %}
+
+            <div class="ui three wide column">
+                <div class="ui segments" id="speciality" style="opacity: 0.9; overflow: hidden">
+                    <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
+                        <h3>انواع تخصص</h3>
+                        <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
+                    </div>
+                    <div class="ui basic segment" id="list"
+                         style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
+                        <div class="ui segments content">
+                            {% for speciality in specialities %}
+                                <div class="ui segment"
+                                     style="display: flex; justify-content: space-between; align-items: center">
+                                    {{ speciality.name }}
+                                    {% if user.role.type == 'CM' %}
+
+                                        <div style="white-space: nowrap;">
+                                            <a style="color: black"
+                                               href="/resources/removespeciality/{{ speciality.id }}">
+                                                <i class="left floated times icon"></i></a>
+                                            <a style="color: black" href="#">
+                                                <i class="left floated edit icon" id="{{ speciality.id }}"></i></a>
+                                        </div>
+                                    {% endif %}
                                 </div>
-                                <div class="ui seven wide column">
-                                    <a href="" style="color: black"><i class="right floated plus icon"></i></a>
-                                    20
-                                    <a href="" style="color: black"><i class="left floated minus icon"></i></a>
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
 
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="ui three wide column">
-            <div class="ui segments" id="mission" style="opacity: 0.9; overflow: hidden">
-                <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
-                    <h3>انواع ماموریت</h3>
-                    <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
-                </div>
-                <div class="ui basic segment" id="list"
-                     style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
-                    <div class="ui segments content">
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            گاردریل
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
-                            </div>
-                        </div>
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            گاردریل
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="ui three wide column">
-            <div class="ui segments" id="speciality" style="opacity: 0.9; overflow: hidden">
-                <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
-                    <h3>انواع تخصص</h3>
-                    <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
-                </div>
-                <div class="ui basic segment" id="list"
-                     style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
-                    <div class="ui segments content">
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            آهنگر
-
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
-                            </div>
-                        </div>
-                        <div class="ui segment"
-                             style="display: flex; justify-content: space-between; align-items: center">
-                            متخصص گاو
-
-                            <div>
-                                <a style="color: black" href="">
-                                    <i class="left floated times icon"></i></a>
-                                <a style="color: black" href="#">
-                                    <i class="left floated edit icon" id="2"></i></a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
+        {% endif %}
 
     </div>
 
@@ -241,42 +194,54 @@
 
     <script>
         $('#speciality .plus').on('click', function (event) {
-            $('#speciality').find('.content').append(' <div class="ui segment"\n' +
-                '                             style="display: flex; justify-content: space-between; align-items: center">\n' +
-                '                            <form class="ui form">\n' +
-                '                                <input type="text" placeholder="نام تخصص">\n' +
-                '                            </form>\n' +
-                '                        </div>');
 
-            var element = document.getElementById("speciality-save-icon");
-            //If it isn't "undefined" and it isn't "null", then it exists.
-            if (typeof (element) != 'undefined' && element != null) {
-                console.log('save-icon already exists!!')
-            } else {
-                $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;color: black">\n' +
-                    '                        <i class="save icon"></i>\n' +
-                    '                    </div>');
-            }
+            var id = $(this).attr('id');
+            var path = "/resources/addspeciality/";
+            {#$("#1-content").load(path);#}
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+
+            {#$('#speciality').find('.content').append(' <div class="ui segment"\n' +#}
+            {#    '                             style="display: flex; justify-content: space-between; align-items: center">\n' +#}
+            {#    '                            <form class="ui form">\n' +#}
+            {#    '                                <input type="text" placeholder="نام تخصص">\n' +#}
+            {#    '                            </form>\n' +#}
+            {#    '                        </div>');#}
+            {##}
+            {#var element = document.getElementById("speciality-save-icon");#}
+            {#//If it isn't "undefined" and it isn't "null", then it exists.#}
+            {#if (typeof (element) != 'undefined' && element != null) {#}
+            {#    console.log('save-icon already exists!!')#}
+            {# } else {#}
+            {#    $('#speciality').find('#list').append(' <a class="ui segment" href="" id="speciality-save-icon" style="width: fit-content;float: left;color: black">\n' +#}
+            {#        '                        <i class="save icon"></i>\n' +#}
+            {#        '                    </div>');#}
+            {# }#}
 
         });
 
         $('#mission .plus').on('click', function (event) {
-            $('#mission').find('.content').append(' <div class="ui segment"\n' +
-                '                             style="display: flex; justify-content: space-between; align-items: center">\n' +
-                '                            <form class="ui form">\n' +
-                '                                <input type="text" placeholder="نام ماموریت">\n' +
-                '                            </form>\n' +
-                '                        </div>');
+            var id = $(this).attr('id');
+            var path = "/resources/addmissiontype/";
+            {#$("#1-content").load(path);#}
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+            {#$('#mission').find('.content').append(' <div class="ui segment"\n' +#}
+            {#    '                             style="display: flex; justify-content: space-between; align-items: center">\n' +#}
+            {#    '                            <form class="ui form">\n' +#}
+            {#    '                                <input type="text" placeholder="نام ماموریت">\n' +#}
+            {#    '                            </form>\n' +#}
+            {#    '                        </div>');#}
 
-            var element = document.getElementById("mission-save-icon");
-            //If it isn't "undefined" and it isn't "null", then it exists.
-            if (typeof (element) != 'undefined' && element != null) {
-                console.log('save-icon already exists!!')
-            } else {
-                $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;color: black">\n' +
-                    '                        <i class="save icon"></i>\n' +
-                    '                    </div>');
-            }
+            {#var element = document.getElementById("mission-save-icon");#}
+            {#//If it isn't "undefined" and it isn't "null", then it exists.#}
+            {#if (typeof (element) != 'undefined' && element != null) {#}
+            {#    console.log('save-icon already exists!!')#}
+            {# } else {#}
+            {#    $('#mission').find('#list').append(' <a class="ui segment" href="" id="mission-save-icon" style="width: fit-content;float: left;color: black">\n' +#}
+            {#        '                        <i class="save icon"></i>\n' +#}
+            {#        '                    </div>');#}
+            {# }#}
 
         });
 
@@ -289,22 +254,22 @@
     <script>
         $(document).ready(function () {
 
-            $('.issuecard').click(function () {
-                var id = $(this).attr('id');
-                var path = "/resources/teamdetails/" + id;
-                $("#secretbox").load(path);
-                $("#secretbox").modal('show');
-
-            });
+            {#$('.issuecard').click(function () {#}
+            {#    var id = $(this).attr('id');#}
+            {#    var path = "/resources/teamdetails/" + id;#}
+            {#    $("#secretbox").load(path);#}
+            {#    $("#secretbox").modal('show');#}
+            {##}
+            {#});#}
 
             $('#add-team-icon').click(function () {
-                var path = "/resources/changeteam/" + 0;
+                var path = "/resources/addteam/";
                 $("#secretbox").load(path);
                 $("#secretbox").modal('show');
-
             });
 
-            $('#teams .edit.icon').click(function () {
+            $('#teams .edit.icon').click(function (e) {
+                e.preventDefault();
                 var id = $(this).parent().parent().attr('id');
                 var path = "/resources/changeteam/" + id;
                 {#$("#1-content").load(path);#}
@@ -314,9 +279,10 @@
             });
 
 
-            $('#mission .edit.icon').click(function () {
+            $('#mission .edit.icon').click(function (e) {
+                e.preventDefault();
                 var id = $(this).attr('id');
-                var path = "/resources/changemission/" + id;
+                var path = "/resources/changemissiontype/" + id;
                 {#$("#1-content").load(path);#}
                 $("#secretbox").load(path);
                 $("#secretbox").modal('show');
@@ -363,7 +329,6 @@
             $('#resources').find('.edit.icon').mouseout(function () {
                 $(this).css('color', 'black');
             });
-
 
 
             $('#resources').find('.save.icon').mouseover(function () {

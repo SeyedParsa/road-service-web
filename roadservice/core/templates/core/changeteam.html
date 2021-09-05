@@ -1,182 +1,103 @@
 {% load static %}
 
-<div class="ui mini modal" style="display: block !important;">
+{#<div class="" style="display: block !important;">#}
 {#<div class="ui segment" style="display: block !important;">#}
-    <div class="header" style="text-align: right">
-        ویرایش تیم
-    </div>
-    <div class="content">
-        <form class="ui form" method="post">
-            {% csrf_token %}
-            <div class="field" style="">
-                <label>بخش</label>
-                <select class="ui fluid right aligned search dropdown">
-                    <option value="">شهرستان شیراز</option>
-                    <option value="AL">کشور سوئد</option>
-                    <option value="AK">استان البرز</option>
-                    <option value="AZ">استان تهران</option>
-                    <option value="AR">استان فارس</option>
-                    <option value="CA">شهرستان شیراز</option>
-                    <option value="CO">شهرستان فیروزکوه</option>
-                    <option value="CT">شهرستان تهران</option>
-                    <option value="DE">شهرستان کرج</option>
-                    <option value="DC">شهرستان قم</option>
-                    <option value="FL">شهرستان دماوند</option>
-                    <option value="GA">شهرستان اصفهان</option>
-                    <option value="HI">استان اصفهان</option>
-                    <option value="ID">Idaho</option>
-                    <option value="IL">Illinois</option>
-                    <option value="IN">Indiana</option>
-                    <option value="IA">Iowa</option>
-                    <option value="KS">Kansas</option>
-                    <option value="KY">Kentucky</option>
-                    <option value="LA">Louisiana</option>
-                    <option value="ME">Maine</option>
-                    <option value="MD">Maryland</option>
-                    <option value="MA">Massachusetts</option>
-                    <option value="MI">Michigan</option>
-                    <option value="MN">Minnesota</option>
-                    <option value="MS">Mississippi</option>
-                    <option value="MO">Missouri</option>
-                    <option value="MT">Montana</option>
-                    <option value="NE">Nebraska</option>
-                    <option value="NV">Nevada</option>
-                </select>
-            </div>
+<div class="header" style="text-align: right">
+    ویرایش تیم
+</div>
+<div class="content">
+    <form class="ui form" id="form1" method="post" action="/resources/{% if team %}changeteam/{{ team.id }}{% else %}addteam{% endif %}/">
+        {% csrf_token %}
 
-            <div class="field" style="">
-                <label>تخصص</label>
-                <select class="ui fluid right aligned search dropdown">
-                    <option value="">آهنگر</option>
-                    <option value="AL">کشور سوئد</option>
-                    <option value="AK">استان البرز</option>
-                    <option value="AZ">استان تهران</option>
-                    <option value="AR">استان فارس</option>
-                    <option value="CA">شهرستان شیراز</option>
-                    <option value="CO">شهرستان فیروزکوه</option>
-                    <option value="CT">شهرستان تهران</option>
-                    <option value="DE">شهرستان کرج</option>
-                    <option value="DC">شهرستان قم</option>
-                    <option value="FL">شهرستان دماوند</option>
-                    <option value="GA">شهرستان اصفهان</option>
-                    <option value="HI">استان اصفهان</option>
-                    <option value="ID">Idaho</option>
-                    <option value="IL">Illinois</option>
-                    <option value="IN">Indiana</option>
-                    <option value="IA">Iowa</option>
-                    <option value="KS">Kansas</option>
-                    <option value="KY">Kentucky</option>
-                    <option value="LA">Louisiana</option>
-                    <option value="ME">Maine</option>
-                    <option value="MD">Maryland</option>
-                    <option value="MA">Massachusetts</option>
-                    <option value="MI">Michigan</option>
-                    <option value="MN">Minnesota</option>
-                    <option value="MS">Mississippi</option>
-                    <option value="MO">Missouri</option>
-                    <option value="MT">Montana</option>
-                    <option value="NE">Nebraska</option>
-                    <option value="NV">Nevada</option>
-                </select>
-            </div>
-
-            <table class="ui very basic right aligned table" style="text-align: right">
-                <thead>
-                <tr>
-                    <th colspan="2" style="display: flex; justify-content: space-between; align-items: center">
-                        <h3>اعضای تیم</h3>
-                        <i class="left floated small plus icon"></i>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="ui left icon input">
-                        <i class="id card icon"> </i>
-                        <input type="text" value="۱۷۴۵۳۱۲۴۳۶">
-                    </td>
-                    <td>
-                        <div class="ui checkbox">
-                            <input type="checkbox" tabindex="0" class="hidden">
-                            <label>حذف</label>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="ui left icon input">
-                        <i class="id card icon"> </i>
-                        <input type="text" value="۱۷۴۵۳۱۲۴۳۶">
-                    </td>
-                    <td>
-                        <div class="ui checkbox">
-                            <input type="checkbox" tabindex="0" class="hidden">
-                            <label>حذف</label>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="ui left icon input">
-                        <i class="id card icon"> </i>
-                        <input type="text" value="۱۷۴۵۳۱۲۴۳۶">
-                    </td>
-                    <td>
-                        <div class="ui checkbox">
-                            <input type="checkbox" tabindex="0" class="hidden">
-                            <label>حذف</label>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ui left icon input">
-                        <i class="id card icon"> </i>
-                        <input type="text" value="۱۷۴۵۳۱۲۴۳۶">
-                    </td>
-                    <td>
-                        <div class="ui checkbox">
-                            <input type="checkbox" tabindex="0" class="hidden">
-                            <label>حذف</label>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ui left icon input">
-                        <i class="id card icon"> </i>
-                        <input type="text" value="۱۷۴۵۳۱۲۴۳۶">
-                    </td>
-                    <td>
-                        <div class="ui checkbox">
-                            <input type="checkbox" tabindex="0" class="hidden">
-                            <label>حذف</label>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-
-        </form>
-
-    </div>
-    <div class="left aligned actions" style="overflow: hidden;">
-        <div class="ui positive right labeled icon button" style="float: left;">
-            ذخیره
-            <i class="checkmark icon"></i>
+        <div class="field" style="">
+            <label>تخصص</label>
+            <select class="ui fluid right aligned search dropdown" name="spaciality">
+                {% for speciality in specialities %}
+                    <option value="{{ speciality.id }}" {% if team.speciality == speciality %}selected{% endif %}>{{ speciality.name }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="ui black deny button" style="float: left;">
-            انصراف
-        </div>
+
+        <table class="ui very basic right aligned table" style="text-align: right">
+            <thead>
+            <tr>
+                <th colspan="2" style="display: flex; justify-content: space-between; align-items: center">
+                    <h3>اعضای تیم</h3>
+                    <a href="#"><i class="left floated small black plus icon"></i></a>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for member in team.members.all %}
+
+                <tr id="{{ forloop.counter }}">
+                    <td class="ui left icon input">
+                        <i class="phone icon"> </i>
+                        <input type="text" value="{{ member.user.phone_number }}" name="phone{{ forloop.counter }}">
+                    </td>
+                    <td>
+                        <div class="ui checkbox">
+                            <input type="checkbox" name="remove{{ forloop.counter }}" tabindex="0" class="hidden">
+                            <label>حذف</label>
+                        </div>
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+
+    </form>
+
+</div>
+<div class="left aligned actions" style="overflow: hidden;">
+    <button class="ui positive right labeled icon button" type="submit" style="float: left;" form="form1" value="ذخیره">
+        <i class="checkmark icon"></i>
+        ذخیره
+    </button>
+    <div class="ui black deny button" style="float: left;">
+        انصراف
     </div>
 </div>
+{#</div>#}
 
 
 <script>
     $(document).ready(function () {
 
         $('.ui.checkbox')
-            .checkbox()
-        ;
+            .checkbox();
+
+        $('.content').find('.plus.icon').mouseover(function () {
+            $(this).css('color', 'green');
+        });
+        $('.content').find('.plus.icon').mouseout(function () {
+            $(this).css('color', 'black');
+        });
+    });
+
+    $('.content .plus').on('click', function (event) {
+
+        let num = 5;
+        num = parseInt($('tbody').children().last().attr('id'))+1;
+        if(!$.isNumeric( num))
+            num = 1;
+        console.log(`New ID is: ${num}`);
+
+        $('.content').find('.table').append('<tr id="'+num+'">\n' +
+            '                    <td class="ui left icon input">\n' +
+            '                        <i class="phone icon"> </i>\n' +
+            '                        <input type="text" placeholder="شماره تماس" name="phone' + num + '">\n' +
+            '                    </td>\n' +
+            '                    <td>\n' +
+            '                        <div class="ui checkbox">\n' +
+            '                            <input type="checkbox" name="remove' + num + '" tabindex="0" class="hidden">\n' +
+            '                            <label>حذف</label>\n' +
+            '                        </div>\n' +
+            '                    </td>\n' +
+            '                </tr>\n');
     });
 
 </script>

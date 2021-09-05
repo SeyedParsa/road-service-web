@@ -107,7 +107,11 @@
         </div>
     </div>
 
+   {{ mission_type_dist.items }}
 
+{% for key, value in mission_type_dist.items %}
+                        {{ key }}, {{ value }}
+                    {% endfor %}
 
     {#{% include 'reporting/parts/simple_bar.html' with name='teams_chart' color='green' objs=teams_report.data description="تعداد تیم‌های فعال در طول زمان" %}#}
     {#{% include 'reporting/parts/simple_bar.html' with name='issues_chart' color='green' objs=issues_report.data description="تعداد مشکلات در طول زمان" %}#}
@@ -125,7 +129,7 @@
     {#</script>#}
 
     <script>
-
+        let colors = ['#BE3075', '#EB001F', '#64A12D', '#FFED00', '#000000', '#009EE0'];
 
         Highcharts.chart('missiontypereport', {
 
@@ -147,12 +151,9 @@
                 name: 'تعداد ماموریت',
                 keys: ['name', 'y', 'color', 'label'],
                 data: [
-                    ['تعمیر آسفالت', 38, '#BE3075', 'ASPHALT'],
-                    ['پر کردن چاله', 33, '#EB001F', 'HOLE'],
-                    ['تعمیر گاردریل', 57, '#64A12D', 'GUARDRAIL'],
-                    ['تعویض درب چاه فاضلاب', 22, '#FFED00', 'WW'],
-                    ['برف‌روبی', 72, '#000000', 'SNOW'],
-                    ['ریزش سنگ', 21, '#009EE0', 'ROCK']
+                    {% for key, value in mission_type_dist.items %}
+                        ['{{ key }}', {{ value }}, colors[{{ forloop.counter }}-1], '{{ key }}'],
+                    {% endfor %}
                 ],
                 dataLabels: {
                     enabled: true,
@@ -188,10 +189,13 @@
                 name: 'تعداد تیم',
                 keys: ['name', 'y', 'color', 'label'],
                 data: [
-                    ['تعمیرکار آسفالت', 12, '#BE3075', 'ASPHALT'],
-                    ['متخصص چاه', 6, '#EB001F', 'HOLE'],
-                    ['متخصص ماموریت‌های زمستانی', 18, '#5f9aa1', 'WINTER'],
-                    ['متخصص فضای سبز شهری', 9, '#50ff3d', 'GRIN']
+                    {% for key, value in speciality_dist.items %}
+                        ['{{ key }}', {{ value }}, colors[{{ forloop.counter }}-1], '{{ key }}'],
+                    {% endfor %}
+                    {#['تعمیرکار آسفالت', 12, '#BE3075', 'ASPHALT'],#}
+                    {#['متخصص چاه', 6, '#EB001F', 'HOLE'],#}
+                    {#['متخصص ماموریت‌های زمستانی', 18, '#5f9aa1', 'WINTER'],#}
+                    {#['متخصص فضای سبز شهری', 9, '#50ff3d', 'GRIN']#}
                 ],
                 dataLabels: {
                     enabled: true,
@@ -227,12 +231,17 @@
                 name: 'تعداد',
                 keys: ['name', 'y', 'color', 'label'],
                 data: [
-                    ['بولدوزر', 12, '#BE3075', 'BULLDOZER'],
-                    ['غلتک', 20, '#EB001F', 'ROLLER'],
-                    ['جرثقیل', 8, '#64A12D', 'CRANE'],
-                    ['باب کت', 34, '#FFED00', 'BOBCAT'],
-                    ['بیل مکانیکی', 6, '#000000', 'EXCAVATOR'],
-                    ['لودر', 8, '#009EE0', 'LOADER']
+
+                    {% for key, value in machinery_type_dist.items %}
+                        ['{{ key }}', {{ value }}, colors[{{ forloop.counter }}-1], '{{ key }}'],
+                    {% endfor %}
+
+                    {#['بولدوزر', 12, '#BE3075', 'BULLDOZER'],#}
+                    {#['غلتک', 20, '#EB001F', 'ROLLER'],#}
+                    {#['جرثقیل', 8, '#64A12D', 'CRANE'],#}
+                    {#['باب کت', 34, '#FFED00', 'BOBCAT'],#}
+                    {#['بیل مکانیکی', 6, '#000000', 'EXCAVATOR'],#}
+                    {#['لودر', 8, '#009EE0', 'LOADER']#}
                 ],
                 dataLabels: {
                     enabled: true,
@@ -268,11 +277,16 @@
                 name: 'تعداد',
                 keys: ['name', 'y', 'color', 'label'],
                 data: [
-                    ['1', 33, '#be271f', '1'],
-                    ['2', 20, '#eb9145', '2'],
-                    ['3', 18, '#fff153', '3'],
-                    ['4', 34, '#d3ff5a', '4'],
-                    ['5', 26, '#00ff07', '5']
+
+                    {% for key, value in score_dist.items %}
+                        ['{{ key }}', {{ value }}, colors[{{ forloop.counter }}-1], '{{ key }}'],
+                    {% endfor %}
+
+                    {#['1', 33, '#be271f', '1'],#}
+                    {#['2', 20, '#eb9145', '2'],#}
+                    {#['3', 18, '#fff153', '3'],#}
+                    {#['4', 34, '#d3ff5a', '4'],#}
+                    {#['5', 26, '#00ff07', '5']#}
                 ],
                 dataLabels: {
                     enabled: true,
