@@ -3,17 +3,23 @@
 {#<div class="" style="display: block !important;">#}
 {#<div class="ui segment" style="display: block !important;">#}
 <div class="header" style="text-align: right">
-    ویرایش تیم
+    {% if team %}
+        ویرایش تیم
+    {% else %}
+        اضافه کردن تیم جدید
+    {% endif %}
 </div>
-<div class="content">
-    <form class="ui form" id="form1" method="post" action="/resources/{% if team %}changeteam/{{ team.id }}{% else %}addteam{% endif %}/">
+<div class="content" id="team-content">
+    <form class="ui form" id="form1" method="post"
+          action="/resources/{% if team %}changeteam/{{ team.id }}{% else %}addteam{% endif %}/">
         {% csrf_token %}
 
         <div class="field" style="">
             <label>تخصص</label>
             <select class="ui fluid right aligned search dropdown" name="spaciality">
                 {% for speciality in specialities %}
-                    <option value="{{ speciality.id }}" {% if team.speciality == speciality %}selected{% endif %}>{{ speciality.name }}</option>
+                    <option value="{{ speciality.id }}"
+                            {% if team.speciality == speciality %}selected{% endif %}>{{ speciality.name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -70,10 +76,10 @@
         $('.ui.checkbox')
             .checkbox();
 
-        $('.content').find('.plus.icon').mouseover(function () {
+        $('#team-content').find('.plus.icon').mouseover(function () {
             $(this).css('color', 'green');
         });
-        $('.content').find('.plus.icon').mouseout(function () {
+        $('#team-content').find('.plus.icon').mouseout(function () {
             $(this).css('color', 'black');
         });
     });
@@ -81,12 +87,12 @@
     $('.content .plus').on('click', function (event) {
 
         let num = 5;
-        num = parseInt($('tbody').children().last().attr('id'))+1;
-        if(!$.isNumeric( num))
+        num = parseInt($('tbody').children().last().attr('id')) + 1;
+        if (!$.isNumeric(num))
             num = 1;
         console.log(`New ID is: ${num}`);
 
-        $('.content').find('.table').append('<tr id="'+num+'">\n' +
+        $('#team-content').find('.table').append('<tr id="' + num + '">\n' +
             '                    <td class="ui left icon input">\n' +
             '                        <i class="phone icon"> </i>\n' +
             '                        <input type="text" placeholder="شماره تماس" name="phone' + num + '">\n' +
