@@ -1,6 +1,6 @@
 from django import forms
 
-from core.models import Region, Country, Province, County
+from core.models import Region
 
 
 class SingleRegionSelectForm(forms.Form):
@@ -18,5 +18,5 @@ class SingleRegionSelectForm(forms.Form):
 
 
 class TimeReportForm(SingleRegionSelectForm):
-    start_date = forms.DateField(label='شروع بازه', input_formats=['%Y-%m-%d'])
-    end_date = forms.DateField(label='پایان بازه', input_formats=['%Y-%m-%d'])
+    start_date = forms.DateField(label='شروع بازه')
+    end_date = forms.DateField(label='پایان بازه')

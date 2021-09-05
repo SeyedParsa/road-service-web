@@ -1,12 +1,12 @@
 {% extends 'reporting/../../../core/templates/core/base.html' %}
 {% load static %}
-{%  block semantic-css %}
+{% block semantic-css %}
     <link
-  rel="stylesheet"
-  href="https://cdn.rtlcss.com/semantic-ui/2.4.1/semantic.rtl.min.css"
-  integrity="sha384-yXUIpeQfH3cuk6u6Mwu8uyJXB2R3UOLvcha1343UCMA2TA7lQ14BFmrudI6LAP8A"
-  crossorigin="anonymous">
-{%  endblock %}
+            rel="stylesheet"
+            href="https://cdn.rtlcss.com/semantic-ui/2.4.1/semantic.rtl.min.css"
+            integrity="sha384-yXUIpeQfH3cuk6u6Mwu8uyJXB2R3UOLvcha1343UCMA2TA7lQ14BFmrudI6LAP8A"
+            crossorigin="anonymous">
+{% endblock %}
 {% block content %}
 
 
@@ -14,53 +14,32 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
 
 
-
     <form class="ui form" method="post">
         {% csrf_token %}
         <div class="fields">
             <div class="field" style="width: 400px">
-                <select class="ui fluid right aligned search dropdown">
-                    <option value="">بخش</option>
-                    <option value="AL">کشور سوئد</option>
-                    <option value="AK">استان البرز</option>
-                    <option value="AZ">استان تهران</option>
-                    <option value="AR">استان فارس</option>
-                    <option value="CA">شهرستان شیراز</option>
-                    <option value="CO">شهرستان فیروزکوه</option>
-                    <option value="CT">شهرستان تهران</option>
-                    <option value="DE">شهرستان کرج</option>
-                    <option value="DC">شهرستان قم</option>
-                    <option value="FL">شهرستان دماوند</option>
-                    <option value="GA">شهرستان اصفهان</option>
-                    <option value="HI">استان اصفهان</option>
-                    <option value="ID">Idaho</option>
-                    <option value="IL">Illinois</option>
-                    <option value="IN">Indiana</option>
-                    <option value="IA">Iowa</option>
-                    <option value="KS">Kansas</option>
-                    <option value="KY">Kentucky</option>
-                    <option value="LA">Louisiana</option>
-                    <option value="ME">Maine</option>
-                    <option value="MD">Maryland</option>
-                    <option value="MA">Massachusetts</option>
-                    <option value="MI">Michigan</option>
-                    <option value="MN">Minnesota</option>
-                    <option value="MS">Mississippi</option>
-                    <option value="MO">Missouri</option>
-                    <option value="MT">Montana</option>
-                    <option value="NE">Nebraska</option>
-                    <option value="NV">Nevada</option>
-                </select>
+                {{ form.region }}
             </div>
 
-            <div class="field">
-                <input type="text" class="example1"/>
+            {#            <div class="field">#}
+            {#                <input type="text" name="{{ form.start_date.name }}" class="example1"/>#}
+            {#            </div>#}
+            <div class="ui calendar" id="example1">
+{#                <div class="ui input left icon">#}
+{#                    <i class="calendar icon"></i>#}
+                    <input type="date" name="{{ form.start_date.name }}" placeholder="Date/Time">
+{#                </div>#}
             </div>
 
-            <div class="field">
-                <input type="text" class="example1"/>
+            <div class="ui calendar" id="example2">
+{#                <div class="ui input left icon">#}
+{#                    <i class="calendar icon"></i>#}
+                    <input type="date" name="{{ form.end_date.name }}" placeholder="Date/Time">
+{#                </div>#}
             </div>
-
+{#            <div class="field">#}
+{#                <input type="text" name="{{ form.end_date.name }}" class="example2"/>#}
+{#            </div>#}
 
             <div class="field">
                 <input type="submit" class="ui button" value="فیلتر"></input>
@@ -70,20 +49,33 @@
 
         <script type="text/javascript">
             $(document).ready(function () {
-                $(".example1").pDatepicker(
-                    {format: 'YYYY/MM/DD'});
+                {#$('#example1').calendar({#}
+                {#    type: 'date'#}
+                {#    format: ''#}
+                {# });#}
+                {#$('#example2').calendar({#}
+                {#    type: 'date'#}
+                {# });#}
+                {#$(".example2").pDatepicker(#}
+                {#    {format: 'YYYY/MM/DD'});#}
             });
         </script>
 
     </form>
 
     <div class="ui deviding header" style="height: 20px;"></div>
-    <div id="timereportsContainer" style="width:100%; height:400px; margin: auto;"></div>
+    {% if report %}
+        <div id="timereportsContainer" style="width:100%; height:400px; margin: auto;"></div>
 
-    <div class="ui deviding header" style="height: 20px"></div>
+        <div class="ui deviding header" style="height: 20px"></div>
 
-    <div id="pointsContainer" style="width:100%; height:400px; margin: auto"></div>
-    <div style=" margin: 100px"></div>
+        {% if positive_score_averages %}
+            <div id="pointsContainer" style="width:100%; height:400px; margin: auto"></div>
+        {% else %}
+            <h1 id="content" style="display: flex; justify-content: space-around; align-self: center; width:100%; margin: auto">در این بازه زمانی امتیازی ثبت نشده!</h1>
+        {% endif %}
+        <div style=" margin: 100px"></div>
+    {% endif %}
 
     {#{% include 'reporting/parts/simple_bar.html' with name='teams_chart' color='green' objs=teams_report.data description="تعداد تیم‌های فعال در طول زمان" %}#}
     {#{% include 'reporting/parts/simple_bar.html' with name='issues_chart' color='green' objs=issues_report.data description="تعداد مشکلات در طول زمان" %}#}
@@ -107,25 +99,28 @@
                 backgroundColor: 'rgba(255, 255, 255, 0.50)'
             },
             title: {
-                text: 'گزارش کشور سوئد در بازه زمانی'
+                text: 'گزارش {{ region.name }}در بازه زمانی'
             },
-            subtitle: {
-                text: 'فروردین الی اسفند ۱۳۹۹'
-            },
+            {# subtitle: {#}
+            {#    text: 'فروردین الی اسفند ۱۳۹۹'#}
+            {# },#}
             xAxis: {
                 categories: [
-                    'فروردین',
-                    'اردیبهشت',
-                    'خرداد',
-                    'تیر',
-                    'مرداد',
-                    'شهریور',
-                    'مهر',
-                    'آبان',
-                    'آذر',
-                    'دی',
-                    'بهمن',
-                    'اسفند'
+                    {% for start in persian_bin_starts %}
+                        '{{ start }}',
+                    {% endfor %}
+                    {#'فروردین',#}
+                    {#'اردیبهشت',#}
+                    {#'خرداد',#}
+                    {#'تیر',#}
+                    {#'مرداد',#}
+                    {#'شهریور',#}
+                    {#'مهر',#}
+                    {#'آبان',#}
+                    {#'آذر',#}
+                    {#'دی',#}
+                    {#'بهمن',#}
+                    {#'اسفند'#}
                 ],
                 crosshair: true
             },
@@ -152,22 +147,26 @@
             },
             series: [{
                 name: 'تعداد تیم',
-                data: [10, 12, 15, 30, 25, 22, 14, 15, 42, 41, 30, 15],
+                data: [{% for cnt in report.team_counts %} {{ cnt }},{% endfor %}],
+                {#data: [10, 12, 15, 30, 25, 22, 14, 15, 42, 41, 30, 15],#}
                 stack: '#team'
 
             }, {
                 name: 'تعداد ماموریت‌های در دست انجام',
-                data: [2, 5, 3, 3, 10, 1, 15, 3, 4, 5, 6, 10],
+                data: [{% for cnt in report.issue_counts %} {{ cnt }},{% endfor %}],
+                {#data: [2, 5, 3, 3, 10, 1, 15, 3, 4, 5, 6, 10],#}
                 stack: '#mission'
 
             }, {
                 name: 'تعداد ماموریت‌های موفق',
-                data: [28, 30, 19, 49, 49, 40, 39, 55, 80, 100, 86, 35],
+                data: [{% for cnt in report.successful_issue_counts %} {{ cnt }},{% endfor %}],
+                {#data: [28, 30, 19, 49, 49, 40, 39, 55, 80, 100, 86, 35],#}
                 stack: '#mission'
 
             }, {
                 name: 'تعداد ماموریت‌های خطا خورده',
-                data: [2, 1, 4, 4, 5, 15, 1, 0, 20, 20, 2, 5],
+                data: [{% for cnt in report.failed_issue_counts %} {{ cnt }},{% endfor %}],
+                {#data: [2, 1, 4, 4, 5, 15, 1, 0, 20, 20, 2, 5],#}
                 stack: '#mission'
 
             }]
@@ -179,25 +178,28 @@
                 backgroundColor: 'rgba(255, 255, 255, 0.50)'
             },
             title: {
-                text: 'میانگین امتیاز ماموریت‌های کشور سوئد در بازه زمانی'
+                text: 'میانگین امتیاز ماموریت‌های {{ region.name }} در بازه زمانی'
             },
-            subtitle: {
-                text: 'فروردین الی اسفند ۱۳۹۹'
-            },
+            {#subtitle: {#}
+            {#    text: 'فروردین الی اسفند ۱۳۹۹'#}
+            {# },#}
             xAxis: {
                 categories: [
-                    'فروردین',
-                    'اردیبهشت',
-                    'خرداد',
-                    'تیر',
-                    'مرداد',
-                    'شهریور',
-                    'مهر',
-                    'آبان',
-                    'آذر',
-                    'دی',
-                    'بهمن',
-                    'اسفند'
+                    {% for start in have_score_times %}
+                        '{{ start }}',
+                    {% endfor %}
+{#                    'فروردین',#}
+{#                    'اردیبهشت',#}
+{#                    'خرداد',#}
+{#                    'تیر',#}
+{#                    'مرداد',#}
+{#                    'شهریور',#}
+{#                    'مهر',#}
+{#                    'آبان',#}
+{#                    'آذر',#}
+{#                    'دی',#}
+{#                    'بهمن',#}
+{#                    'اسفند'#}
                 ]
             },
             yAxis: {
@@ -215,7 +217,8 @@
             },
             series: [{
                 name: 'میانگین امتیاز',
-                data: [3.9, 4.2, 4.9, 3.5, 3.9, 3.2, 4.0, 4.6, 4.2, 3.3, 2.6, 3.8]
+                data: [{% for cnt in positive_score_averages %} {{ cnt }},{% endfor %}]
+                {#data: [3.9, 4.2, 4.9, 3.5, 3.9, 3.2, 4.0, 4.6, 4.2, 3.3, 2.6, 3.8]#}
             }]
         });
 
