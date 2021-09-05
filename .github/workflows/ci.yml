@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      DEBUG=on
-      SECRET_KEY=deKNY8GpQ6Y19nf78XNjGVbb6v6Af3y6
-      DATABASE_URL=sqlite:////tmp/my-tmp-sqlite.db
-      ALLOWED_HOSTS=*
-      TIME_ZONE=Asia/Tehran
-      DOMAIN=
-      KAVENEGAR_API_KEY=
+      DEBUG: on
+      SECRET_KEY: deKNY8GpQ6Y19nf78XNjGVbb6v6Af3y6
+      DATABASE_URL: sqlite:////tmp/my-tmp-sqlite.db
+      ALLOWED_HOSTS: '*'
+      TIME_ZONE: Asia/Tehran
+      DOMAIN: ''
+      KAVENEGAR_API_KEY: ''
     
     steps:
     - uses: actions/checkout@v2
