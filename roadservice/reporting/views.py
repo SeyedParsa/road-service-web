@@ -97,7 +97,6 @@ class TimeReport(LoginRequiredMixin, UserPassesTestMixin, View):
         if form.is_valid():
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
-            # TODO @Mahdi: make sure these dates are correct (that they're really what we want)
             region_id = form.cleaned_data['region']
             region = Region.objects.get(id=region_id)
             messages.add_message(request, messages.INFO, 'گزارش به روز شد!')
@@ -107,11 +106,11 @@ class TimeReport(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class RegionReport(SingleRegionReportView):
-    def process(self, request, form, region):
+    def process(self, request, form, region=None):
         if not region:
             region = request.user.role.moderator.region
-        # TODO report = ReportGenerator.get_instance().get_...
-        # TODO: Create context + RETURN render
-        # return render(request=request,
-        #               template_name='reporting/regionreport.html',
-        #               context={'form': status_report_form})
+        report = ReportGenerator.get_instance().get_subregions_report(region)
+        context = {'report': report, 'form': form, 'region': region}
+        return render(request=request,
+                      template_name='reporting/regionreport.html',
+                      context=context)
