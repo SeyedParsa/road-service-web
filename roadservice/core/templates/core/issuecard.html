@@ -114,12 +114,14 @@
                             {% endfor %}
                         </div>
                     {% endif %}
-                    {% if issue.state == 'DO' or issue.state == 'SC' %}
-                        <div class="ui button">
-                            <i class="download icon" style="margin-left: 10px"></i>دانلود گزارش
-                        </div>
-                    {% endif %}
                 </div>
+                {% if issue.state == 'DO' or issue.state == 'SC' %}
+                                    <div class="ui row" style="margin: 20px">
+                    <div class="ui button">
+                        <i class="newspaper icon" style="margin-left: 10px"></i>{{ issue.mission.report | safe }}
+                    </div>
+                                    </div>
+                {% endif %}
                 <div class="ui hidden divider"></div>
                 {% if issue.state != 'RP' and issue.state != 'RJ' %}
                     <div class="ui grid">

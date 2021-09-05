@@ -1,12 +1,12 @@
 {% extends 'reporting/../../../core/templates/core/base.html' %}
 {% load static %}
-{%  block semantic-css %}
+{% block semantic-css %}
     <link
-  rel="stylesheet"
-  href="https://cdn.rtlcss.com/semantic-ui/2.4.1/semantic.rtl.min.css"
-  integrity="sha384-yXUIpeQfH3cuk6u6Mwu8uyJXB2R3UOLvcha1343UCMA2TA7lQ14BFmrudI6LAP8A"
-  crossorigin="anonymous">
-{%  endblock %}
+            rel="stylesheet"
+            href="https://cdn.rtlcss.com/semantic-ui/2.4.1/semantic.rtl.min.css"
+            integrity="sha384-yXUIpeQfH3cuk6u6Mwu8uyJXB2R3UOLvcha1343UCMA2TA7lQ14BFmrudI6LAP8A"
+            crossorigin="anonymous">
+{% endblock %}
 {% block content %}
 
 
@@ -21,42 +21,12 @@
         <div class="sixteen wide column">
             <div class="ui row">
 
-                 <form class="ui form" method="post">
+                <form class="ui form" method="post">
                     {% csrf_token %}
                     <div class="fields">
+
                         <div class="field" style="width: 400px">
-                            <select class="ui fluid right aligned search dropdown">
-                                <option value="">بخش</option>
-                                <option value="AL">کشور سوئد</option>
-                                <option value="AK">استان البرز</option>
-                                <option value="AZ">استان تهران</option>
-                                <option value="AR">استان فارس</option>
-                                <option value="CA">شهرستان شیراز</option>
-                                <option value="CO">شهرستان فیروزکوه</option>
-                                <option value="CT">شهرستان تهران</option>
-                                <option value="DE">شهرستان کرج</option>
-                                <option value="DC">شهرستان قم</option>
-                                <option value="FL">شهرستان دماوند</option>
-                                <option value="GA">شهرستان اصفهان</option>
-                                <option value="HI">استان اصفهان</option>
-                                <option value="ID">Idaho</option>
-                                <option value="IL">Illinois</option>
-                                <option value="IN">Indiana</option>
-                                <option value="IA">Iowa</option>
-                                <option value="KS">Kansas</option>
-                                <option value="KY">Kentucky</option>
-                                <option value="LA">Louisiana</option>
-                                <option value="ME">Maine</option>
-                                <option value="MD">Maryland</option>
-                                <option value="MA">Massachusetts</option>
-                                <option value="MI">Michigan</option>
-                                <option value="MN">Minnesota</option>
-                                <option value="MS">Mississippi</option>
-                                <option value="MO">Missouri</option>
-                                <option value="MT">Montana</option>
-                                <option value="NE">Nebraska</option>
-                                <option value="NV">Nevada</option>
-                            </select>
+                            {{ form.region }}
                         </div>
 
                         <div class="field">
@@ -107,11 +77,11 @@
         </div>
     </div>
 
-   {{ mission_type_dist.items }}
-
-{% for key, value in mission_type_dist.items %}
-                        {{ key }}, {{ value }}
-                    {% endfor %}
+{#    {{ mission_type_dist.items }}#}
+{##}
+{#    {% for key, value in mission_type_dist.items %}#}
+{#        {{ key }}, {{ value }}#}
+{#    {% endfor %}#}
 
     {#{% include 'reporting/parts/simple_bar.html' with name='teams_chart' color='green' objs=teams_report.data description="تعداد تیم‌های فعال در طول زمان" %}#}
     {#{% include 'reporting/parts/simple_bar.html' with name='issues_chart' color='green' objs=issues_report.data description="تعداد مشکلات در طول زمان" %}#}

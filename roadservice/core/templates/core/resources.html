@@ -158,7 +158,10 @@
                 <div class="ui segments" id="speciality" style="opacity: 0.9; overflow: hidden">
                     <div class="ui segment" style="display: flex; justify-content: space-between; align-items: center">
                         <h3>انواع تخصص</h3>
-                        <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
+                        {% if user.role.type == 'CM' %}
+
+                            <a href="#" style="color: black"> <i class="left floated small plus icon"></i> </a>
+                        {% endif %}
                     </div>
                     <div class="ui basic segment" id="list"
                          style="margin-top: 5px;/* padding: initial; */overflow: hidden;">
@@ -260,84 +263,86 @@
             {#    $("#secretbox").load(path);#}
             {#    $("#secretbox").modal('show');#}
             {##}
-            {#});#}
-
-            $('#add-team-icon').click(function () {
-                var path = "/resources/addteam/";
-                $("#secretbox").load(path);
-                $("#secretbox").modal('show');
-            });
-
-            $('#teams .edit.icon').click(function (e) {
-                e.preventDefault();
-                var id = $(this).parent().parent().attr('id');
-                var path = "/resources/changeteam/" + id;
-                {#$("#1-content").load(path);#}
-                $("#secretbox").load(path);
-                $("#secretbox").modal('show');
-
-            });
+            {# });#}
 
 
-            $('#mission .edit.icon').click(function (e) {
-                e.preventDefault();
-                var id = $(this).attr('id');
-                var path = "/resources/changemissiontype/" + id;
-                {#$("#1-content").load(path);#}
-                $("#secretbox").load(path);
-                $("#secretbox").modal('show');
-
-            });
-
-
-            $('#speciality .edit.icon').click(function () {
-                var id = $(this).attr('id');
-                var path = "/resources/changespeciality/" + id;
-                {#$("#1-content").load(path);#}
-                $("#secretbox").load(path);
-                $("#secretbox").modal('show');
-
-            });
-
-            $('#resources').find('.times.icon').mouseover(function () {
-                $(this).css('color', 'red');
-            });
-            $('#resources').find('.times.icon').mouseout(function () {
-                $(this).css('color', 'black');
-            });
-
-
-            $('#resources').find('.plus.icon').mouseover(function () {
-                $(this).css('color', 'green');
-            });
-            $('#resources').find('.plus.icon').mouseout(function () {
-                $(this).css('color', 'black');
-            });
-
-
-            $('#resources').find('.minus.icon').mouseover(function () {
-                $(this).css('color', 'red');
-            });
-            $('#resources').find('.minus.icon').mouseout(function () {
-                $(this).css('color', 'black');
-            });
-
-
-            $('#resources').find('.edit.icon').mouseover(function () {
-                $(this).css('color', 'orange');
-            });
-            $('#resources').find('.edit.icon').mouseout(function () {
-                $(this).css('color', 'black');
-            });
-
-
-            $('#resources').find('.save.icon').mouseover(function () {
-                $(this).css('color', 'green');
-            });
-            $('#resources').find('.save.icon').mouseout(function () {
-                $(this).css('color', 'black');
-            });
+        $('#add-team-icon').click(function () {
+            var path = "/resources/addteam/";
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
         });
+
+        $('#teams .edit.icon').click(function (e) {
+            e.preventDefault();
+            var id = $(this).parent().parent().attr('id');
+            var path = "/resources/changeteam/" + id;
+            {#$("#1-content").load(path);#}
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+
+        });
+
+
+        $('#mission .edit.icon').click(function (e) {
+            e.preventDefault();
+            var id = $(this).attr('id');
+            var path = "/resources/changemissiontype/" + id;
+            {#$("#1-content").load(path);#}
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+
+        });
+
+
+        $('#speciality .edit.icon').click(function () {
+            var id = $(this).attr('id');
+            var path = "/resources/changespeciality/" + id;
+            {#$("#1-content").load(path);#}
+            $("#secretbox").load(path);
+            $("#secretbox").modal('show');
+
+        });
+
+        $('#resources').find('.times.icon').mouseover(function () {
+            $(this).css('color', 'red');
+        });
+        $('#resources').find('.times.icon').mouseout(function () {
+            $(this).css('color', 'black');
+        });
+
+
+        $('#resources').find('.plus.icon').mouseover(function () {
+            $(this).css('color', 'green');
+        });
+        $('#resources').find('.plus.icon').mouseout(function () {
+            $(this).css('color', 'black');
+        });
+
+
+        $('#resources').find('.minus.icon').mouseover(function () {
+            $(this).css('color', 'red');
+        });
+        $('#resources').find('.minus.icon').mouseout(function () {
+            $(this).css('color', 'black');
+        });
+
+
+        $('#resources').find('.edit.icon').mouseover(function () {
+            $(this).css('color', 'orange');
+        });
+        $('#resources').find('.edit.icon').mouseout(function () {
+            $(this).css('color', 'black');
+        });
+
+
+        $('#resources').find('.save.icon').mouseover(function () {
+            $(this).css('color', 'green');
+        });
+        $('#resources').find('.save.icon').mouseout(function () {
+            $(this).css('color', 'black');
+        });
+        })
+        ;
     </script>
 
 

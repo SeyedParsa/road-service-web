@@ -94,7 +94,8 @@ class ReportGenerator:
 
     def get_subregions_report(self, region):
         report = SubregionsReport(region)
-        for subregion in region.sub_regions.all():
+        # print(region.name)
+        for subregion in [region]+list(region.sub_regions.all()):
             missions = subregion.get_missions()
             issues = subregion.get_issues()
             mission_count = missions.count()
@@ -104,8 +105,8 @@ class ReportGenerator:
             failed_issues_count = issues.filter(state=Issue.State.FAILED).count()
             finished_issues_count = successful_issues_count + failed_issues_count
             mission_success_rate = None if (finished_issues_count == 0) else \
-                successful_issues_count / finished_issues_count
+                int(successful_issues_count / finished_issues_count * 100)
             team_count = subregion.get_teams().count()
-            report.subregions_info.append((subregion, mission_count, issue_count,
+            report.subregions_info.append((subregion.name, mission_count, issue_count,
                                            mission_score_avg, mission_success_rate, team_count))
         return report
