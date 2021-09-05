@@ -275,23 +275,19 @@ class ServicemanTestCase(BaseTestCase):
         self.assertEqual(serviceman.location, new_location)
 
     def test_end_mission(self):
-        service_team = self.tehran_wind_team
-        crane_need = 2
-        truck_need = 3
         self.mission = self.tehran_expert.accept_issue(self.issue0, self.animal_type, [(self.wind_speciality, 1)],
-                                                       [(self.crane_type, crane_need), (self.truck_type, truck_need)])
-        available_cranes = self.tehran.machinery_set.get(type=self.crane_type).available_count
-        available_trucks = self.tehran.machinery_set.get(type=self.truck_type).available_count
+                                                       [(self.crane_type, 10), (self.truck_type, 30)])
         self.tehran_wind_team.refresh_from_db()
         self.tehran_wind_team_servicemen[0].end_mission('The cow is caught alive')
         self.issue0.refresh_from_db()
         self.assertEqual(self.issue0.state, Issue.State.DONE)
         self.tehran_wind_team.refresh_from_db()
         self.assertIsNone(self.tehran_wind_team.active_mission)
-        self.assertEqual(available_cranes + crane_need,
-                         self.tehran.machinery_set.get(type=self.crane_type).available_count)
-        self.assertEqual(available_trucks + truck_need,
-                         self.tehran.machinery_set.get(type=self.truck_type).available_count)
+
+
+class ServiceTeamTestCase(BaseTestCase):
+    def test_farthest_member_distance(self):
+        pass
 
 
 class CountyExpertTestCase(BaseTestCase):
@@ -352,21 +348,25 @@ class CountyExpertTestCase(BaseTestCase):
     def test_notify(self):
         pass  # test manually
 
-class IssueTestCase(TestCase):
-    def setUp(self):
-        pass
 
+class IssueTestCase(BaseTestCase):
     def test_assign_resources(self):
         pass
 
-    def test_postpone_assignment(self):
-        pass
-
-    def test_rate(self):
-        pass
-
     def test_return_machineries(self):
-        pass
+        crane_need = 10
+        truck_need = 30
+        self.mission = self.tehran_expert.accept_issue(self.issue0, self.animal_type, [(self.wind_speciality, 1)],
+                                                       [(self.crane_type, crane_need), (self.truck_type, truck_need)])
+        available_cranes = self.tehran.machinery_set.get(type=self.crane_type).available_count
+        available_trucks = self.tehran.machinery_set.get(type=self.truck_type).available_count
+        self.tehran_wind_team.refresh_from_db()
+        self.tehran_wind_team_servicemen[0].end_mission('The cow is caught alive')
+        self.tehran_wind_team.refresh_from_db()
+        self.assertEqual(available_cranes + crane_need,
+                         self.tehran.machinery_set.get(type=self.crane_type).available_count)
+        self.assertEqual(available_trucks + truck_need,
+                         self.tehran.machinery_set.get(type=self.truck_type).available_count)
 
 
 class ModeratorTestCase(BaseTestCase):
@@ -551,7 +551,6 @@ class ModeratorTestCase(BaseTestCase):
         with self.assertRaises(OccupiedUserError):
             self.shahrerey.moderator.get_concrete().edit_service_team(self.team17, self.my_speciality,
                                                        [self.osama, self.vladimir, self.kiarash])
-        #TODO: Mark team17 as busy on a mission and see that we can't delete it due to BusyResourceError
         self.shahrerey_moderator.delete_service_team(self.team17)
         self.osama.refresh_from_db()
         self.assertFalse(self.osama.has_role())
@@ -634,5 +633,3 @@ class ScenarioTestCase1(BaseTestCase):
         self.varamin_moderator.get_concrete().decrease_machinery(self.roadroller_type)
         self.roadroller.refresh_from_db()
         self.assertEqual(self.roadroller.total_count, 2)
-        # TODO: Insert some issue manipulation here and at its midst, manipulate teams and machinery
-        # TODO: and make sure that everything's okay
