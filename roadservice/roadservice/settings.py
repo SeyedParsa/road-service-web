@@ -144,13 +144,15 @@ STATICFILES_DIRS = [
 
 STATIC_DIR = os.path.join(BASE_DIR, 'www', 'static')
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 LOGIN_REDIRECT_URL = '/dashboard'
 LOGIN_URL = '/login/'
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'www','static')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'www', 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

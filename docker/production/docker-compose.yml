@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ../../roadservice
+    command: gunicorn roadservice.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/media
+    expose:
+      - 8000
+    environment:
+      - DEBUG
+      - SECRET_KEY
+      - DATABASE_URL
+      - ALLOWED_HOSTS
+      - TIME_ZONE
+      - DOMAIN
+      - KAVENEGAR_API_KEY
+    depends_on:
+      - database
+
+  database:
+    image: postgres:12.1
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_DB
+      - POSTGRES_PASSWORD
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    build: ../../nginx
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/media
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
