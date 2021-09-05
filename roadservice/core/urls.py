@@ -41,4 +41,6 @@ urlpatterns = [
     path('resources/removeteam/<int:team_id>/', views.RemoveTeam.as_view()),
     path('resources/', views.Resources.as_view(), name='resources'),
     path('', RedirectView.as_view(url='/dashboard/', permanent=False), name='dashboard'),
+
+    path('test/', views.TestView.as_view()),
 ]

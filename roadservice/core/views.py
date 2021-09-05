@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
@@ -430,3 +430,8 @@ class AssignExpert(LoginRequiredMixin, UserPassesTestMixin, View):
         return render(request=request,
                       template_name='core/assignexpert.html',
                       context={'form': form})
+
+
+class TestView(View):
+    def get(self, request):
+        return HttpResponse('salam3')
