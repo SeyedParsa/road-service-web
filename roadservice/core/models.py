@@ -205,7 +205,7 @@ class Moderator(Role):
     region = models.OneToOneField(Region, on_delete=models.PROTECT)
 
     def __str__(self):
-        return '%s %s %s' % (self.type, self.user, self.region)
+        return '%s %s %s' % (self.type, self.region, self.user)
 
     def pre_assign_moderator(self, user, region):
         """Check if the assignment is valid and dismiss the previous moderator if applicable.\
