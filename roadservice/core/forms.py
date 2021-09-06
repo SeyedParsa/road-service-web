@@ -17,9 +17,7 @@ class AssignModeratorForm(forms.Form):
         moderator = kwargs.pop('moderator')
         super().__init__(*args, **kwargs)
         regions = moderator.region.sub_regions.all()
-        region_choices = [(region.id,
-                           ('استان %s' if region.type == Region.Type.PROVINCE else 'شهرستان %s') % region.name)
-                          for region in regions]
+        region_choices = [(region.id, region.full_name) for region in regions]
         self.fields['region'].choices = region_choices
         self.fields['region'].widget.attrs['class'] = 'ui fluid right aligned search dropdown'
 
@@ -34,9 +32,7 @@ class RegionMultipleFilterForm(forms.Form):
             regions = []
         else:
             regions = user.role.get_concrete().region.get_included_regions()
-        region_choices = [(region.id,
-                           ('استان %s' if region.type == Region.Type.PROVINCE else 'شهرستان %s') % region.name)
-                          for region in regions if region.type != Region.Type.COUNTRY]
+        region_choices = [(region.id, region.full_name) for region in regions]
         self.fields['regions'].choices = region_choices
         self.fields['regions'].widget.attrs['class'] = 'ui fluid right aligned search dropdown'
 

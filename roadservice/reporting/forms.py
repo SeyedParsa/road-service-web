@@ -1,7 +1,5 @@
 from django import forms
 
-from core.models import Region
-
 
 class SingleRegionSelectForm(forms.Form):
     region = forms.ChoiceField(label='بخش')
@@ -10,10 +8,7 @@ class SingleRegionSelectForm(forms.Form):
         moderator = kwargs.pop('moderator')
         super().__init__(*args, **kwargs)
         regions = moderator.region.get_included_regions()
-        region_choices = [(region.id,
-                           ('استان %s' if region.type == Region.Type.PROVINCE else
-                            'شهرستان %s' if region.type == Region.Type.COUNTY else 'کشور %s') % region.name)
-                          for region in regions]
+        region_choices = [(region.id, region.full_name) for region in regions]
         self.fields['region'].choices = region_choices
         self.fields['region'].widget.attrs['class'] = 'ui fluid right aligned search dropdown'
 

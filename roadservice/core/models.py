@@ -69,7 +69,16 @@ class Region(models.Model):
                                      on_delete=models.PROTECT)
 
     def __str__(self):
-        return '%s: %s' % (self.type, self.name)
+        return self.full_name
+
+    @property
+    def full_name(self):
+        if self.type == Region.Type.COUNTRY:
+            return 'کشور ' + self.name
+        if self.type == Region.Type.PROVINCE:
+            return 'استان ' + self.name
+        if self.type == Region.Type.COUNTY:
+            return 'شهرستان ' + self.name
 
     def has_moderator(self):
         return hasattr(self, 'moderator')
