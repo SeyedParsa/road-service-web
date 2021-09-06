@@ -355,7 +355,7 @@ class Signup(LoginRequiredMixin, UserPassesTestMixin, View):
                                                              first_name,
                                                              last_name)
             messages.success(request, "کاربر جدید با موافقیت اضافه شد!")
-            return HttpResponseRedirect(reverse('core:dashboard'))
+            return HttpResponseRedirect(reverse('core:resources'))
         else:
             messages.error(request, "فرم معتبر نیست!")
             return render(request=request,
@@ -392,7 +392,7 @@ class AssignModerator(LoginRequiredMixin, UserPassesTestMixin, View):
                 messages.add_message(request, messages.ERROR, 'شما مدیر این بخش نیستید!')
             except OccupiedUserError:
                 messages.add_message(request, messages.ERROR, 'کاربر نقش دیگری دارد!')
-            return HttpResponseRedirect(reverse('core:dashboard'))
+            return HttpResponseRedirect(reverse('core:resources'))
         else:
             messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
         return render(request=request,
@@ -424,7 +424,7 @@ class AssignExpert(LoginRequiredMixin, UserPassesTestMixin, View):
                 messages.add_message(request, messages.ERROR, 'کاربر مورد نظر یافت نشد!')
             except OccupiedUserError:
                 messages.add_message(request, messages.ERROR, 'کاربر نقش دیگری دارد!')
-            return HttpResponseRedirect(reverse('core:dashboard'))
+            return HttpResponseRedirect(reverse('core:resources'))
         else:
             messages.add_message(request, messages.ERROR, 'فرم نامعتبر است!')
         return render(request=request,

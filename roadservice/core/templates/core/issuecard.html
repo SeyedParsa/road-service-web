@@ -108,10 +108,13 @@
                     </div>
                     {% if issue.state == 'SC' %}
                         <div class="ui label" style="line-height:2">
-
-                            {% for i in '12345'|make_list %}
-                                <i class="{% if forloop.counter <= issue.mission.score %}yellow {% endif %}star icon"></i>
-                            {% endfor %}
+                            {% if issue.mission.score == None %}
+                                کاربر از امتیازدهی منصرف شده
+                            {% else %}
+                                {% for i in '12345'|make_list %}
+                                    <i class="{% if forloop.counter <= issue.mission.score %}yellow {% endif %}star icon"></i>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
