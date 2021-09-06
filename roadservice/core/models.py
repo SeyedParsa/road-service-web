@@ -479,7 +479,8 @@ class Citizen(Role):
                                      location=location)
         if base64_image:
             issue.image.save(file_name, image_file)
-        county.notify_expert()
+        if county.has_expert():
+            county.notify_expert()
         return issue
 
     def rate_issue(self, issue, rating):
@@ -754,7 +755,7 @@ class CountyExpert(Role):
 
     def notify(self):
         sms_sender = SmsSender.get_instance()
-        message = 'مشکل تازه‌ای در شهرستان %s گزارش شده است. لطفا آن را بررسی فرمایید.' % self.county
+        message = 'مشکل تازه‌ای در شهرستان %s گزارش شده است. لطفا آن را بررسی فرمایید.' % self.county.name
         sms_sender.send_to_number(self.user.phone_number, message)
 
     def get_issues(self):

@@ -62,9 +62,13 @@
 
             <div class="center aligned extra content" style="">
                 {% if issue.state == 'SC' %}
-                    {% for i in '12345'|make_list %}
-                        <i class="{% if forloop.counter <= issue.mission.score %}yellow {% endif %}star icon"></i>
-                    {% endfor %}
+                    {% if issue.mission.score == None %}
+                        کاربر از امتیازدهی منصرف شده
+                    {% else %}
+                        {% for i in '12345'|make_list %}
+                            <i class="{% if forloop.counter <= issue.mission.score %}yellow {% endif %}star icon"></i>
+                        {% endfor %}
+                    {% endif %}
                 {% endif %}
 
                 {% if issue.state == 'AS' %}
