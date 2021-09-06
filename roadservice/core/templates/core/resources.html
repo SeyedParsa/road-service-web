@@ -43,7 +43,7 @@
 
                         {% for team in teams %}
                             <div class="title" style="color: rgba(0, 0, 0, 0.87)">
-                                <div class="ui  grid" id="{{ team.id }}">
+                                <div class="ui  grid" id="{{ team.id }}" style="white-space: nowrap">
                                     <div class="ui five wide column">
                                         <i class="ui angle left icon"></i>
                                         {#                                        آهنگر#}
@@ -57,9 +57,9 @@
                                     <div class="ui four wide column">
                                         {#                                        فارس، شیراز#}
 
-                                        {{ team.county.super_region }}
+                                        {{ team.county.super_region.name }}
                                         ،
-                                        {{ team.county }}
+                                        {{ team.county.name }}
 
                                     </div>
                                     {% if user.role.type == 'CM' %}

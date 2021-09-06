@@ -36,7 +36,7 @@
 
 
             </div>
-            <div class="ui deviding header" style="min-height: 20px; text-align: center"><h1>زیربخش‌های استان فارس</h1>
+            <div class="ui deviding header" style="min-height: 20px; text-align: center"><h1>زیربخش‌های {{ region.full_name }}</h1>
             </div>
             <div class="ui row" style="text-align: center"><h4>
                 ستون‌ها قابل مرتب‌سازی هستند!
@@ -59,8 +59,9 @@
                 {% for region in report.subregions_info %}
                     <tr>
                         {% for value in region %}
-                            <td>{% if forloop.counter == 5 %}%{% endif %}{{ value }}</td>
+                            <td>{% if value != None %}{% if forloop.counter == 5 %}%{% endif %}{{ value }}{% else %}-{% endif %}</td>
                         {% endfor %}
+
                         {#                    <td>شیراز</td>#}
                         {#                    <td>12</td>#}
                         {#                    <td>56</td>#}
