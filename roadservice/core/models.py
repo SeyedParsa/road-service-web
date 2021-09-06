@@ -189,7 +189,7 @@ class County(Region):
                 active_mission__isnull=True,
                 deleted_at__isnull=True,
                 members__isnull=False
-            )
+            ).distinct()
         )
         special_teams.sort(key=lambda t: t.farthest_member_distance(location))
         return special_teams[:amount]
