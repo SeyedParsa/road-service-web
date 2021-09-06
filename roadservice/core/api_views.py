@@ -36,19 +36,19 @@ class RegionsListView(APIView):
 
 class SpecialitiesView(APIView):
     def get(self, request):
-        specialities = Speciality.objects.all()
+        specialities = Speciality.objects.all().order_by('name')
         return Response(SpecialitySerializer(specialities, many=True).data)
 
 
 class MachineryTypesView(APIView):
     def get(self, request):
-        machinery_types = MachineryType.objects.all()
+        machinery_types = MachineryType.objects.all().order_by('name')
         return Response(MachineryTypeSerializer(machinery_types, many=True).data)
 
 
 class MissionTypesView(APIView):
     def get(self, request):
-        mission_types = MissionType.objects.all()
+        mission_types = MissionType.objects.all().order_by('name')
         return Response(MissionTypeSerializer(mission_types, many=True).data)
 
 

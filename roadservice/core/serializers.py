@@ -132,7 +132,7 @@ class NestedCountrySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'sub_regions']
 
     def get_sub_regions(self, obj):
-        return [NestedProvinceSerializer(region.province).data for region in obj.sub_regions.all()]
+        return [NestedProvinceSerializer(region.province).data for region in obj.sub_regions.all().order_by('name')]
 
 
 class IssueReportingSerializer(serializers.ModelSerializer):
